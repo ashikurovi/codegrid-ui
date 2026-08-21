@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Bodoni_Moda } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/landing/navber";
 import { Footer } from "@/components/landing/footer";
 
-const inter = Inter({
+const bodoniModa = Bodoni_Moda({
   variable: "--font-sans",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
 });
 
 export const metadata: Metadata = {
@@ -18,7 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${inter.variable} h-full antialiased`}
+      className={`${bodoniModa.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <Navbar />
