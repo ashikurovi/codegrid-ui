@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
-import { Bodoni_Moda } from "next/font/google";
+import { EB_Garamond } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/landing/navber";
 import { Footer } from "@/components/landing/footer";
 
-const bodoniModa = Bodoni_Moda({
+const ebGaramond = EB_Garamond({
   variable: "--font-sans",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
@@ -19,7 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${bodoniModa.variable} h-full antialiased`}
+      className={`${ebGaramond.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <Navbar />
