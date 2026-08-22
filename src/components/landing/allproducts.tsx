@@ -106,10 +106,10 @@ export function AllProducts() {
             <button
               key={category}
               onClick={() => setActiveCategory(category)}
-              className={`px-4 py-1.5 text-xs sm:text-sm font-semibold border transition-colors uppercase ${
+              className={`px-4 py-1.5 text-xs sm:text-sm font-semibold border transition-colors uppercase backdrop-blur-md rounded-none shadow-sm ${
                 activeCategory === category
-                  ? "bg-[#0A1128] text-white border-[#0A1128]"
-                  : "bg-white text-gray-600 border-gray-300 hover:border-gray-800 hover:text-gray-900"
+                  ? "bg-white/40 dark:bg-black/50 text-gray-900 dark:text-white border-white/50"
+                  : "bg-white/10 dark:bg-black/10 text-gray-600 dark:text-gray-300 border-white/20 hover:border-white/40 hover:bg-white/20 hover:text-gray-900"
               }`}
             >
               {category}
@@ -123,7 +123,7 @@ export function AllProducts() {
         {products.map((product) => (
           <Link key={product.id} href={`/main/product/motorsport-porsche`} className="group block">
             {/* Image Container */}
-            <div className="relative aspect-[4/5] bg-gray-100 overflow-hidden mb-4">
+            <div className="relative aspect-[4/5] bg-gray-100 overflow-hidden mb-4 rounded-none">
               {/* Primary Image */}
               <Image
                 src={product.image}

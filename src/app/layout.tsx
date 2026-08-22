@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
-import { EB_Garamond } from "next/font/google";
+import { GFS_Didot } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/landing/navber";
 import { Footer } from "@/components/landing/footer";
 
-const ebGaramond = EB_Garamond({
+const gfsDidot = GFS_Didot({
   variable: "--font-sans",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+  subsets: ["greek"], // Note: GFS Didot is primarily Greek, but supports latin too. Next.js might require latin subset or no subsets if not available.
+  weight: ["400"],
 });
 
 export const metadata: Metadata = {
@@ -19,9 +19,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${ebGaramond.variable} h-full antialiased`}
+      className={`${gfsDidot.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col bg-white dark:bg-black">
         <Navbar />
         <main className="flex-1 flex flex-col">
           {children}

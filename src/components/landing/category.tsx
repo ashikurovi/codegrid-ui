@@ -93,7 +93,7 @@ export function Category() {
           <Link
             key={category.id}
             href={category.link}
-            className="group relative aspect-square overflow-hidden rounded-none block shadow-sm hover:shadow-md transition-shadow"
+            className="group relative aspect-square overflow-hidden rounded-none block"
           >
             {/* Image */}
             <Image
@@ -109,7 +109,7 @@ export function Category() {
 
             {/* Title */}
             <div className="absolute inset-x-0 bottom-2 sm:bottom-4 flex justify-center">
-              <span className="bg-black/70 backdrop-blur-sm text-white text-[8px] sm:text-[10px] md:text-xs font-bold px-2 sm:px-3 py-1 sm:py-1.5 rounded-none uppercase tracking-widest text-center">
+              <span className="bg-white/30 dark:bg-black/40 backdrop-blur-md text-white border border-white/30 dark:border-white/10 text-[8px] sm:text-[10px] md:text-xs font-bold px-3 sm:px-4 py-1.5 sm:py-2 rounded-none uppercase tracking-widest text-center shadow-lg">
                 {category.title}
               </span>
             </div>

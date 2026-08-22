@@ -54,7 +54,7 @@ export function Navbar() {
             </div>
 
             {/* Main Navigation */}
-            <div className="w-full bg-white border-b border-gray-100 flex items-center justify-between px-4 sm:px-8 py-4 shadow-sm relative">
+            <div className="w-full bg-white/30 dark:bg-black/30 backdrop-blur-md border-b border-white/20 dark:border-white/10 flex items-center justify-between px-4 sm:px-8 py-4 shadow-sm relative">
                 <div className="flex-shrink-0">
                     <Link href="/" className="flex items-center gap-2">
                         <Image

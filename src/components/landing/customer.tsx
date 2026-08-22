@@ -58,7 +58,7 @@ export function Customer() {
         {/* Left Arrow */}
         <button
           onClick={scrollLeft}
-          className="absolute left-2 sm:-left-4 top-1/2 -translate-y-1/2 z-10 p-2 sm:p-3 bg-white/80 hover:bg-white bg-gradient-to-r from-[#00B4DB] to-[#0000FF] bg-clip-text text-transparent rounded-none shadow-md transition-all opacity-0 group-hover:opacity-100 hidden sm:flex items-center justify-center"
+          className="absolute left-2 sm:-left-4 top-1/2 -translate-y-1/2 z-10 p-2 sm:p-3 bg-white/30 hover:bg-white/50 backdrop-blur-md border border-white/40 text-gray-900 rounded-none shadow-lg transition-all opacity-0 group-hover:opacity-100 hidden sm:flex items-center justify-center"
         >
           <ChevronLeft className="w-6 h-6" />
         </button>
@@ -75,7 +75,7 @@ export function Customer() {
               className="min-w-[280px] sm:min-w-[300px] flex-shrink-0 snap-start flex flex-col items-center"
             >
               {/* Image */}
-              <div className="relative w-full aspect-[4/5] overflow-hidden mb-4 shadow-sm bg-gray-100">
+              <div className="relative w-full aspect-[4/5] overflow-hidden mb-4 bg-gray-100 rounded-none">
                 <Image
                   src={customer.image}
                   alt={customer.name}
@@ -95,7 +95,7 @@ export function Customer() {
         {/* Right Arrow */}
         <button
           onClick={scrollRight}
-          className="absolute right-2 sm:-right-4 top-1/2 -translate-y-1/2 z-10 p-2 sm:p-3 bg-white/80 hover:bg-white bg-gradient-to-r from-[#00B4DB] to-[#0000FF] bg-clip-text text-transparent rounded-none shadow-md transition-all opacity-0 group-hover:opacity-100 hidden sm:flex items-center justify-center"
+          className="absolute right-2 sm:-right-4 top-1/2 -translate-y-1/2 z-10 p-2 sm:p-3 bg-white/30 hover:bg-white/50 backdrop-blur-md border border-white/40 text-gray-900 rounded-none shadow-lg transition-all opacity-0 group-hover:opacity-100 hidden sm:flex items-center justify-center"
         >
           <ChevronRight className="w-6 h-6" />
         </button>
