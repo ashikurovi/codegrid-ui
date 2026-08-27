@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
-import { GFS_Didot } from "next/font/google";
+import { Manjari } from "next/font/google";
 import "./globals.css";
-import { Navbar } from "@/components/landing/navber";
-import { Footer } from "@/components/landing/footer";
 
-const gfsDidot = GFS_Didot({
+const manjari = Manjari({
   variable: "--font-sans",
-  subsets: ["greek"], // Note: GFS Didot is primarily Greek, but supports latin too. Next.js might require latin subset or no subsets if not available.
-  weight: ["400"],
+  subsets: ["latin"],
+  weight: ["100", "400", "700"],
 });
 
 export const metadata: Metadata = {
@@ -19,14 +17,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${gfsDidot.variable} h-full antialiased`}
+      className={`${manjari.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-white dark:bg-black">
-        <Navbar />
-        <main className="flex-1 flex flex-col">
-          {children}
-        </main>
-        <Footer />
+        {children}
       </body>
     </html>
   );
