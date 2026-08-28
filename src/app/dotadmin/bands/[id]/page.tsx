@@ -2,11 +2,70 @@
 
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { getBrandById, updateBrand } from "@/api/brandApi";
 
 export default function BandDetailsPage() {
   const params = useParams();
   const router = useRouter();
-  const brandId = params.id;
+  const brandId = params.id as string;
+
+  const [brand, setBrand] = useState<{name: string, description: string, image: File | null, existingPicture: string}>({
+    name: "",
+    description: "",
+    image: null,
+    existingPicture: ""
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    fetchBrandDetails();
+  }, [brandId]);
+
+  const fetchBrandDetails = async () => {
+    try {
+      setIsLoading(true);
+      const res = await getBrandById(brandId);
+      
+      if (res) {
+        const brandData = res.data || res;
+        setBrand({
+          name: brandData.name || "",
+          description: brandData.description || "",
+          image: null,
+          existingPicture: brandData.picture || ""
+        });
+      }
+    } catch (error) {
+      console.error("Failed to fetch brand details:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleUpdate = async () => {
+    try {
+      setIsSaving(true);
+      const formData = new FormData();
+      formData.append('name', brand.name);
+      formData.append('description', brand.description);
+      if (brand.image) {
+        formData.append('picture', brand.image);
+      }
+
+      await updateBrand(brandId, formData);
+      router.push("/dotadmin/bands");
+    } catch (error) {
+      console.error("Failed to update brand:", error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (isLoading) {
+    return <div className="p-8 text-center">Loading brand details...</div>;
+  }
 
   return (
     <div className="flex flex-col gap-8">
@@ -26,7 +85,8 @@ export default function BandDetailsPage() {
               <input 
                 type="text" 
                 id="name" 
-                defaultValue="Apple" 
+                value={brand.name}
+                onChange={(e) => setBrand({...brand, name: e.target.value})}
                 className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 dark:bg-gray-900 dark:border-gray-700" 
               />
             </div>
@@ -35,28 +95,37 @@ export default function BandDetailsPage() {
               <textarea 
                 id="description" 
                 rows={3}
-                defaultValue="Electronics and software" 
+                value={brand.description}
+                onChange={(e) => setBrand({...brand, description: e.target.value})}
                 className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 dark:bg-gray-900 dark:border-gray-700 resize-none" 
               />
             </div>
             <div className="flex flex-col gap-2">
-              <label htmlFor="status" className="text-sm font-medium">Status</label>
-              <select 
-                id="status" 
-                defaultValue="Active"
-                className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white dark:bg-gray-900 dark:border-gray-700"
-              >
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-              </select>
+              <label htmlFor="image" className="text-sm font-medium">Brand Logo / Image</label>
+              {brand.existingPicture && !brand.image && (
+                <div className="mb-2">
+                  <img src={`http://localhost:8000${brand.existingPicture}`} alt="Current brand picture" className="w-20 h-20 object-cover border rounded" />
+                </div>
+              )}
+              <input 
+                type="file" 
+                id="image" 
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0] || null;
+                  setBrand({ ...brand, image: file });
+                }}
+                className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 dark:bg-gray-900 dark:border-gray-700" 
+              />
             </div>
             <div className="mt-4 flex gap-2">
               <button 
                 type="button"
-                onClick={() => router.push("/dotadmin/bands")}
-                className="bg-gray-900 text-white px-6 py-2 text-sm font-medium hover:bg-gray-800 transition-colors dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
+                onClick={handleUpdate}
+                disabled={isSaving || !brand.name}
+                className="bg-gray-900 text-white px-6 py-2 text-sm font-medium hover:bg-gray-800 transition-colors dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200 disabled:opacity-70"
               >
-                Save Changes
+                {isSaving ? "Saving..." : "Save Changes"}
               </button>
             </div>
           </form>
@@ -65,18 +134,7 @@ export default function BandDetailsPage() {
         <div className="border bg-white p-6 shadow-sm dark:bg-gray-950 dark:border-gray-800 flex flex-col gap-6">
           <h2 className="text-xl font-semibold">Related Products</h2>
           <div className="flex flex-col gap-4">
-            <div className="border-b pb-4 dark:border-gray-800">
-              <p className="text-sm font-medium">iPhone 14 Pro</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Stock: 45 | Price: $999</p>
-            </div>
-            <div className="border-b pb-4 dark:border-gray-800">
-              <p className="text-sm font-medium">MacBook Pro 16"</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Stock: 12 | Price: $2499</p>
-            </div>
-            <div className="border-b pb-4 dark:border-gray-800">
-              <p className="text-sm font-medium">AirPods Pro (2nd Gen)</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Stock: 150 | Price: $249</p>
-            </div>
+             <p className="text-sm text-gray-500">Products API not yet connected.</p>
           </div>
         </div>
       </div>

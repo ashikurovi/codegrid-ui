@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import {
   Table,
@@ -13,40 +13,98 @@ import {
 import { TableControls } from "@/components/admin/table-controls";
 import { TablePagination } from "@/components/admin/table-pagination";
 import { Eye, Edit, Trash2 } from "lucide-react";
+import { getAllSubCategories, createSubCategory, deleteSubCategory } from "@/api/sub-categoryApi";
+import { getAllCategories } from "@/api/categoryApi";
+import Select from "react-select";
 
 export default function SubCategoryManagementPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  const subCategories = [
-    { id: 1, name: "Smartphones", parent: "Electronics", description: "Mobile phones", status: "Active" },
-    { id: 2, name: "Laptops", parent: "Electronics", description: "Portable computers", status: "Active" },
-    { id: 3, name: "Men's Wear", parent: "Clothing", description: "Apparel for men", status: "Active" },
-    { id: 4, name: "Women's Wear", parent: "Clothing", description: "Apparel for women", status: "Active" },
-    { id: 5, name: "Kitchen Tools", parent: "Home & Garden", description: "Utensils and appliances", status: "Inactive" },
-    { id: 6, name: "Fitness", parent: "Sports", description: "Workout equipment", status: "Active" },
-    { id: 7, name: "Board Games", parent: "Toys", description: "Tabletop games", status: "Inactive" },
-  ];
+  const [subCategories, setSubCategories] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  
+  const [newSubCategory, setNewSubCategory] = useState({ name: "", description: "", parentCategoryId: "" });
 
-  const statusOptions = [
-    { label: "All Status", value: "All" },
-    { label: "Active", value: "Active" },
-    { label: "Inactive", value: "Inactive" },
-  ];
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      setIsLoading(true);
+      const [subCatRes, catRes] = await Promise.all([
+        getAllSubCategories(),
+        getAllCategories()
+      ]);
+      
+      if (subCatRes && Array.isArray(subCatRes.data)) {
+        setSubCategories(subCatRes.data);
+      } else if (Array.isArray(subCatRes)) {
+        setSubCategories(subCatRes);
+      } else {
+        setSubCategories([]);
+      }
+
+      if (catRes && Array.isArray(catRes.data)) {
+        setCategories(catRes.data);
+      } else if (Array.isArray(catRes)) {
+        setCategories(catRes);
+      } else {
+        setCategories([]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch data:", error);
+      setSubCategories([]);
+      setCategories([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCreateSubCategory = async () => {
+    try {
+      setIsSaving(true);
+      await createSubCategory({
+        name: newSubCategory.name,
+        description: newSubCategory.description,
+        parentCategoryId: Number(newSubCategory.parentCategoryId)
+      });
+      setIsModalOpen(false);
+      setNewSubCategory({ name: "", description: "", parentCategoryId: "" });
+      fetchData();
+    } catch (error) {
+      console.error("Failed to create sub-category:", error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDeleteSubCategory = async (id: number | string) => {
+    if (confirm("Are you sure you want to delete this sub-category?")) {
+      try {
+        await deleteSubCategory(id);
+        fetchData();
+      } catch (error) {
+        console.error("Failed to delete sub-category:", error);
+      }
+    }
+  };
 
   // Filter and Search logic
   const filteredSubCategories = useMemo(() => {
     return subCategories.filter((sub) => {
+      const parentName = sub.parentCategory?.name || "";
       const matchesSearch = sub.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                            sub.parent.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            sub.description.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesStatus = statusFilter === "All" || sub.status === statusFilter;
-      return matchesSearch && matchesStatus;
+                            parentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            (sub.description || "").toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesSearch;
     });
-  }, [subCategories, searchQuery, statusFilter]);
+  }, [subCategories, searchQuery]);
 
   // Pagination logic
   const totalPages = Math.ceil(filteredSubCategories.length / itemsPerPage);
@@ -83,40 +141,41 @@ export default function SubCategoryManagementPage() {
                 <input 
                   type="text" 
                   id="name" 
+                  value={newSubCategory.name}
+                  onChange={(e) => setNewSubCategory({...newSubCategory, name: e.target.value})}
                   placeholder="e.g. Smartphones" 
                   className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 dark:bg-gray-900 dark:border-gray-700" 
                 />
               </div>
               <div className="flex flex-col gap-2">
                 <label htmlFor="parent" className="text-sm font-medium">Parent Category</label>
-                <select 
+                <Select 
                   id="parent" 
-                  className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white dark:bg-gray-900 dark:border-gray-700"
-                >
-                  <option value="Electronics">Electronics</option>
-                  <option value="Clothing">Clothing</option>
-                  <option value="Home & Garden">Home & Garden</option>
-                  <option value="Sports">Sports</option>
-                </select>
+                  options={categories.map(cat => ({ value: String(cat.id), label: cat.name }))}
+                  value={
+                    newSubCategory.parentCategoryId 
+                      ? { 
+                          value: newSubCategory.parentCategoryId, 
+                          label: categories.find(c => String(c.id) === newSubCategory.parentCategoryId)?.name || "" 
+                        } 
+                      : null
+                  }
+                  onChange={(selectedOption: any) => setNewSubCategory({...newSubCategory, parentCategoryId: selectedOption ? selectedOption.value : ""})}
+                  placeholder="Select a parent category"
+                  isClearable
+                  className="text-sm text-gray-900"
+                />
               </div>
               <div className="flex flex-col gap-2">
                 <label htmlFor="description" className="text-sm font-medium">Description</label>
                 <textarea 
                   id="description" 
                   rows={3}
+                  value={newSubCategory.description}
+                  onChange={(e) => setNewSubCategory({...newSubCategory, description: e.target.value})}
                   placeholder="Sub-Category description..." 
                   className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 dark:bg-gray-900 dark:border-gray-700 resize-none" 
                 />
-              </div>
-              <div className="flex flex-col gap-2">
-                <label htmlFor="status" className="text-sm font-medium">Status</label>
-                <select 
-                  id="status" 
-                  className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white dark:bg-gray-900 dark:border-gray-700"
-                >
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
-                </select>
               </div>
               <div className="mt-4 flex justify-end gap-2">
                 <button 
@@ -128,10 +187,11 @@ export default function SubCategoryManagementPage() {
                 </button>
                 <button 
                   type="button" 
-                  onClick={() => setIsModalOpen(false)}
-                  className="bg-gray-900 text-white px-6 py-2 text-sm font-medium hover:bg-gray-800 transition-colors dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
+                  onClick={handleCreateSubCategory}
+                  disabled={isSaving || !newSubCategory.name || !newSubCategory.parentCategoryId}
+                  className="bg-gray-900 text-white px-6 py-2 text-sm font-medium hover:bg-gray-800 transition-colors dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200 disabled:opacity-70 flex items-center justify-center gap-2"
                 >
-                  Save Sub-Category
+                  {isSaving ? "Saving..." : "Save Sub-Category"}
                 </button>
               </div>
             </form>
@@ -143,42 +203,42 @@ export default function SubCategoryManagementPage() {
         <TableControls 
           searchQuery={searchQuery}
           setSearchQuery={(val) => { setSearchQuery(val); setCurrentPage(1); }}
-          statusFilter={statusFilter}
-          setStatusFilter={(val) => { setStatusFilter(val); setCurrentPage(1); }}
-          statusOptions={statusOptions}
+          statusFilter="All"
+          setStatusFilter={() => {}}
+          statusOptions={[{label: "All Status", value: "All"}]}
           searchPlaceholder="Search sub-categories..."
         />
         <div className="border bg-white shadow-sm dark:bg-gray-950 dark:border-gray-800">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[100px]">ID</TableHead>
+                <TableHead className="w-[100px]">SL</TableHead>
                 <TableHead>Sub-Category Name</TableHead>
                 <TableHead>Parent Category</TableHead>
                 <TableHead>Description</TableHead>
-                <TableHead>Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paginatedSubCategories.length === 0 ? (
+              {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-6 text-gray-500">
+                  <TableCell colSpan={5} className="text-center py-6 text-gray-500">
+                    Loading sub-categories...
+                  </TableCell>
+                </TableRow>
+              ) : paginatedSubCategories.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-6 text-gray-500">
                     No sub-categories found.
                   </TableCell>
                 </TableRow>
               ) : (
-                paginatedSubCategories.map((sub) => (
+                paginatedSubCategories.map((sub, index) => (
                   <TableRow key={sub.id}>
-                    <TableCell className="font-medium">SUBCAT-{sub.id}</TableCell>
+                    <TableCell className="font-medium">{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
                     <TableCell>{sub.name}</TableCell>
-                    <TableCell>{sub.parent}</TableCell>
+                    <TableCell>{sub.parentCategory?.name || "-"}</TableCell>
                     <TableCell>{sub.description}</TableCell>
-                    <TableCell>
-                      <span className={`px-2 py-1 text-xs font-medium ${sub.status === "Active" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"}`}>
-                        {sub.status}
-                      </span>
-                    </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
                         <Link 
@@ -197,6 +257,7 @@ export default function SubCategoryManagementPage() {
                         </Link>
                         <button 
                           type="button"
+                          onClick={() => handleDeleteSubCategory(sub.id)}
                           className="p-1 text-gray-500 hover:text-red-600 transition-colors"
                           title="Delete"
                         >

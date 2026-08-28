@@ -6,17 +6,17 @@ import { useRouter } from "next/navigation";
 import { Upload, Plus, X } from "lucide-react";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 
-export default function AddProductPage() {
+export default function AddBudgetPickPage() {
   const router = useRouter();
   const [galleryImages, setGalleryImages] = useState([1]);
 
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center gap-4">
-        <Link href="/dotadmin/products" className="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50 flex items-center justify-center p-2 border bg-white shadow-sm dark:bg-gray-950 dark:border-gray-800 transition-colors">
+        <Link href="/dotadmin/budget-pick" className="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50 flex items-center justify-center p-2 border bg-white shadow-sm dark:bg-gray-950 dark:border-gray-800 transition-colors">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg>
         </Link>
-        <h1 className="text-3xl font-bold tracking-tight">Add New Product</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Add Budget Pick Package</h1>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-8 items-start">
@@ -34,7 +34,7 @@ export default function AddProductPage() {
                   <input 
                     type="text" 
                     id="name" 
-                    placeholder="e.g. Motorsport Racing T-Shirt: Porsche" 
+                    placeholder="e.g. Budget Package: 3 Tees" 
                     className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 dark:bg-gray-900 dark:border-gray-700 rounded-sm" 
                   />
                 </div>
@@ -43,7 +43,7 @@ export default function AddProductPage() {
                   <input 
                     type="text" 
                     id="variantLabel" 
-                    placeholder="e.g. Half/Drop Available" 
+                    placeholder="e.g. Budget Pick" 
                     className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 dark:bg-gray-900 dark:border-gray-700 rounded-sm" 
                   />
                 </div>
@@ -138,14 +138,14 @@ export default function AddProductPage() {
             <div className="mt-4 flex gap-4">
               <button 
                 type="button"
-                onClick={() => router.push("/dotadmin/products")}
+                onClick={() => router.push("/dotadmin/budget-pick")}
                 className="bg-gray-900 text-white px-8 py-3 text-sm font-medium hover:bg-gray-800 transition-colors dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200 rounded-sm"
               >
-                Publish Product
+                Publish Package
               </button>
               <button 
                 type="button"
-                onClick={() => router.push("/dotadmin/products")}
+                onClick={() => router.push("/dotadmin/budget-pick")}
                 className="border border-gray-300 bg-white px-8 py-3 text-sm font-medium hover:bg-gray-50 transition-colors dark:bg-gray-900 dark:border-gray-700 dark:hover:bg-gray-800 rounded-sm"
               >
                 Cancel

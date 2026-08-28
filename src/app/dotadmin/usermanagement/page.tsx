@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import {
   Table,
@@ -12,25 +12,99 @@ import {
 } from "@/components/ui/table"
 import { TableControls } from "@/components/admin/table-controls";
 import { TablePagination } from "@/components/admin/table-pagination";
-import { Eye, Edit, Trash2 } from "lucide-react";
+import { Eye, Edit, Trash2, User as UserIcon, Ban, CheckCircle } from "lucide-react";
+import { getAllUsers, createUser, deleteUser, banUser } from "@/api/userApi";
+import { BASE_URL } from "@/api/baseApi";
+import { GlobalLoader } from "@/components/ui/global-loader";
+import { SimpleSelect } from "@/components/ui/simple-select";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 
 export default function UserManagementPage() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<number | null>(null);
+  const [userToToggleBan, setUserToToggleBan] = useState<{id: number, isBanned: boolean} | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
+  const [users, setUsers] = useState<any[]>([]);
   const itemsPerPage = 5;
 
-  // Dummy data (expanded to show pagination)
-  const users = [
-    { id: 1, name: "Alice Johnson", email: "alice@example.com", role: "Admin", status: "Active" },
-    { id: 2, name: "Bob Smith", email: "bob@example.com", role: "Editor", status: "Inactive" },
-    { id: 3, name: "Charlie Brown", email: "charlie@example.com", role: "Viewer", status: "Active" },
-    { id: 4, name: "Diana Prince", email: "diana@example.com", role: "Admin", status: "Active" },
-    { id: 5, name: "Evan Wright", email: "evan@example.com", role: "Editor", status: "Active" },
-    { id: 6, name: "Fiona Gallagher", email: "fiona@example.com", role: "Viewer", status: "Inactive" },
-    { id: 7, name: "George Martin", email: "george@example.com", role: "Viewer", status: "Active" },
-  ];
+  // New user form state
+  const [newName, setNewName] = useState("");
+  const [newEmail, setNewEmail] = useState("");
+  const [newRole, setNewRole] = useState("customer");
+  const [newPassword, setNewPassword] = useState("");
+
+  const fetchUsers = async () => {
+    setIsLoading(true);
+    try {
+      const res = await getAllUsers();
+      if (res.data) {
+        setUsers(res.data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch users", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      await createUser({
+        name: newName,
+        email: newEmail,
+        password: newPassword,
+        role: newRole,
+      });
+      setIsModalOpen(false);
+      setNewName("");
+      setNewEmail("");
+      setNewPassword("");
+      setNewRole("customer");
+      await fetchUsers();
+    } catch (err) {
+      console.error("Failed to create user", err);
+      setIsLoading(false);
+    }
+  };
+
+  const confirmDelete = async () => {
+    if (userToDelete !== null) {
+      setIsLoading(true);
+      try {
+        await deleteUser(userToDelete);
+        await fetchUsers();
+      } catch (err) {
+        console.error("Failed to delete user", err);
+        setIsLoading(false);
+      } finally {
+        setUserToDelete(null);
+      }
+    }
+  };
+
+  const confirmToggleBan = async () => {
+    if (userToToggleBan) {
+      setIsLoading(true);
+      try {
+        await banUser(userToToggleBan.id, !userToToggleBan.isBanned);
+        await fetchUsers();
+      } catch (err) {
+        console.error("Failed to toggle ban status", err);
+      } finally {
+        setIsLoading(false);
+        setUserToToggleBan(null);
+      }
+    }
+  };
 
   const statusOptions = [
     { label: "All Status", value: "All" },
@@ -43,7 +117,8 @@ export default function UserManagementPage() {
     return users.filter((user) => {
       const matchesSearch = user.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                             user.email.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesStatus = statusFilter === "All" || user.status === statusFilter;
+      const userStatus = user.isBanned ? "Inactive" : "Active";
+      const matchesStatus = statusFilter === "All" || userStatus === statusFilter;
       return matchesSearch && matchesStatus;
     });
   }, [users, searchQuery, statusFilter]);
@@ -56,8 +131,10 @@ export default function UserManagementPage() {
   );
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex items-center justify-between">
+    <>
+      {isLoading && <GlobalLoader />}
+      <div className="flex flex-col gap-8">
+        <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">User Management</h1>
         <button 
           onClick={() => setIsModalOpen(true)}
@@ -77,13 +154,16 @@ export default function UserManagementPage() {
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
             <h2 className="text-xl font-semibold mb-6">Add New User</h2>
-            <form className="flex flex-col gap-4">
+            <form onSubmit={handleCreateUser} className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
                 <label htmlFor="name" className="text-sm font-medium">Full Name</label>
                 <input 
                   type="text" 
                   id="name" 
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
                   placeholder="John Doe" 
+                  required
                   className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 dark:bg-gray-900 dark:border-gray-700" 
                 />
               </div>
@@ -92,20 +172,37 @@ export default function UserManagementPage() {
                 <input 
                   type="email" 
                   id="email" 
+                  value={newEmail}
+                  onChange={(e) => setNewEmail(e.target.value)}
                   placeholder="john@example.com" 
+                  required
+                  className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 dark:bg-gray-900 dark:border-gray-700" 
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label htmlFor="password" className="text-sm font-medium">Password</label>
+                <input 
+                  type="password" 
+                  id="password" 
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Secret password" 
+                  required
                   className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 dark:bg-gray-900 dark:border-gray-700" 
                 />
               </div>
               <div className="flex flex-col gap-2">
                 <label htmlFor="role" className="text-sm font-medium">Role</label>
-                <select 
+                <SimpleSelect 
                   id="role" 
-                  className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white dark:bg-gray-900 dark:border-gray-700"
-                >
-                  <option value="Admin">Admin</option>
-                  <option value="Editor">Editor</option>
-                  <option value="Viewer">Viewer</option>
-                </select>
+                  value={newRole}
+                  onChange={(e) => setNewRole(e.target.value)}
+                  options={[
+                    { label: "Customer", value: "customer" },
+                    { label: "Admin", value: "admin" },
+                    { label: "Manager", value: "manager" }
+                  ]}
+                />
               </div>
               <div className="mt-4 flex justify-end gap-2">
                 <button 
@@ -116,8 +213,7 @@ export default function UserManagementPage() {
                   Cancel
                 </button>
                 <button 
-                  type="button" 
-                  onClick={() => setIsModalOpen(false)}
+                  type="submit" 
                   className="bg-gray-900 text-white px-6 py-2 text-sm font-medium hover:bg-gray-800 transition-colors dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
                 >
                   Save User
@@ -137,11 +233,12 @@ export default function UserManagementPage() {
           statusOptions={statusOptions}
           searchPlaceholder="Search users..."
         />
-        <div className="border bg-white shadow-sm dark:bg-gray-950 dark:border-gray-800">
+        <div className="border bg-white shadow-sm dark:bg-gray-950 dark:border-gray-800 overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[100px]">ID</TableHead>
+                <TableHead className="w-[100px]">SL</TableHead>
+                <TableHead>Picture</TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Role</TableHead>
@@ -152,49 +249,70 @@ export default function UserManagementPage() {
             <TableBody>
               {paginatedUsers.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-6 text-gray-500">
+                  <TableCell colSpan={7} className="text-center py-6 text-gray-500">
                     No users found.
                   </TableCell>
                 </TableRow>
               ) : (
-                paginatedUsers.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell className="font-medium">USR-{user.id}</TableCell>
-                    <TableCell>{user.name}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>{user.role}</TableCell>
-                    <TableCell>
-                      <span className={`px-2 py-1 text-xs font-medium ${user.status === "Active" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"}`}>
-                        {user.status}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Link 
-                          href={`/dotadmin/usermanagement/${user.id}`}
-                          className="p-1 text-gray-500 hover:text-blue-600 transition-colors"
-                          title="View Details"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Link>
-                        <Link 
-                          href={`/dotadmin/usermanagement/${user.id}`}
-                          className="p-1 text-gray-500 hover:text-green-600 transition-colors"
-                          title="Edit"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Link>
-                        <button 
-                          type="button"
-                          className="p-1 text-gray-500 hover:text-red-600 transition-colors"
-                          title="Delete"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
+                paginatedUsers.map((user, index) => {
+                  const isActive = !user.isBanned;
+                  return (
+                    <TableRow key={user.id}>
+                      <TableCell className="font-medium">{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
+                      <TableCell>
+                        {user.picture ? (
+                          <img src={`${BASE_URL}${user.picture}`} alt={user.name} className="w-10 h-10 rounded-full object-cover border" />
+                        ) : (
+                          <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center text-gray-500 border">
+                            <UserIcon className="w-5 h-5" />
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell>{user.name}</TableCell>
+                      <TableCell>{user.email}</TableCell>
+                      <TableCell className="capitalize">{user.role}</TableCell>
+                      <TableCell>
+                        <span className={`px-2 py-1 text-xs font-medium ${isActive ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"}`}>
+                          {isActive ? "Active" : "Inactive"}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Link 
+                            href={`/dotadmin/usermanagement/${user.id}`}
+                            className="p-1 text-gray-500 hover:text-blue-600 transition-colors"
+                            title="View Details"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Link>
+                          <Link 
+                            href={`/dotadmin/usermanagement/${user.id}`}
+                            className="p-1 text-gray-500 hover:text-green-600 transition-colors"
+                            title="Edit"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Link>
+                          <button 
+                            type="button"
+                            onClick={() => setUserToToggleBan({ id: user.id, isBanned: user.isBanned })}
+                            className={`p-1 transition-colors ${isActive ? "text-gray-500 hover:text-orange-500" : "text-gray-500 hover:text-green-500"}`}
+                            title={isActive ? "Ban User" : "Unban User"}
+                          >
+                            {isActive ? <Ban className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}
+                          </button>
+                          <button 
+                            type="button"
+                            onClick={() => setUserToDelete(user.id)}
+                            className="p-1 text-gray-500 hover:text-red-600 transition-colors"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })
               )}
             </TableBody>
           </Table>
@@ -206,5 +324,26 @@ export default function UserManagementPage() {
         />
       </div>
     </div>
+    
+    <ConfirmModal 
+      isOpen={userToDelete !== null}
+      title="Delete User"
+      message="Are you sure you want to delete this user? This action cannot be undone."
+      confirmText="Delete"
+      onConfirm={confirmDelete}
+      onCancel={() => setUserToDelete(null)}
+    />
+
+    <ConfirmModal 
+      isOpen={userToToggleBan !== null}
+      title={userToToggleBan?.isBanned ? "Unban User" : "Ban User"}
+      message={userToToggleBan?.isBanned 
+        ? "Are you sure you want to unban this user? They will regain access to the platform." 
+        : "Are you sure you want to ban this user? They will lose access to the platform."}
+      confirmText={userToToggleBan?.isBanned ? "Unban" : "Ban"}
+      onConfirm={confirmToggleBan}
+      onCancel={() => setUserToToggleBan(null)}
+    />
+    </>
   );
 }

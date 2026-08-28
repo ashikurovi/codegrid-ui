@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import {
   Table,
@@ -13,39 +13,84 @@ import {
 import { TableControls } from "@/components/admin/table-controls";
 import { TablePagination } from "@/components/admin/table-pagination";
 import { Eye, Edit, Trash2 } from "lucide-react";
+import { getAllBrands, createBrand, deleteBrand } from "@/api/brandApi";
 
-export default function BandsManagementPage() {
+export default function BrandsManagementPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  const brands = [
-    { id: 1, name: "Apple", description: "Electronics and software", status: "Active" },
-    { id: 2, name: "Samsung", description: "Consumer electronics", status: "Active" },
-    { id: 3, name: "Sony", description: "Electronics and entertainment", status: "Active" },
-    { id: 4, name: "Nike", description: "Athletic apparel and footwear", status: "Active" },
-    { id: 5, name: "Adidas", description: "Sports clothing and shoes", status: "Inactive" },
-    { id: 6, name: "LG", description: "Home appliances and electronics", status: "Active" },
-    { id: 7, name: "Puma", description: "Sportswear", status: "Inactive" },
-  ];
+  const [brands, setBrands] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  
+  const [newBrand, setNewBrand] = useState<{ name: string; description: string; image: File | null }>({ name: "", description: "", image: null });
 
-  const statusOptions = [
-    { label: "All Status", value: "All" },
-    { label: "Active", value: "Active" },
-    { label: "Inactive", value: "Inactive" },
-  ];
+  useEffect(() => {
+    fetchBrands();
+  }, []);
+
+  const fetchBrands = async () => {
+    try {
+      setIsLoading(true);
+      const response = await getAllBrands();
+      
+      if (response && Array.isArray(response.data)) {
+        setBrands(response.data);
+      } else if (Array.isArray(response)) {
+        setBrands(response);
+      } else {
+        setBrands([]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch brands:", error);
+      setBrands([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCreateBrand = async () => {
+    try {
+      setIsSaving(true);
+      const formData = new FormData();
+      formData.append('name', newBrand.name);
+      formData.append('description', newBrand.description);
+      if (newBrand.image) {
+        formData.append('picture', newBrand.image);
+      }
+
+      await createBrand(formData);
+      setIsModalOpen(false);
+      setNewBrand({ name: "", description: "", image: null });
+      fetchBrands();
+    } catch (error) {
+      console.error("Failed to create brand:", error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDeleteBrand = async (id: number | string) => {
+    if (confirm("Are you sure you want to delete this brand?")) {
+      try {
+        await deleteBrand(id);
+        fetchBrands();
+      } catch (error) {
+        console.error("Failed to delete brand:", error);
+      }
+    }
+  };
 
   // Filter and Search logic
   const filteredBrands = useMemo(() => {
     return brands.filter((brand) => {
       const matchesSearch = brand.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                            brand.description.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesStatus = statusFilter === "All" || brand.status === statusFilter;
-      return matchesSearch && matchesStatus;
+                            (brand.description || "").toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesSearch;
     });
-  }, [brands, searchQuery, statusFilter]);
+  }, [brands, searchQuery]);
 
   // Pagination logic
   const totalPages = Math.ceil(filteredBrands.length / itemsPerPage);
@@ -82,6 +127,8 @@ export default function BandsManagementPage() {
                 <input 
                   type="text" 
                   id="name" 
+                  value={newBrand.name}
+                  onChange={(e) => setNewBrand({...newBrand, name: e.target.value})}
                   placeholder="e.g. Apple" 
                   className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 dark:bg-gray-900 dark:border-gray-700" 
                 />
@@ -91,19 +138,24 @@ export default function BandsManagementPage() {
                 <textarea 
                   id="description" 
                   rows={3}
+                  value={newBrand.description}
+                  onChange={(e) => setNewBrand({...newBrand, description: e.target.value})}
                   placeholder="Brand description..." 
                   className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 dark:bg-gray-900 dark:border-gray-700 resize-none" 
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label htmlFor="status" className="text-sm font-medium">Status</label>
-                <select 
-                  id="status" 
-                  className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white dark:bg-gray-900 dark:border-gray-700"
-                >
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
-                </select>
+                <label htmlFor="image" className="text-sm font-medium">Brand Logo / Image</label>
+                <input 
+                  type="file" 
+                  id="image" 
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] || null;
+                    setNewBrand({ ...newBrand, image: file });
+                  }}
+                  className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 dark:bg-gray-900 dark:border-gray-700" 
+                />
               </div>
               <div className="mt-4 flex justify-end gap-2">
                 <button 
@@ -115,10 +167,11 @@ export default function BandsManagementPage() {
                 </button>
                 <button 
                   type="button" 
-                  onClick={() => setIsModalOpen(false)}
-                  className="bg-gray-900 text-white px-6 py-2 text-sm font-medium hover:bg-gray-800 transition-colors dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
+                  onClick={handleCreateBrand}
+                  disabled={isSaving || !newBrand.name}
+                  className="bg-gray-900 text-white px-6 py-2 text-sm font-medium hover:bg-gray-800 transition-colors dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200 disabled:opacity-70 flex items-center justify-center gap-2"
                 >
-                  Save Brand
+                  {isSaving ? "Saving..." : "Save Brand"}
                 </button>
               </div>
             </form>
@@ -130,40 +183,47 @@ export default function BandsManagementPage() {
         <TableControls 
           searchQuery={searchQuery}
           setSearchQuery={(val) => { setSearchQuery(val); setCurrentPage(1); }}
-          statusFilter={statusFilter}
-          setStatusFilter={(val) => { setStatusFilter(val); setCurrentPage(1); }}
-          statusOptions={statusOptions}
+          statusFilter="All"
+          setStatusFilter={() => {}}
+          statusOptions={[{label: "All Status", value: "All"}]}
           searchPlaceholder="Search brands..."
         />
         <div className="border bg-white shadow-sm dark:bg-gray-950 dark:border-gray-800">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[100px]">ID</TableHead>
+                <TableHead className="w-[100px]">SL</TableHead>
                 <TableHead>Brand Name</TableHead>
                 <TableHead>Description</TableHead>
-                <TableHead>Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paginatedBrands.length === 0 ? (
+              {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-6 text-gray-500">
+                  <TableCell colSpan={4} className="text-center py-6 text-gray-500">
+                    Loading brands...
+                  </TableCell>
+                </TableRow>
+              ) : paginatedBrands.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center py-6 text-gray-500">
                     No brands found.
                   </TableCell>
                 </TableRow>
               ) : (
-                paginatedBrands.map((brand) => (
+                paginatedBrands.map((brand, index) => (
                   <TableRow key={brand.id}>
-                    <TableCell className="font-medium">BRND-{brand.id}</TableCell>
-                    <TableCell>{brand.name}</TableCell>
-                    <TableCell>{brand.description}</TableCell>
+                    <TableCell className="font-medium">{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
                     <TableCell>
-                      <span className={`px-2 py-1 text-xs font-medium ${brand.status === "Active" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"}`}>
-                        {brand.status}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        {brand.picture && (
+                          <img src={`http://localhost:8000${brand.picture}`} alt={brand.name} className="w-8 h-8 rounded object-cover border" />
+                        )}
+                        {brand.name}
+                      </div>
                     </TableCell>
+                    <TableCell>{brand.description}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
                         <Link 
@@ -182,6 +242,7 @@ export default function BandsManagementPage() {
                         </Link>
                         <button 
                           type="button"
+                          onClick={() => handleDeleteBrand(brand.id)}
                           className="p-1 text-gray-500 hover:text-red-600 transition-colors"
                           title="Delete"
                         >

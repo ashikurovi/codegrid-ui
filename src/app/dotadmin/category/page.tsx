@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
+import { getAllCategories, createCategory, deleteCategory } from "@/api/categoryApi";
 import {
   Table,
   TableHeader,
@@ -21,15 +22,67 @@ export default function CategoryManagementPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  const categories = [
-    { id: 1, name: "Electronics", description: "Gadgets and devices", status: "Active" },
-    { id: 2, name: "Clothing", description: "Apparel and accessories", status: "Active" },
-    { id: 3, name: "Home & Garden", description: "Furniture and tools", status: "Inactive" },
-    { id: 4, name: "Sports", description: "Sporting goods", status: "Active" },
-    { id: 5, name: "Automotive", description: "Car parts and accessories", status: "Active" },
-    { id: 6, name: "Toys", description: "Kids toys and games", status: "Inactive" },
-    { id: 7, name: "Books", description: "Novels, textbooks, and magazines", status: "Active" },
-  ];
+  const [categories, setCategories] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [newCategory, setNewCategory] = useState<{ name: string; description: string; status: string; image: File | null }>({ name: "", description: "", status: "Active", image: null });
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      setIsLoading(true);
+      const response = await getAllCategories();
+      // Ensure data is an array before setting
+      if (response && Array.isArray(response.data)) {
+        setCategories(response.data);
+      } else if (Array.isArray(response)) {
+        setCategories(response);
+      } else {
+        setCategories([]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch categories:", error);
+      setCategories([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCreateCategory = async () => {
+    try {
+      setIsSaving(true);
+      const formData = new FormData();
+      formData.append('name', newCategory.name);
+      formData.append('description', newCategory.description);
+      formData.append('status', newCategory.status);
+      if (newCategory.image) {
+        formData.append('picture', newCategory.image);
+      }
+
+      await createCategory(formData);
+      setIsModalOpen(false);
+      setNewCategory({ name: "", description: "", status: "Active", image: null });
+      fetchCategories();
+    } catch (error) {
+      console.error("Failed to create category:", error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDeleteCategory = async (id: number | string) => {
+    if (confirm("Are you sure you want to delete this category?")) {
+      try {
+        await deleteCategory(id);
+        fetchCategories();
+      } catch (error) {
+        console.error("Failed to delete category:", error);
+      }
+    }
+  };
 
   const statusOptions = [
     { label: "All Status", value: "All" },
@@ -42,7 +95,7 @@ export default function CategoryManagementPage() {
     return categories.filter((category) => {
       const matchesSearch = category.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                             category.description.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesStatus = statusFilter === "All" || category.status === statusFilter;
+      const matchesStatus = statusFilter === "All" || (category.status || "Active") === statusFilter;
       return matchesSearch && matchesStatus;
     });
   }, [categories, searchQuery, statusFilter]);
@@ -82,6 +135,8 @@ export default function CategoryManagementPage() {
                 <input 
                   type="text" 
                   id="name" 
+                  value={newCategory.name}
+                  onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
                   placeholder="e.g. Electronics" 
                   className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 dark:bg-gray-900 dark:border-gray-700" 
                 />
@@ -91,6 +146,8 @@ export default function CategoryManagementPage() {
                 <textarea 
                   id="description" 
                   rows={3}
+                  value={newCategory.description}
+                  onChange={(e) => setNewCategory({ ...newCategory, description: e.target.value })}
                   placeholder="Category description..." 
                   className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 dark:bg-gray-900 dark:border-gray-700 resize-none" 
                 />
@@ -99,11 +156,26 @@ export default function CategoryManagementPage() {
                 <label htmlFor="status" className="text-sm font-medium">Status</label>
                 <select 
                   id="status" 
+                  value={newCategory.status}
+                  onChange={(e) => setNewCategory({ ...newCategory, status: e.target.value })}
                   className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white dark:bg-gray-900 dark:border-gray-700"
                 >
                   <option value="Active">Active</option>
                   <option value="Inactive">Inactive</option>
                 </select>
+              </div>
+              <div className="flex flex-col gap-2">
+                <label htmlFor="image" className="text-sm font-medium">Category Image</label>
+                <input 
+                  type="file" 
+                  id="image" 
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] || null;
+                    setNewCategory({ ...newCategory, image: file });
+                  }}
+                  className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 dark:bg-gray-900 dark:border-gray-700" 
+                />
               </div>
               <div className="mt-4 flex justify-end gap-2">
                 <button 
@@ -115,10 +187,21 @@ export default function CategoryManagementPage() {
                 </button>
                 <button 
                   type="button" 
-                  onClick={() => setIsModalOpen(false)}
-                  className="bg-gray-900 text-white px-6 py-2 text-sm font-medium hover:bg-gray-800 transition-colors dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
+                  onClick={handleCreateCategory}
+                  disabled={isSaving}
+                  className="bg-gray-900 text-white px-6 py-2 text-sm font-medium hover:bg-gray-800 transition-colors dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-w-[140px]"
                 >
-                  Save Category
+                  {isSaving ? (
+                    <>
+                      <svg className="animate-spin h-4 w-4 text-white dark:text-gray-900" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Saving...
+                    </>
+                  ) : (
+                    "Save Category"
+                  )}
                 </button>
               </div>
             </form>
@@ -139,7 +222,7 @@ export default function CategoryManagementPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[100px]">ID</TableHead>
+                <TableHead className="w-[100px]">SL</TableHead>
                 <TableHead>Category Name</TableHead>
                 <TableHead>Description</TableHead>
                 <TableHead>Status</TableHead>
@@ -147,21 +230,27 @@ export default function CategoryManagementPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paginatedCategories.length === 0 ? (
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-6 text-gray-500">
+                    Loading categories...
+                  </TableCell>
+                </TableRow>
+              ) : paginatedCategories.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-6 text-gray-500">
                     No categories found.
                   </TableCell>
                 </TableRow>
               ) : (
-                paginatedCategories.map((category) => (
+                paginatedCategories.map((category, index) => (
                   <TableRow key={category.id}>
-                    <TableCell className="font-medium">CAT-{category.id}</TableCell>
+                    <TableCell className="font-medium">{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
                     <TableCell>{category.name}</TableCell>
                     <TableCell>{category.description}</TableCell>
                     <TableCell>
-                      <span className={`px-2 py-1 text-xs font-medium ${category.status === "Active" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"}`}>
-                        {category.status}
+                      <span className={`px-2 py-1 text-xs font-medium ${(category.status || "Active") === "Active" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"}`}>
+                        {category.status || "Active"}
                       </span>
                     </TableCell>
                     <TableCell className="text-right">
@@ -182,6 +271,7 @@ export default function CategoryManagementPage() {
                         </Link>
                         <button 
                           type="button"
+                          onClick={() => handleDeleteCategory(category.id)}
                           className="p-1 text-gray-500 hover:text-red-600 transition-colors"
                           title="Delete"
                         >

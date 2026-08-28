@@ -2,15 +2,80 @@
 
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { getUserById, updateUser, banUser } from "@/api/userApi";
+import { BASE_URL } from "@/api/baseApi";
+import { GlobalLoader } from "@/components/ui/global-loader";
+import { SimpleSelect } from "@/components/ui/simple-select";
 
 export default function UserDetailsPage() {
   const params = useParams();
   const router = useRouter();
-  const userId = params.id;
+  const userId = params.id as string;
+
+  const [loading, setLoading] = useState(true);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState("customer");
+  const [status, setStatus] = useState("Active");
+  const [pictureUrl, setPictureUrl] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await getUserById(userId);
+        if (res.data) {
+          setName(res.data.name);
+          setEmail(res.data.email);
+          setRole(res.data.role || "customer");
+          setStatus(res.data.isBanned ? "Inactive" : "Active");
+          setPictureUrl(res.data.picture || "");
+        }
+      } catch (err) {
+        console.error("Failed to fetch user details", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (userId) fetchUser();
+  }, [userId]);
+
+  const handleSaveChanges = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      // 1. Update general info with FormData if file is selected, else json
+      let updatePayload: any;
+      if (selectedFile) {
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("email", email);
+        formData.append("role", role);
+        formData.append("picture", selectedFile);
+        updatePayload = formData;
+      } else {
+        updatePayload = { name, email, role };
+      }
+      
+      await updateUser(userId, updatePayload);
+      
+      // 2. Update banned status
+      await banUser(userId, status === "Inactive");
+
+      router.push("/dotadmin/usermanagement");
+    } catch (err) {
+      console.error("Failed to update user", err);
+      alert("Failed to update user. See console for details.");
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex items-center gap-4">
+    <>
+      {loading && <GlobalLoader />}
+      <div className="flex flex-col gap-8">
+        <div className="flex items-center gap-4">
         <Link href="/dotadmin/usermanagement" className="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50 flex items-center justify-center p-2 border bg-white shadow-sm dark:bg-gray-950 dark:border-gray-800 transition-colors">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg>
         </Link>
@@ -20,13 +85,36 @@ export default function UserDetailsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="border bg-white p-6 shadow-sm dark:bg-gray-950 dark:border-gray-800">
           <h2 className="text-xl font-semibold mb-6">Edit User Information</h2>
-          <form className="flex flex-col gap-4">
+          <form onSubmit={handleSaveChanges} className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium">Profile Picture</label>
+              <div className="flex items-center gap-4">
+                {selectedFile ? (
+                  <img src={URL.createObjectURL(selectedFile)} alt="Preview" className="w-16 h-16 rounded-full object-cover border" />
+                ) : pictureUrl ? (
+                  <img src={`${BASE_URL}${pictureUrl}`} alt="Profile" className="w-16 h-16 rounded-full object-cover border" />
+                ) : (
+                  <div className="w-16 h-16 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center text-gray-500 border">No Pic</div>
+                )}
+                <input 
+                  type="file" 
+                  accept="image/*"
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      setSelectedFile(e.target.files[0]);
+                    }
+                  }}
+                  className="text-sm" 
+                />
+              </div>
+            </div>
             <div className="flex flex-col gap-2">
               <label htmlFor="name" className="text-sm font-medium">Full Name</label>
               <input 
                 type="text" 
                 id="name" 
-                defaultValue="Alice Johnson" 
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 dark:bg-gray-900 dark:border-gray-700" 
               />
             </div>
@@ -35,39 +123,41 @@ export default function UserDetailsPage() {
               <input 
                 type="email" 
                 id="email" 
-                defaultValue="alice@example.com" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 dark:bg-gray-900 dark:border-gray-700" 
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
                 <label htmlFor="role" className="text-sm font-medium">Role</label>
-                <select 
+                <SimpleSelect 
                   id="role" 
-                  defaultValue="Admin"
-                  className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white dark:bg-gray-900 dark:border-gray-700"
-                >
-                  <option value="Admin">Admin</option>
-                  <option value="Editor">Editor</option>
-                  <option value="Viewer">Viewer</option>
-                </select>
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  options={[
+                    { label: "Admin", value: "admin" },
+                    { label: "Manager", value: "manager" },
+                    { label: "Customer", value: "customer" }
+                  ]}
+                />
               </div>
               <div className="flex flex-col gap-2">
                 <label htmlFor="status" className="text-sm font-medium">Status</label>
-                <select 
+                <SimpleSelect 
                   id="status" 
-                  defaultValue="Active"
-                  className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white dark:bg-gray-900 dark:border-gray-700"
-                >
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
-                </select>
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value)}
+                  options={[
+                    { label: "Active", value: "Active" },
+                    { label: "Inactive", value: "Inactive" }
+                  ]}
+                />
               </div>
             </div>
             <div className="mt-4 flex gap-2">
               <button 
-                type="button"
-                onClick={() => router.push("/dotadmin/usermanagement")}
+                type="submit"
                 className="bg-gray-900 text-white px-6 py-2 text-sm font-medium hover:bg-gray-800 transition-colors dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
               >
                 Save Changes
@@ -80,20 +170,13 @@ export default function UserDetailsPage() {
           <h2 className="text-xl font-semibold">Recent Activity</h2>
           <div className="flex flex-col gap-4">
             <div className="border-b pb-4 dark:border-gray-800">
-              <p className="text-sm font-medium">Logged in</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Oct 24, 2023 - 10:30 AM</p>
-            </div>
-            <div className="border-b pb-4 dark:border-gray-800">
-              <p className="text-sm font-medium">Created a new category</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Oct 23, 2023 - 2:15 PM</p>
-            </div>
-            <div className="border-b pb-4 dark:border-gray-800">
-              <p className="text-sm font-medium">Updated settings</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Oct 21, 2023 - 9:45 AM</p>
+              <p className="text-sm font-medium">Account created</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Activity logs coming soon</p>
             </div>
           </div>
         </div>
       </div>
     </div>
+    </>
   );
 }

@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ChevronRight, ShieldCheck, RefreshCw, Lock } from "lucide-react";
 
 const product = {
@@ -39,6 +40,7 @@ export default function ProductDetailPage() {
   const [selectedSize, setSelectedSize] = useState("M");
   const [selectedType, setSelectedType] = useState("DROP SHOULDER");
   const [activeTab, setActiveTab] = useState("DESCRIPTION");
+  const router = useRouter();
 
   return (
     <div className="w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans text-gray-900">
@@ -200,7 +202,10 @@ export default function ProductDetailPage() {
             <button className="w-full bg-gradient-to-br from-[#00A8FF] to-[#0033FF] hover:from-[#0099EE] hover:to-[#0022DD] text-white font-black uppercase tracking-wider py-4 rounded-none transition-all shadow-sm border border-transparent">
               ADD TO CART
             </button>
-            <button className="w-full bg-black hover:bg-gray-900 text-white font-black uppercase tracking-wider py-4 rounded-none transition-colors shadow-sm border border-black">
+            <button 
+              onClick={() => router.push("/main/checkout")}
+              className="w-full bg-black hover:bg-gray-900 text-white font-black uppercase tracking-wider py-4 rounded-none transition-colors shadow-sm border border-black"
+            >
               BUY NOW
             </button>
           </div>

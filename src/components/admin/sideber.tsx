@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
     LayoutDashboard, Users, Tags, CornerDownRight, Bookmark,
     ShoppingCart, Warehouse, ClipboardList, Wrench, AlertCircle,
-    BarChart, SettingsIcon, ImageIcon, PenTool, MessageSquareHeart, Calculator, Box
+    BarChart, SettingsIcon, ImageIcon, PenTool, MessageSquareHeart, Calculator, Box, Zap, PiggyBank, Ruler, Shirt, LogOut
 } from "lucide-react";
+import { logoutUser } from "../../api/authApi";
 
 const navGroups = [
   {
@@ -24,6 +25,10 @@ const navGroups = [
       { name: "Category", href: "/dotadmin/category", icon: Tags },
       { name: "Sub-Category", href: "/dotadmin/subcategory", icon: CornerDownRight },
       { name: "Brands", href: "/dotadmin/bands", icon: Bookmark },
+      { name: "Sizes", href: "/dotadmin/sizes", icon: Ruler },
+      { name: "Product Types", href: "/dotadmin/types", icon: Shirt },
+      { name: "Flash Sale", href: "/dotadmin/big-sell", icon: Zap },
+      { name: "Budget Pick", href: "/dotadmin/budget-pick", icon: PiggyBank },
     ]
   },
   {
@@ -55,6 +60,12 @@ const navGroups = [
 
 export default function Sideber() {
     const pathname = usePathname();
+    const router = useRouter();
+
+    const handleLogout = () => {
+        logoutUser();
+        window.location.href = "/main/login";
+    };
 
     return (
         <div className="hidden border-r bg-white lg:block dark:bg-[#0a0a0a] border-gray-200 dark:border-gray-800 w-[260px] flex-shrink-0">
@@ -102,14 +113,23 @@ export default function Sideber() {
                 
                 {/* Footer User Area */}
                 <div className="p-4 border-t border-gray-100 dark:border-gray-800">
-                    <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-900/50">
-                        <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs">
-                            A
+                    <div className="flex items-center justify-between gap-3 px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-900/50">
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs">
+                                A
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">Admin User</span>
+                                <span className="text-xs text-gray-500">admin@codegrid.com</span>
+                            </div>
                         </div>
-                        <div className="flex flex-col">
-                            <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">Admin User</span>
-                            <span className="text-xs text-gray-500">admin@codegrid.com</span>
-                        </div>
+                        <button 
+                            onClick={handleLogout}
+                            className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors dark:hover:bg-red-900/20"
+                            title="Logout"
+                        >
+                            <LogOut className="w-5 h-5" />
+                        </button>
                     </div>
                 </div>
             </div>

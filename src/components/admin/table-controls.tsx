@@ -1,4 +1,5 @@
 import { Search } from "lucide-react";
+import { SimpleSelect } from "@/components/ui/simple-select";
 
 interface TableControlsProps {
   searchQuery: string;
@@ -32,17 +33,12 @@ export function TableControls({
         />
       </div>
       <div className="w-full md:w-auto">
-        <select 
+        <SimpleSelect 
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="w-full md:w-auto border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white dark:bg-gray-900 dark:border-gray-700"
-        >
-          {statusOptions.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
+          options={statusOptions}
+          className="md:w-auto min-w-[150px]"
+        />
       </div>
     </div>
   );
