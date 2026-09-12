@@ -77,28 +77,28 @@ export default function SubCategoryDetailsPage() {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center gap-4">
-        <Link href="/dotadmin/subcategory" className="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50 flex items-center justify-center p-2 border bg-white shadow-sm dark:bg-gray-950 dark:border-gray-800 transition-colors">
+        <Link href="/dotadmin/subcategory" className="text-black hover:text-[#3b82f6] flex items-center justify-center p-2 border-[3px] border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 rounded-none">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg>
         </Link>
-        <h1 className="text-3xl font-bold tracking-tight">Sub-Category Details: SUBCAT-{subCategoryId}</h1>
+        <h1 className="text-3xl font-black uppercase tracking-tight text-black">Sub-Category Details: SUBCAT-{subCategoryId}</h1>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="border bg-white p-6 shadow-sm dark:bg-gray-950 dark:border-gray-800">
+        <div className="border-[3px] border-black bg-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none">
           <h2 className="text-xl font-semibold mb-6">Edit Sub-Category Information</h2>
           <form className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
-              <label htmlFor="name" className="text-sm font-medium">Sub-Category Name</label>
+              <label htmlFor="name" className="text-sm font-black uppercase text-black">Sub-Category Name</label>
               <input 
                 type="text" 
                 id="name" 
                 value={subCategory.name}
                 onChange={(e) => setSubCategory({...subCategory, name: e.target.value})}
-                className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 dark:bg-gray-900 dark:border-gray-700" 
+                className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase" 
               />
             </div>
             <div className="flex flex-col gap-2">
-              <label htmlFor="parent" className="text-sm font-medium">Parent Category</label>
+              <label htmlFor="parent" className="text-sm font-black uppercase text-black">Parent Category</label>
               <Select 
                   id="parent" 
                   options={categories.map(cat => ({ value: String(cat.id), label: cat.name }))}
@@ -117,13 +117,13 @@ export default function SubCategoryDetailsPage() {
                 />
             </div>
             <div className="flex flex-col gap-2">
-              <label htmlFor="description" className="text-sm font-medium">Description</label>
+              <label htmlFor="description" className="text-sm font-black uppercase text-black">Description</label>
               <textarea 
                 id="description" 
                 rows={3}
                 value={subCategory.description}
                 onChange={(e) => setSubCategory({...subCategory, description: e.target.value})}
-                className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 dark:bg-gray-900 dark:border-gray-700 resize-none" 
+                className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase resize-none" 
               />
             </div>
             <div className="mt-4 flex gap-2">

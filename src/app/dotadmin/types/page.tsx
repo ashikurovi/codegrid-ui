@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import {
   Table,
@@ -13,18 +13,42 @@ import {
 import { TableControls } from "@/components/admin/table-controls";
 import { TablePagination } from "@/components/admin/table-pagination";
 import { Eye, Edit, Trash2 } from "lucide-react";
+import { getAllTypes, deleteType } from "../../../api/typeApi";
 
 export default function TypesManagementPage() {
+  const [typeData, setTypeData] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
   const itemsPerPage = 5;
 
-  const typeData = [
-    { id: 1, name: "Drop Shoulder", status: "Active" },
-    { id: 2, name: "Half Sleeve", status: "Active" },
-    { id: 3, name: "Full Sleeve", status: "Active" },
-  ];
+  useEffect(() => {
+    fetchTypes();
+  }, []);
+
+  const fetchTypes = async () => {
+    try {
+      setIsLoading(true);
+      const res = await getAllTypes();
+      setTypeData(res.data || []);
+    } catch (error) {
+      console.error("Failed to fetch types", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (confirm("Are you sure you want to delete this type?")) {
+      try {
+        await deleteType(id);
+        setTypeData(typeData.filter(t => t.id !== id));
+      } catch (error) {
+        console.error("Failed to delete type", error);
+      }
+    }
+  };
 
   const statusOptions = [
     { label: "All Status", value: "All" },
@@ -35,11 +59,11 @@ export default function TypesManagementPage() {
   // Filter and Search logic
   const filteredTypes = useMemo(() => {
     return typeData.filter((type) => {
-      const matchesSearch = type.name.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesStatus = statusFilter === "All" || type.status === statusFilter;
+      const matchesSearch = (type.name || "").toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStatus = statusFilter === "All" || "Active" === statusFilter;
       return matchesSearch && matchesStatus;
     });
-  }, [searchQuery, statusFilter]);
+  }, [typeData, searchQuery, statusFilter]);
 
   // Pagination logic
   const totalPages = Math.ceil(filteredTypes.length / itemsPerPage);
@@ -51,10 +75,10 @@ export default function TypesManagementPage() {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Product Types Management</h1>
+        <h1 className="text-3xl font-black uppercase tracking-tight text-black">Product Types Management</h1>
         <Link 
           href="/dotadmin/types/add"
-          className="bg-gray-900 text-white px-6 py-2 text-sm font-medium hover:bg-gray-800 transition-colors dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
+          className="bg-[#3b82f6] text-white px-6 py-2 text-sm font-black uppercase border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all rounded-none"
         >
           Add New Type
         </Link>
@@ -69,7 +93,7 @@ export default function TypesManagementPage() {
           statusOptions={statusOptions}
           searchPlaceholder="Search types..."
         />
-        <div className="border bg-white shadow-sm dark:bg-gray-950 dark:border-gray-800">
+        <div className="border-[3px] border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow>
@@ -92,8 +116,8 @@ export default function TypesManagementPage() {
                     <TableCell className="font-medium">TYP-{type.id}</TableCell>
                     <TableCell className="font-bold">{type.name}</TableCell>
                     <TableCell>
-                      <span className={`px-2 py-1 text-xs font-medium rounded ${type.status === "Active" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"}`}>
-                        {type.status}
+                      <span className={`px-2 py-1 text-xs font-medium rounded ${"Active" === "Active" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"}`}>
+                        Active
                       </span>
                     </TableCell>
                     <TableCell className="text-right">
@@ -107,6 +131,7 @@ export default function TypesManagementPage() {
                         </Link>
                         <button 
                           type="button"
+                          onClick={() => handleDelete(type.id)}
                           className="p-1 text-gray-500 hover:text-red-600 transition-colors"
                           title="Delete"
                         >

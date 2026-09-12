@@ -70,10 +70,10 @@ export default function OrdersManagementPage() {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Orders Management</h1>
+        <h1 className="text-3xl font-black uppercase tracking-tight text-black">Orders Management</h1>
         <Link 
           href="/dotadmin/orders/add"
-          className="bg-gray-900 text-white px-6 py-2 text-sm font-medium hover:bg-gray-800 transition-colors dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
+          className="bg-[#3b82f6] text-white px-6 py-2 text-sm font-black uppercase border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all rounded-none"
         >
           Create New Order
         </Link>
@@ -88,7 +88,7 @@ export default function OrdersManagementPage() {
           statusOptions={statusOptions}
           searchPlaceholder="Search by customer or order ID..."
         />
-        <div className="border bg-white shadow-sm dark:bg-gray-950 dark:border-gray-800">
+        <div className="border-[3px] border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow>

@@ -7,17 +7,17 @@ export default function AnalyticsPage() {
     <div className="flex flex-col gap-8 pb-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Analytics Overview</h1>
-          <p className="text-gray-500 mt-1">Detailed breakdown of your store's performance.</p>
+          <h1 className="text-3xl font-black uppercase tracking-tight text-black">Analytics Overview</h1>
+          <p className="text-black font-bold uppercase mt-1">Detailed breakdown of your store's performance.</p>
         </div>
-        <div className="flex items-center gap-2">
-          <select className="border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white dark:bg-gray-900 dark:border-gray-700">
+        <div className="flex items-center gap-4">
+          <select className="border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase">
             <option>Last 7 Days</option>
             <option>Last 30 Days</option>
             <option>This Quarter</option>
             <option>This Year</option>
           </select>
-          <button className="bg-gray-900 text-white px-4 py-2 text-sm font-medium hover:bg-gray-800 transition-colors dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200">
+          <button className="bg-[#3b82f6] text-white px-6 py-2 text-sm font-black uppercase border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all rounded-none">
             Export Report
           </button>
         </div>
@@ -25,7 +25,7 @@ export default function AnalyticsPage() {
       
       {/* Top Stats Row */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <div className="border bg-white p-6 shadow-sm dark:bg-gray-950 dark:border-gray-800 flex flex-col gap-2">
+        <div className="border-[3px] border-black bg-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none flex flex-col gap-2">
           <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
             <h3 className="text-sm font-medium tracking-tight">Gross Revenue</h3>
             <BarChart3 className="h-4 w-4" />
@@ -37,7 +37,7 @@ export default function AnalyticsPage() {
           </p>
         </div>
         
-        <div className="border bg-white p-6 shadow-sm dark:bg-gray-950 dark:border-gray-800 flex flex-col gap-2">
+        <div className="border-[3px] border-black bg-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none flex flex-col gap-2">
           <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
             <h3 className="text-sm font-medium tracking-tight">Total Orders</h3>
             <ShoppingBag className="h-4 w-4" />
@@ -49,7 +49,7 @@ export default function AnalyticsPage() {
           </p>
         </div>
         
-        <div className="border bg-white p-6 shadow-sm dark:bg-gray-950 dark:border-gray-800 flex flex-col gap-2">
+        <div className="border-[3px] border-black bg-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none flex flex-col gap-2">
           <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
             <h3 className="text-sm font-medium tracking-tight">Conversion Rate</h3>
             <TrendingUp className="h-4 w-4" />
@@ -61,7 +61,7 @@ export default function AnalyticsPage() {
           </p>
         </div>
         
-        <div className="border bg-white p-6 shadow-sm dark:bg-gray-950 dark:border-gray-800 flex flex-col gap-2">
+        <div className="border-[3px] border-black bg-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none flex flex-col gap-2">
           <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
             <h3 className="text-sm font-medium tracking-tight">New Customers</h3>
             <Users className="h-4 w-4" />
@@ -78,24 +78,24 @@ export default function AnalyticsPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         
         {/* Main Chart */}
-        <div className="border bg-white p-6 shadow-sm col-span-4 dark:bg-gray-950 dark:border-gray-800">
-          <h3 className="text-lg font-bold tracking-tight mb-6">Revenue Over Time</h3>
+        <div className="border-[3px] border-black bg-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none col-span-4 flex flex-col">
+          <h3 className="text-lg font-black uppercase tracking-tight mb-6">Revenue Over Time</h3>
           
           <div className="h-[300px] flex items-end gap-2 px-2 mt-4">
             {/* CSS-based mock Bar Chart */}
             {[45, 60, 30, 80, 55, 90, 70, 100, 65, 85, 40, 75].map((val, idx) => (
               <div key={idx} className="relative flex-1 group h-full flex items-end justify-center">
                 <div 
-                  className="w-full bg-blue-100 hover:bg-blue-600 dark:bg-blue-900/40 dark:hover:bg-blue-600 transition-colors rounded-t-sm"
+                  className="w-full bg-[#3b82f6] border-[2px] border-black hover:bg-blue-600 transition-colors rounded-none"
                   style={{ height: `${val}%` }}
                 ></div>
-                <div className="opacity-0 group-hover:opacity-100 absolute -top-8 bg-gray-900 text-white text-xs py-1 px-2 rounded whitespace-nowrap transition-opacity">
+                <div className="opacity-0 group-hover:opacity-100 absolute -top-8 bg-black text-white text-xs font-bold py-1 px-2 border-2 border-black rounded-none whitespace-nowrap transition-opacity">
                   ৳ {(val * 1234).toLocaleString()}
                 </div>
               </div>
             ))}
           </div>
-          <div className="flex justify-between mt-4 text-xs text-gray-500 font-medium px-2">
+          <div className="flex justify-between mt-4 text-xs text-black font-bold px-2 uppercase">
             <span>Jan</span>
             <span>Feb</span>
             <span>Mar</span>
@@ -112,9 +112,9 @@ export default function AnalyticsPage() {
         </div>
         
         {/* Category Breakdown */}
-        <div className="border bg-white p-6 shadow-sm col-span-3 dark:bg-gray-950 dark:border-gray-800 flex flex-col">
-          <h3 className="text-lg font-bold tracking-tight mb-2">Sales by Category</h3>
-          <p className="text-sm text-gray-500 mb-8 dark:text-gray-400">Custom orders are driving 45% of total revenue this month.</p>
+        <div className="border-[3px] border-black bg-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none col-span-3 flex flex-col">
+          <h3 className="text-lg font-black uppercase tracking-tight mb-2">Sales by Category</h3>
+          <p className="text-sm font-bold text-black uppercase mb-8">Custom orders are driving 45% of total revenue this month.</p>
           
           <div className="space-y-6 flex-1 justify-center flex flex-col">
             

@@ -36,31 +36,31 @@ export function RecentBlog() {
   return (
     <section className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-10 gap-4">
-        <h2 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-wide uppercase">
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-12 gap-4">
+        <h2 className="text-3xl sm:text-4xl font-black text-black tracking-wide uppercase">
           LATEST FROM THE BLOG
         </h2>
         <Link 
           href="/main/blogs" 
-          className="text-sm font-bold uppercase tracking-widest text-gray-600 hover:text-[#00B4DB] transition-colors flex items-center gap-2"
+          className="text-sm font-black uppercase tracking-widest text-black border-[3px] border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:translate-x-1 active:shadow-none transition-all px-6 py-3 flex items-center gap-2 rounded-none"
         >
           VIEW ALL <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
         {recentBlogs.map((blog, index) => (
           <Link 
             key={blog.id} 
             href={blog.link} 
-            className={`group flex flex-col block ${
+            className={`group flex flex-col block bg-white border-[3px] border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-transform hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] ${
               index === 0 ? "md:col-span-2 lg:col-span-2" : "col-span-1"
             }`}
           >
             {/* Image Container */}
             <div 
-              className={`relative bg-gray-100 overflow-hidden mb-5 rounded-none ${
+              className={`relative bg-gray-100 overflow-hidden border-b-[3px] border-black rounded-none ${
                 index === 0 ? "aspect-video md:aspect-[2/1] lg:aspect-[16/9]" : "aspect-video lg:aspect-[4/3]"
               }`}
             >
@@ -74,26 +74,28 @@ export function RecentBlog() {
             </div>
 
             {/* Content */}
-            <div className="flex flex-col flex-1">
-              <span className="text-[10px] sm:text-xs font-bold text-gray-400 tracking-widest uppercase mb-2">
+            <div className="flex flex-col flex-1 p-6 sm:p-8">
+              <span className="inline-block bg-white text-black border-2 border-black px-3 py-1 text-[10px] sm:text-xs font-black tracking-widest uppercase w-max shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-4 group-hover:bg-[#3b82f6] group-hover:text-white transition-colors">
                 {blog.date}
               </span>
               <h3 
-                className={`font-bold text-gray-900 mb-3 group-hover:text-[#00B4DB] transition-colors leading-tight ${
-                  index === 0 ? "text-2xl sm:text-3xl lg:text-4xl" : "text-lg sm:text-xl line-clamp-2"
+                className={`font-black text-black mb-4 leading-tight ${
+                  index === 0 ? "text-2xl sm:text-3xl lg:text-4xl" : "text-xl sm:text-2xl line-clamp-2"
                 }`}
               >
                 {blog.title}
               </h3>
               <p 
-                className={`text-gray-600 flex-1 mb-4 ${
+                className={`text-gray-800 flex-1 mb-6 font-medium ${
                   index === 0 ? "text-base sm:text-lg line-clamp-3" : "text-sm line-clamp-2"
                 }`}
               >
                 {blog.excerpt}
               </p>
-              <div className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#0066FF] flex items-center gap-1 group-hover:gap-2 transition-all">
-                READ MORE <ArrowRight className="w-3 h-3" />
+              <div className="mt-auto">
+                <span className="inline-flex items-center gap-2 bg-[#3b82f6] text-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] px-4 py-2 text-[10px] sm:text-xs font-black uppercase tracking-widest transition-transform group-hover:-translate-y-1 group-hover:-translate-x-1 group-hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+                  READ MORE <ArrowRight className="w-4 h-4" />
+                </span>
               </div>
             </div>
           </Link>

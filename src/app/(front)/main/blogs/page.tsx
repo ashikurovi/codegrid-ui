@@ -82,23 +82,23 @@ export default function BlogsPage() {
   const selectedBlog = blogPosts.find(b => b.id === selectedBlogId);
 
   return (
-    <div className="min-h-screen flex flex-col bg-white font-sans">
+    <div className="min-h-screen flex flex-col font-sans">
       <main className="flex-1 w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        
+
         {/* Render Blog Details */}
         {selectedBlog ? (
           <article className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <button 
+            <button
               onClick={() => setSelectedBlogId(null)}
-              className="group flex items-center text-xs font-bold uppercase tracking-widest text-gray-500 hover:bg-gradient-to-r hover:from-[#00B4DB] hover:to-[#0000FF] hover:bg-clip-text hover:text-transparent transition-colors mb-8"
+              className="group flex items-center w-max bg-white border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-black font-black uppercase tracking-widest px-5 py-3 hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all mb-10"
             >
-              <ArrowLeft className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" />
+              <ArrowLeft className="w-5 h-5 mr-3 font-black" />
               Back to Blogs
             </button>
-            
-            <div className="relative w-full aspect-video bg-gray-100 mb-10 rounded-none border border-gray-100 overflow-hidden">
-              <Image 
-                src={selectedBlog.image} 
+
+            <div className="relative w-full aspect-video bg-white mb-12 rounded-none overflow-hidden">
+              <Image
+                src={selectedBlog.image}
                 alt={selectedBlog.title}
                 fill
                 className="object-cover"
@@ -106,30 +106,33 @@ export default function BlogsPage() {
               />
             </div>
 
-            <div className="max-w-3xl mx-auto">
-              <div className="flex flex-wrap items-center gap-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-6">
-                <span className="flex items-center gap-1.5 bg-gradient-to-r from-[#00B4DB] to-[#0000FF] bg-clip-text text-transparent">
-                  <Calendar className="w-3.5 h-3.5" /> {selectedBlog.date}
+            <div className="max-w-4xl mx-auto">
+              <div className="flex flex-wrap items-center gap-4 text-xs font-black text-black uppercase tracking-widest mb-8">
+                <span className="flex items-center gap-2 bg-white border-[3px] border-black px-4 py-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                  <Calendar className="w-4 h-4" /> {selectedBlog.date}
                 </span>
-                <span className="flex items-center gap-1.5">
-                  <User className="w-3.5 h-3.5" /> {selectedBlog.author}
+                <span className="flex items-center gap-2 bg-[#3b82f6] text-white border-[3px] border-black px-4 py-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                  <User className="w-4 h-4" /> {selectedBlog.author}
                 </span>
               </div>
 
-              <h1 className="text-4xl sm:text-5xl font-black text-gray-900 mb-8 leading-tight">
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-black mb-10 leading-tight uppercase tracking-tighter bg-white border-[4px] border-black p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
                 {selectedBlog.title}
               </h1>
 
-              <div className="prose prose-lg max-w-none text-gray-700 space-y-6 text-base sm:text-lg leading-relaxed">
-                {selectedBlog.content.split('\n').map((paragraph, index) => (
-                  paragraph.trim() ? <p key={index}>{paragraph.trim()}</p> : null
-                ))}
+              <div className="bg-white border-[4px] border-black p-6 sm:p-10 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                <div className="prose prose-lg max-w-none text-black font-bold space-y-6 text-base sm:text-lg leading-loose">
+                  {selectedBlog.content.split('\n').map((paragraph, index) => (
+                    paragraph.trim() ? <p key={index}>{paragraph.trim()}</p> : null
+                  ))}
+                </div>
               </div>
 
-              <div className="mt-12 pt-8 border-t border-gray-100 flex items-center gap-3 flex-wrap">
-                <Tag className="w-4 h-4 text-gray-400" />
+              <div className="mt-12 flex items-center gap-4 flex-wrap bg-white border-[4px] border-black p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+                <Tag className="w-6 h-6 text-black" />
+                <span className="font-black uppercase tracking-widest mr-2">Tags:</span>
                 {selectedBlog.tags.map((tag, idx) => (
-                  <span key={idx} className="bg-gray-100 text-gray-600 text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-none">
+                  <span key={idx} className="bg-black text-white border-2 border-black text-xs font-black uppercase tracking-widest px-4 py-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                     {tag}
                   </span>
                 ))}
@@ -139,51 +142,50 @@ export default function BlogsPage() {
         ) : (
           /* Render Blog List Grid */
           <div className="animate-in fade-in duration-500">
-            <div className="text-center mb-16">
-              <h1 className="text-4xl sm:text-6xl font-black text-gray-900 uppercase tracking-tight mb-4">
-                CodeGrid <span className="bg-gradient-to-r from-[#00B4DB] to-[#0000FF] bg-clip-text text-transparent">Journal</span>
+            <div className="text-center mb-16 flex flex-col items-center">
+              <h1 className="text-4xl sm:text-6xl md:text-7xl font-black text-black uppercase tracking-tight mb-6 bg-white border-[4px] border-black inline-block px-8 py-4 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                CodeGrid <span className="text-[#3b82f6]">Journal</span>
               </h1>
-              <p className="text-gray-500 text-sm sm:text-base max-w-2xl mx-auto">
+              <p className="text-black font-bold text-base sm:text-lg max-w-2xl mx-auto bg-white border-[3px] border-black p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                 Dive into the world of modern streetwear, minimalism, and the culture that drives our design philosophy.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16">
               {blogPosts.map((blog) => (
-                <div 
-                  key={blog.id} 
-                  className="group flex flex-col cursor-pointer"
+                <div
+                  key={blog.id}
+                  className="group flex flex-col cursor-pointer bg-white border-[4px] border-black p-4 sm:p-5 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] transition-all"
                   onClick={() => setSelectedBlogId(blog.id)}
                 >
-                  <div className="relative w-full aspect-[4/3] bg-gray-100 mb-6 overflow-hidden rounded-none border border-gray-100">
-                    <Image 
-                      src={blog.image} 
+                  <div className="relative w-full aspect-[4/3] bg-white mb-6 overflow-hidden rounded-none">
+                    <Image
+                      src={blog.image}
                       alt={blog.title}
                       fill
                       className="object-cover transition-transform duration-700 group-hover:scale-105"
                       sizes="(max-width: 768px) 100vw, 50vw"
                     />
-                    <div className="absolute top-4 left-4 bg-white bg-gradient-to-r from-[#00B4DB] to-[#0000FF] bg-clip-text text-transparent text-[10px] font-black uppercase tracking-widest px-3 py-1.5 shadow-sm rounded-none">
+                    <div className="absolute top-4 left-4 bg-white text-black border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-[10px] sm:text-xs font-black uppercase tracking-widest px-4 py-2">
                       {blog.tags[0]}
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">
-                    <span className="bg-gradient-to-r from-[#00B4DB] to-[#0000FF] bg-clip-text text-transparent">{blog.date}</span>
-                    <span>•</span>
-                    <span>{blog.author}</span>
+                  <div className="flex items-center gap-4 text-xs font-black text-black uppercase tracking-widest mb-4">
+                    <span className="bg-[#3b82f6] text-white border-2 border-black px-2 py-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">{blog.date}</span>
+                    <span className="bg-white text-black border-2 border-black px-2 py-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">{blog.author}</span>
                   </div>
 
-                  <h2 className="text-2xl font-black text-gray-900 mb-3 group-hover:bg-gradient-to-r group-hover:from-[#00B4DB] group-hover:to-[#0000FF] group-hover:bg-clip-text group-hover:text-transparent transition-colors line-clamp-2">
+                  <h2 className="text-3xl font-black text-black uppercase tracking-tighter mb-4 group-hover:text-[#3b82f6] transition-colors line-clamp-2">
                     {blog.title}
                   </h2>
-                  
-                  <p className="text-gray-600 text-sm leading-relaxed mb-6 line-clamp-3">
+
+                  <p className="text-black font-bold text-sm leading-relaxed mb-6 line-clamp-3">
                     {blog.excerpt}
                   </p>
 
                   <div className="mt-auto">
-                    <span className="inline-block border-b-2 border-transparent group-hover:border-[#0066FF] text-xs font-bold text-gray-900 group-hover:bg-gradient-to-r group-hover:from-[#00B4DB] group-hover:to-[#0000FF] group-hover:bg-clip-text group-hover:text-transparent uppercase tracking-widest transition-all pb-1">
+                    <span className="inline-block bg-black text-white font-black border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] uppercase tracking-widest px-5 py-3 group-hover:bg-[#3b82f6] group-hover:-translate-y-1 group-hover:-translate-x-1 group-hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all">
                       Read Article
                     </span>
                   </div>

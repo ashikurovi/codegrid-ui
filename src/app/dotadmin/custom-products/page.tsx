@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import {
   Table,
@@ -12,24 +12,48 @@ import {
 } from "@/components/ui/table"
 import { TableControls } from "@/components/admin/table-controls";
 import { TablePagination } from "@/components/admin/table-pagination";
-import { Eye, Edit, Trash2 } from "lucide-react";
+import { Eye, Edit, Trash2, Loader2 } from "lucide-react";
 import Image from "next/image";
+import { getAllCustomProducts, deleteCustomProduct } from "../../../api/customproductsApi";
 
 export default function CustomProductsManagementPage() {
+  const [customProducts, setCustomProducts] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  const customProducts = [
-    { id: 1, name: "Classic T-Shirt", category: "Apparel", price: "৳ 350 / pc", status: "Active", image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=400&auto=format&fit=crop" },
-    { id: 2, name: "Premium Polo", category: "Apparel", price: "৳ 550 / pc", status: "Active", image: "https://images.unsplash.com/photo-1586363104862-3a5e2ab60d99?q=80&w=400&auto=format&fit=crop" },
-    { id: 3, name: "Winter Hoodie", category: "Apparel", price: "৳ 850 / pc", status: "Active", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=400&auto=format&fit=crop" },
-    { id: 4, name: "Ceramic Mug", category: "Bottles", price: "৳ 250 / pc", status: "Active", image: "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?q=80&w=400&auto=format&fit=crop" },
-    { id: 5, name: "Steel Water Bottle", category: "Bottles", price: "৳ 450 / pc", status: "Inactive", image: "https://images.unsplash.com/photo-1602143407151-7111542de6e8?q=80&w=400&auto=format&fit=crop" },
-    { id: 6, name: "Basic Kit", category: "Corporate", price: "৳ 1,500 / kit", status: "Active", image: "https://images.unsplash.com/photo-1585336261022-680e295ce3fe?q=80&w=400&auto=format&fit=crop" },
-    { id: 7, name: "Executive Kit", category: "Corporate", price: "৳ 6,000 / kit", status: "Active", image: "https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=400&auto=format&fit=crop" },
-  ];
+  const fetchProducts = async () => {
+    try {
+      setIsLoading(true);
+      const res = await getAllCustomProducts();
+      const data = res.data ? res.data : res;
+      setCustomProducts(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Failed to fetch custom products", error);
+      setCustomProducts([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const handleDelete = async (id: string | number) => {
+    if (window.confirm("Are you sure you want to delete this custom product?")) {
+      try {
+        await deleteCustomProduct(id);
+        fetchProducts(); // Refresh list after deletion
+      } catch (error) {
+        console.error("Failed to delete custom product", error);
+        alert("Failed to delete product.");
+      }
+    }
+  };
 
   const statusOptions = [
     { label: "All Status", value: "All" },
@@ -40,15 +64,19 @@ export default function CustomProductsManagementPage() {
   // Filter and Search logic
   const filteredProducts = useMemo(() => {
     return customProducts.filter((product) => {
-      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                            product.category.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesStatus = statusFilter === "All" || product.status === statusFilter;
+      const pName = product.productName || product.name || "";
+      const pCat = product.category || "";
+      const pStat = product.status || "";
+
+      const matchesSearch = pName.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                            pCat.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStatus = statusFilter === "All" || pStat === statusFilter;
       return matchesSearch && matchesStatus;
     });
   }, [customProducts, searchQuery, statusFilter]);
 
   // Pagination logic
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage) || 1;
   const paginatedProducts = filteredProducts.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -57,10 +85,10 @@ export default function CustomProductsManagementPage() {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Custom Products</h1>
+        <h1 className="text-3xl font-black uppercase tracking-tight text-black">Custom Products</h1>
         <Link 
           href="/dotadmin/custom-products/add"
-          className="bg-gray-900 text-white px-6 py-2 text-sm font-medium hover:bg-gray-800 transition-colors dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
+          className="bg-[#3b82f6] text-white px-6 py-2 text-sm font-black uppercase border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all rounded-none"
         >
           Add Custom Product
         </Link>
@@ -75,7 +103,7 @@ export default function CustomProductsManagementPage() {
           statusOptions={statusOptions}
           searchPlaceholder="Search custom products..."
         />
-        <div className="border bg-white shadow-sm dark:bg-gray-950 dark:border-gray-800">
+        <div className="border-[3px] border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow>
@@ -88,7 +116,16 @@ export default function CustomProductsManagementPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paginatedProducts.length === 0 ? (
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-10">
+                    <div className="flex items-center justify-center gap-2 text-gray-500">
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      <span>Loading products...</span>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : paginatedProducts.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center py-6 text-gray-500">
                     No custom products found.
@@ -99,15 +136,20 @@ export default function CustomProductsManagementPage() {
                   <TableRow key={product.id}>
                     <TableCell>
                       <div className="w-12 h-12 relative rounded overflow-hidden bg-gray-100">
-                        <Image src={product.image} alt={product.name} fill className="object-cover" />
+                        {product.image ? (
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img src={product.image} alt={product.productName || product.name || "Product"} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">No Img</div>
+                        )}
                       </div>
                     </TableCell>
-                    <TableCell className="font-medium">{product.name}</TableCell>
+                    <TableCell className="font-medium">{product.productName || product.name}</TableCell>
                     <TableCell>{product.category}</TableCell>
                     <TableCell>{product.price}</TableCell>
                     <TableCell>
                       <span className={`px-2 py-1 text-xs font-medium ${product.status === "Active" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"}`}>
-                        {product.status}
+                        {product.status || "N/A"}
                       </span>
                     </TableCell>
                     <TableCell className="text-right">
@@ -121,6 +163,7 @@ export default function CustomProductsManagementPage() {
                         </Link>
                         <button 
                           type="button"
+                          onClick={() => handleDelete(product.id)}
                           className="p-1 text-gray-500 hover:text-red-600 transition-colors"
                           title="Delete"
                         >

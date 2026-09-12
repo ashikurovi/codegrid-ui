@@ -73,12 +73,12 @@ export default function BlogManagementPage() {
     <div className="flex flex-col gap-8 pb-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Blog Management</h1>
-          <p className="text-gray-500 mt-1">Manage articles and content for the store's blog.</p>
+          <h1 className="text-3xl font-black uppercase tracking-tight text-black">Blog Management</h1>
+          <p className="text-black font-bold uppercase mt-1">Manage articles and content for the store's blog.</p>
         </div>
         <Link 
           href="/dotadmin/blogs/add"
-          className="flex items-center gap-2 bg-gray-900 text-white px-6 py-2 text-sm font-medium hover:bg-gray-800 transition-colors dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
+          className="flex items-center gap-2 bg-[#3b82f6] text-white px-6 py-2 text-sm font-black uppercase border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all rounded-none"
         >
           <Plus className="w-4 h-4" /> Add Blog
         </Link>
@@ -93,7 +93,7 @@ export default function BlogManagementPage() {
           statusOptions={statusOptions}
           searchPlaceholder="Search by title or excerpt..."
         />
-        <div className="border bg-white shadow-sm dark:bg-gray-950 dark:border-gray-800">
+        <div className="border-[3px] border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow>

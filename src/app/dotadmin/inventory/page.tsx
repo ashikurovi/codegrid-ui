@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import {
   Table,
@@ -13,6 +13,8 @@ import {
 import { TableControls } from "@/components/admin/table-controls";
 import { TablePagination } from "@/components/admin/table-pagination";
 import { Eye, Edit, Trash2 } from "lucide-react";
+import { createInventory, deleteInventory, getAllInventory } from "@/api/inventoryApi";
+import { getAllProducts } from "@/api/productApi";
 
 export default function InventoryManagementPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,15 +23,79 @@ export default function InventoryManagementPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  const inventoryItems = [
-    { id: 1, product: "iPhone 14 Pro", sku: "SKU-IP14P", stock: 45, status: "In Stock" },
-    { id: 2, product: "MacBook Pro 16\"", sku: "SKU-MBP16", stock: 12, status: "Low Stock" },
-    { id: 3, product: "AirPods Pro", sku: "SKU-APP2", stock: 150, status: "In Stock" },
-    { id: 4, product: "Nike Air Max", sku: "SKU-NAM12", stock: 0, status: "Out of Stock" },
-    { id: 5, product: "Samsung Galaxy S23", sku: "SKU-SGS23", stock: 28, status: "In Stock" },
-    { id: 6, product: "Levi's Denim Jacket", sku: "SKU-LDJ", stock: 5, status: "Low Stock" },
-    { id: 7, product: "Yoga Mat", sku: "SKU-YM01", stock: 200, status: "In Stock" },
-  ];
+  const [inventoryItems, setInventoryItems] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Modal form state
+  const [newProduct, setNewProduct] = useState("");
+  const [newSku, setNewSku] = useState("");
+  const [newStock, setNewStock] = useState("");
+  const [newStatus, setNewStatus] = useState("In Stock");
+
+  const [availableProducts, setAvailableProducts] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetchInventory();
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const res = await getAllProducts();
+      setAvailableProducts(res.data || []);
+    } catch (error) {
+      console.error("Failed to fetch products", error);
+    }
+  };
+
+  const fetchInventory = async () => {
+    try {
+      setIsLoading(true);
+      const res = await getAllInventory();
+      const items = Array.isArray(res) ? res : (res.data || []);
+      setInventoryItems(items);
+    } catch (error) {
+      console.error("Failed to fetch inventory", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCreate = async () => {
+    if (!newProduct || !newSku || !newStock) {
+      alert("Please fill out all required fields.");
+      return;
+    }
+
+    try {
+      await createInventory({
+        product: newProduct,
+        sku: newSku,
+        stock: Number(newStock),
+        status: newStatus
+      });
+      setIsModalOpen(false);
+      setNewProduct("");
+      setNewSku("");
+      setNewStock("");
+      setNewStatus("In Stock");
+      fetchInventory();
+    } catch (error) {
+      console.error("Failed to create inventory record", error);
+      alert("Failed to create record.");
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (confirm("Are you sure you want to delete this inventory record?")) {
+      try {
+        await deleteInventory(id);
+        setInventoryItems(inventoryItems.filter((i) => i.id !== id));
+      } catch (error) {
+        console.error("Failed to delete record", error);
+      }
+    }
+  };
 
   const statusOptions = [
     { label: "All Status", value: "All" },
@@ -41,8 +107,8 @@ export default function InventoryManagementPage() {
   // Filter and Search logic
   const filteredInventory = useMemo(() => {
     return inventoryItems.filter((item) => {
-      const matchesSearch = item.product.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                            item.sku.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = item.product.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.sku.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStatus = statusFilter === "All" || item.status === statusFilter;
       return matchesSearch && matchesStatus;
     });
@@ -58,10 +124,10 @@ export default function InventoryManagementPage() {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Inventory Management</h1>
-        <button 
+        <h1 className="text-3xl font-black uppercase tracking-tight text-black">Inventory Management</h1>
+        <button
           onClick={() => setIsModalOpen(true)}
-          className="bg-gray-900 text-white px-6 py-2 text-sm font-medium hover:bg-gray-800 transition-colors dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
+          className="bg-[#3b82f6] text-white px-6 py-2 text-sm font-black uppercase border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all rounded-none"
         >
           Add Inventory Record
         </button>
@@ -69,67 +135,76 @@ export default function InventoryManagementPage() {
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="w-full max-w-lg border bg-white p-6 shadow-lg dark:bg-gray-950 dark:border-gray-800 relative">
-            <button 
+          <div className="w-full max-w-lg border-[3px] border-black bg-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none relative">
+            <button
               onClick={() => setIsModalOpen(false)}
-              className="absolute right-4 top-4 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
+              className="absolute right-4 top-4 text-black hover:scale-110 transition-transform"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="square" strokeLinejoin="miter"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
-            <h2 className="text-xl font-semibold mb-6">Update Inventory</h2>
+            <h2 className="text-2xl font-black uppercase border-b-4 border-black w-max pb-1 mb-6 text-black">Update Inventory</h2>
             <form className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
-                <label htmlFor="product" className="text-sm font-medium">Product</label>
-                <select 
-                  id="product" 
-                  className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white dark:bg-gray-900 dark:border-gray-700"
+                <label htmlFor="product" className="text-sm font-black uppercase text-black">Product</label>
+                <select
+                  id="product"
+                  value={newProduct}
+                  onChange={(e) => setNewProduct(e.target.value)}
+                  className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase"
                 >
-                  <option value="iPhone 14 Pro">iPhone 14 Pro</option>
-                  <option value="MacBook Pro 16">MacBook Pro 16"</option>
-                  <option value="AirPods Pro">AirPods Pro</option>
+                  <option value="">SELECT A PRODUCT</option>
+                  {availableProducts.map((p) => (
+                    <option key={p.id} value={p.title || p.name}>{p.title || p.name}</option>
+                  ))}
                 </select>
               </div>
               <div className="flex flex-col gap-2">
-                <label htmlFor="sku" className="text-sm font-medium">SKU</label>
-                <input 
-                  type="text" 
-                  id="sku" 
-                  placeholder="e.g. SKU-1234" 
-                  className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 dark:bg-gray-900 dark:border-gray-700" 
+                <label htmlFor="sku" className="text-sm font-black uppercase text-black">SKU</label>
+                <input
+                  type="text"
+                  id="sku"
+                  value={newSku}
+                  onChange={(e) => setNewSku(e.target.value)}
+                  placeholder="E.G. SKU-1234"
+                  className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase"
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label htmlFor="stock" className="text-sm font-medium">Add/Adjust Stock</label>
-                <input 
-                  type="number" 
-                  id="stock" 
-                  placeholder="e.g. 50" 
-                  className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 dark:bg-gray-900 dark:border-gray-700" 
+                <label htmlFor="stock" className="text-sm font-black uppercase text-black">Initial Stock</label>
+                <input
+                  type="number"
+                  id="stock"
+                  value={newStock}
+                  onChange={(e) => setNewStock(e.target.value)}
+                  placeholder="E.G. 50"
+                  className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase"
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label htmlFor="status" className="text-sm font-medium">Status</label>
-                <select 
-                  id="status" 
-                  className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white dark:bg-gray-900 dark:border-gray-700"
+                <label htmlFor="status" className="text-sm font-black uppercase text-black">Status</label>
+                <select
+                  id="status"
+                  value={newStatus}
+                  onChange={(e) => setNewStatus(e.target.value)}
+                  className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase"
                 >
-                  <option value="In Stock">In Stock</option>
-                  <option value="Low Stock">Low Stock</option>
-                  <option value="Out of Stock">Out of Stock</option>
+                  <option value="In Stock">IN STOCK</option>
+                  <option value="Low Stock">LOW STOCK</option>
+                  <option value="Out of Stock">OUT OF STOCK</option>
                 </select>
               </div>
-              <div className="mt-4 flex justify-end gap-2">
-                <button 
-                  type="button" 
+              <div className="mt-6 flex justify-end gap-4">
+                <button
+                  type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="border border-gray-300 bg-white px-6 py-2 text-sm font-medium hover:bg-gray-50 transition-colors dark:bg-gray-900 dark:border-gray-700 dark:hover:bg-gray-800"
+                  className="border-2 border-black bg-white px-6 py-2 text-sm font-black uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 hover:-translate-x-0.5 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all text-black rounded-none"
                 >
                   Cancel
                 </button>
-                <button 
-                  type="button" 
-                  onClick={() => setIsModalOpen(false)}
-                  className="bg-gray-900 text-white px-6 py-2 text-sm font-medium hover:bg-gray-800 transition-colors dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
+                <button
+                  type="button"
+                  onClick={handleCreate}
+                  className="bg-[#3b82f6] text-white px-6 py-2 text-sm font-black uppercase border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 hover:-translate-x-0.5 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all rounded-none"
                 >
                   Save Record
                 </button>
@@ -140,7 +215,7 @@ export default function InventoryManagementPage() {
       )}
 
       <div>
-        <TableControls 
+        <TableControls
           searchQuery={searchQuery}
           setSearchQuery={(val) => { setSearchQuery(val); setCurrentPage(1); }}
           statusFilter={statusFilter}
@@ -148,7 +223,7 @@ export default function InventoryManagementPage() {
           statusOptions={statusOptions}
           searchPlaceholder="Search inventory..."
         />
-        <div className="border bg-white shadow-sm dark:bg-gray-950 dark:border-gray-800">
+        <div className="border-[3px] border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow>
@@ -161,7 +236,13 @@ export default function InventoryManagementPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paginatedInventory.length === 0 ? (
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-6 text-gray-500">
+                    Loading inventory records...
+                  </TableCell>
+                </TableRow>
+              ) : paginatedInventory.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center py-6 text-gray-500">
                     No inventory records found.
@@ -185,22 +266,23 @@ export default function InventoryManagementPage() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <Link 
+                        <Link
                           href={`/dotadmin/inventory/${item.id}`}
                           className="p-1 text-gray-500 hover:text-blue-600 transition-colors"
                           title="View Details"
                         >
                           <Eye className="w-4 h-4" />
                         </Link>
-                        <Link 
+                        <Link
                           href={`/dotadmin/inventory/${item.id}`}
                           className="p-1 text-gray-500 hover:text-green-600 transition-colors"
                           title="Edit"
                         >
                           <Edit className="w-4 h-4" />
                         </Link>
-                        <button 
+                        <button
                           type="button"
+                          onClick={() => handleDelete(item.id)}
                           className="p-1 text-gray-500 hover:text-red-600 transition-colors"
                           title="Delete"
                         >
@@ -214,7 +296,7 @@ export default function InventoryManagementPage() {
             </TableBody>
           </Table>
         </div>
-        <TablePagination 
+        <TablePagination
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={setCurrentPage}

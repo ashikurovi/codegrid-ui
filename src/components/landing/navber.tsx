@@ -39,22 +39,22 @@ export function Navbar() {
     return (
         <div className="w-full flex flex-col font-sans sticky top-0 z-50">
             {/* Top Navy Bar */}
-            <div className="w-full bg-gradient-to-r from-[#00A8FF] to-[#0033FF] text-white text-[13px] font-extrabold tracking-wide flex justify-between items-center px-4 py-2 sm:px-8 shadow-sm">
-                <div className="text-white font-extrabold transition-colors text-[11px] sm:text-[13px] md:text-[15px] truncate max-w-[60%]">
+            <div className="w-full bg-[#3b82f6] text-white text-[13px] font-black tracking-wide flex justify-between items-center px-4 py-2 sm:px-8 border-b-[3px] border-black">
+                <div className="text-white font-black transition-colors text-[11px] sm:text-[13px] md:text-[15px] truncate max-w-[60%]">
                     Welcome to CodeGrid Platform.
                 </div>
-                <div className="flex items-center space-x-3 sm:space-x-6 text-white/90">
-                    <Link href="/main/ordertraking" className="text-white text-[10px] sm:text-[13px] font-extrabold transition-colors hidden sm:block">
+                <div className="flex items-center space-x-3 sm:space-x-6 text-white">
+                    <Link href="/main/ordertraking" className="text-white text-[10px] sm:text-[13px] font-black hover:underline transition-all hidden sm:block">
                         TRACK ORDER
                     </Link>
-                    <Link href="/main/custom-order" className="text-white text-[10px] sm:text-[13px] font-extrabold transition-colors hidden sm:block">
+                    <Link href="/main/custom-order" className="text-white text-[10px] sm:text-[13px] font-black hover:underline transition-all hidden sm:block">
                         CUSTOM/BULK
                     </Link>
                 </div>
             </div>
 
             {/* Main Navigation */}
-            <div className="w-full bg-white/30 dark:bg-black/30 backdrop-blur-md border-b border-white/20 dark:border-white/10 flex items-center justify-between px-4 sm:px-8 py-4 shadow-sm relative">
+            <div className="w-full bg-white border-b-[3px] border-black flex items-center justify-between px-4 sm:px-8 py-4 relative">
                 <div className="flex-shrink-0">
                     <Link href="/" className="flex items-center gap-2">
                         <Image
@@ -70,62 +70,54 @@ export function Navbar() {
                 <div className="hidden lg:flex items-center space-x-8">
                     <Link
                         href="/main/big-sale"
-                        className={`font-bold text-sm tracking-wide uppercase hover:bg-gradient-to-r hover:from-[#00B4DB] hover:to-[#0000FF] hover:bg-clip-text hover:text-transparent transition-colors ${
+                        className={`font-black text-sm tracking-wide uppercase hover:bg-[#3b82f6] hover:text-white px-2 py-1 transition-colors border-2 ${
                             pathname === '/main/big-sale' 
-                            ? 'border-b-2 border-[#00B4DB] pb-1 text-[#0A1128]' 
-                            : 'text-[#0A1128]'
+                            ? 'border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-[#3b82f6] text-white' 
+                            : 'border-transparent text-black hover:border-black hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
                         }`}
                     >
                         Big Sale
                     </Link>
 
-                    <Link href="/main/budget-pick" className="group relative flex items-center cursor-pointer">
-                        <span className={`font-bold text-sm tracking-wide uppercase group-hover:bg-gradient-to-r group-hover:from-[#00B4DB] group-hover:to-[#0000FF] group-hover:bg-clip-text group-hover:text-transparent transition-colors ${
-                            pathname === '/main/budget-pick' 
-                            ? 'border-b-2 border-[#00B4DB] pb-1 text-[#0A1128]' 
-                            : 'text-[#0A1128]'
-                        }`}>
-                            Budget Pick
-                        </span>
+                    <Link href="/main/budget-pick" className={`font-black text-sm tracking-wide uppercase hover:bg-[#3b82f6] hover:text-white px-2 py-1 transition-colors border-2 ${
+                        pathname === '/main/budget-pick' 
+                        ? 'border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-[#3b82f6] text-white' 
+                        : 'border-transparent text-black hover:border-black hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                    }`}>
+                        Budget Pick
                     </Link>
 
-                    <Link href="/main/shop">
-                        <div className="group relative flex items-center cursor-pointer">
-                            <span className={`font-bold text-sm tracking-wide uppercase group-hover:bg-gradient-to-r group-hover:from-[#00B4DB] group-hover:to-[#0000FF] group-hover:bg-clip-text group-hover:text-transparent transition-colors ${
-                                pathname === '/main/shop' 
-                                ? 'border-b-2 border-[#00B4DB] pb-1 text-[#0A1128]' 
-                                : 'text-[#0A1128]'
-                            }`}>
-                                Collections
-                            </span>
-                        </div>
+                    <Link href="/main/shop" className={`font-black text-sm tracking-wide uppercase hover:bg-[#3b82f6] hover:text-white px-2 py-1 transition-colors border-2 ${
+                        pathname === '/main/shop' 
+                        ? 'border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-[#3b82f6] text-white' 
+                        : 'border-transparent text-black hover:border-black hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                    }`}>
+                        Collections
                     </Link>
 
-                    <Link href="/main/blogs" className="group relative flex items-center cursor-pointer">
-                        <span className={`font-bold text-sm tracking-wide uppercase group-hover:bg-gradient-to-r group-hover:from-[#00B4DB] group-hover:to-[#0000FF] group-hover:bg-clip-text group-hover:text-transparent transition-colors ${
-                            pathname === '/main/blogs' 
-                            ? 'border-b-2 border-[#00B4DB] pb-1 text-[#0A1128]' 
-                            : 'text-[#0A1128]'
-                        }`}>
-                            Blogs
-                        </span>
+                    <Link href="/main/blogs" className={`font-black text-sm tracking-wide uppercase hover:bg-[#3b82f6] hover:text-white px-2 py-1 transition-colors border-2 ${
+                        pathname === '/main/blogs' 
+                        ? 'border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-[#3b82f6] text-white' 
+                        : 'border-transparent text-black hover:border-black hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                    }`}>
+                        Blogs
                     </Link>
                 </div>
 
                 {/* Right Icons */}
                 <div className="flex items-center space-x-2 sm:space-x-4">
-                    <Link href="/main/login" className="p-2 text-[#0A1128] hover:text-[#00B4DB] transition-colors rounded-none hover:bg-gray-50 hidden sm:block">
+                    <Link href="/main/login" className="p-2 text-black border-2 border-transparent hover:border-black hover:bg-[#3b82f6] hover:text-white hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 hover:-translate-x-0.5 transition-all rounded-none hidden sm:block">
                         <User className="w-5 h-5" />
                     </Link>
                     <button 
                         onClick={() => setIsSearchOpen(true)}
-                        className="p-2 text-[#0A1128] hover:text-[#00B4DB] transition-colors rounded-none hover:bg-gray-50"
+                        className="p-2 text-black border-2 border-transparent hover:border-black hover:bg-[#3b82f6] hover:text-white hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 hover:-translate-x-0.5 transition-all rounded-none"
                     >
                         <Search className="w-5 h-5" />
                     </button>
                     <button 
                         onClick={() => setIsMobileMenuOpen(true)}
-                        className="p-2 text-[#0A1128] hover:text-[#00B4DB] transition-colors rounded-none hover:bg-gray-50 lg:hidden"
+                        className="p-2 text-black border-2 border-transparent hover:border-black hover:bg-[#3b82f6] hover:text-white hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 hover:-translate-x-0.5 transition-all rounded-none lg:hidden"
                     >
                         <Menu className="w-5 h-5" />
                     </button>
@@ -134,30 +126,30 @@ export function Navbar() {
 
             {/* --- SEARCH MODAL (Collapses from Top) --- */}
             <div 
-                className={`fixed inset-0 bg-black/60 z-[100] transition-opacity duration-300 ${isSearchOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+                className={`fixed inset-0 bg-black/80 z-[100] transition-opacity duration-300 ${isSearchOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
                 onClick={() => setIsSearchOpen(false)}
             >
                 {/* Search Panel */}
                 <div 
-                    className={`absolute top-0 left-0 w-full bg-white shadow-2xl transition-transform duration-500 ease-out transform ${isSearchOpen ? 'translate-y-0' : '-translate-y-full'}`}
+                    className={`absolute top-0 left-0 w-full bg-white border-b-[4px] border-black shadow-[0_8px_0px_0px_rgba(0,0,0,1)] transition-transform duration-500 ease-out transform ${isSearchOpen ? 'translate-y-0' : '-translate-y-full'}`}
                     onClick={(e) => e.stopPropagation()}
                 >
                     <div className="max-w-screen-xl mx-auto px-4 sm:px-8 py-8">
                         
                         {/* Search Input Area */}
-                        <div className="flex items-center gap-4 border-b-2 border-gray-900 pb-4">
-                            <Search className="w-6 h-6 bg-gradient-to-r from-[#00B4DB] to-[#0000FF] bg-clip-text text-transparent" />
+                        <div className="flex items-center gap-4 border-[3px] border-black p-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-4 bg-white">
+                            <Search className="w-6 h-6 text-black ml-2" />
                             <input 
                                 ref={searchInputRef}
                                 type="text"
                                 placeholder="Search for products, categories..."
-                                className="flex-1 bg-transparent text-xl sm:text-2xl font-black text-gray-900 focus:outline-none placeholder-gray-300"
+                                className="flex-1 bg-transparent text-xl sm:text-2xl font-black text-black focus:outline-none placeholder-gray-400 uppercase"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
                             <button 
                                 onClick={() => setIsSearchOpen(false)}
-                                className="text-gray-400 hover:text-red-500 transition-colors p-2 rounded-none"
+                                className="text-black hover:text-white hover:bg-red-500 border-2 border-transparent hover:border-black p-1 rounded-none transition-colors"
                             >
                                 <X className="w-8 h-8" />
                             </button>
@@ -176,9 +168,9 @@ export function Navbar() {
                                             key={product.id} 
                                             href={`/main/product/${product.id}`}
                                             onClick={() => setIsSearchOpen(false)}
-                                            className="group flex flex-col"
+                                            className="group flex flex-col border-[3px] border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-transform p-2"
                                         >
-                                            <div className="relative aspect-square bg-gray-100 mb-3 overflow-hidden rounded-none border border-gray-100">
+                                            <div className="relative aspect-square mb-3 overflow-hidden rounded-none border-[2px] border-black">
                                                 <Image 
                                                     src={product.image}
                                                     alt={product.title}
@@ -187,7 +179,7 @@ export function Navbar() {
                                                     sizes="(max-width: 640px) 50vw, 20vw"
                                                 />
                                             </div>
-                                            <h4 className="text-xs font-bold text-gray-900 group-hover:bg-gradient-to-r group-hover:from-[#00B4DB] group-hover:to-[#0000FF] group-hover:bg-clip-text group-hover:text-transparent transition-colors line-clamp-2 leading-tight">
+                                            <h4 className="text-xs font-black text-black uppercase group-hover:text-[#3b82f6] transition-colors line-clamp-2 leading-tight">
                                                 {product.title}
                                             </h4>
                                         </Link>
@@ -206,36 +198,36 @@ export function Navbar() {
 
             {/* --- MOBILE MENU (Side Drawer) --- */}
             <div 
-                className={`fixed inset-0 bg-black/60 z-[110] transition-opacity duration-300 lg:hidden ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+                className={`fixed inset-0 bg-black/80 z-[110] transition-opacity duration-300 lg:hidden ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
                 onClick={() => setIsMobileMenuOpen(false)}
             >
                 <div 
-                    className={`absolute top-0 right-0 w-4/5 max-w-sm h-full bg-white shadow-2xl transition-transform duration-500 ease-out transform ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
+                    className={`absolute top-0 right-0 w-4/5 max-w-sm h-full bg-white border-l-[4px] border-black shadow-[-8px_0px_0px_0px_rgba(0,0,0,1)] transition-transform duration-500 ease-out transform ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
                     onClick={(e) => e.stopPropagation()}
                 >
                     <div className="flex flex-col h-full">
-                        <div className="flex justify-between items-center p-6 border-b border-gray-100">
-                            <span className="font-black text-xl text-gray-900 tracking-tighter uppercase">Menu</span>
+                        <div className="flex justify-between items-center p-6 border-b-[3px] border-black bg-[#3b82f6]">
+                            <span className="font-black text-xl text-white tracking-widest uppercase">Menu</span>
                             <button 
                                 onClick={() => setIsMobileMenuOpen(false)}
-                                className="text-gray-400 hover:text-red-500 transition-colors p-2 rounded-none"
+                                className="text-white hover:text-black hover:bg-white border-2 border-transparent hover:border-black p-1 transition-colors rounded-none"
                             >
                                 <X className="w-6 h-6" />
                             </button>
                         </div>
-                        <div className="flex flex-col p-6 space-y-6 overflow-y-auto hide-scrollbar">
-                            <Link href="/main/big-sale" onClick={() => setIsMobileMenuOpen(false)} className={`font-bold text-lg uppercase tracking-wide transition-colors ${pathname === '/main/big-sale' ? 'bg-gradient-to-r from-[#00B4DB] to-[#0000FF] bg-clip-text text-transparent' : 'text-gray-900 hover:text-[#00B4DB]'}`}>Big Sale</Link>
-                            <Link href="/main/budget-pick" onClick={() => setIsMobileMenuOpen(false)} className={`font-bold text-lg uppercase tracking-wide transition-colors ${pathname === '/main/budget-pick' ? 'bg-gradient-to-r from-[#00B4DB] to-[#0000FF] bg-clip-text text-transparent' : 'text-gray-900 hover:text-[#00B4DB]'}`}>Budget Pick</Link>
-                            <Link href="/main/shop" onClick={() => setIsMobileMenuOpen(false)} className={`font-bold text-lg uppercase tracking-wide transition-colors ${pathname === '/main/shop' ? 'bg-gradient-to-r from-[#00B4DB] to-[#0000FF] bg-clip-text text-transparent' : 'text-gray-900 hover:text-[#00B4DB]'}`}>Collections</Link>
-                            <Link href="/main/blogs" onClick={() => setIsMobileMenuOpen(false)} className={`font-bold text-lg uppercase tracking-wide transition-colors ${pathname === '/main/blogs' ? 'bg-gradient-to-r from-[#00B4DB] to-[#0000FF] bg-clip-text text-transparent' : 'text-gray-900 hover:text-[#00B4DB]'}`}>Blogs</Link>
+                        <div className="flex flex-col p-6 space-y-4 overflow-y-auto hide-scrollbar bg-white">
+                            <Link href="/main/big-sale" onClick={() => setIsMobileMenuOpen(false)} className={`font-black text-lg uppercase tracking-widest border-2 p-2 transition-all ${pathname === '/main/big-sale' ? 'border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-[#3b82f6] text-white' : 'border-transparent text-black hover:border-black hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'}`}>Big Sale</Link>
+                            <Link href="/main/budget-pick" onClick={() => setIsMobileMenuOpen(false)} className={`font-black text-lg uppercase tracking-widest border-2 p-2 transition-all ${pathname === '/main/budget-pick' ? 'border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-[#3b82f6] text-white' : 'border-transparent text-black hover:border-black hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'}`}>Budget Pick</Link>
+                            <Link href="/main/shop" onClick={() => setIsMobileMenuOpen(false)} className={`font-black text-lg uppercase tracking-widest border-2 p-2 transition-all ${pathname === '/main/shop' ? 'border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-[#3b82f6] text-white' : 'border-transparent text-black hover:border-black hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'}`}>Collections</Link>
+                            <Link href="/main/blogs" onClick={() => setIsMobileMenuOpen(false)} className={`font-black text-lg uppercase tracking-widest border-2 p-2 transition-all ${pathname === '/main/blogs' ? 'border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-[#3b82f6] text-white' : 'border-transparent text-black hover:border-black hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'}`}>Blogs</Link>
                             
-                            <div className="pt-4 border-t border-gray-100 flex flex-col space-y-6">
-                                <Link href="/main/ordertraking" onClick={() => setIsMobileMenuOpen(false)} className={`font-bold text-sm uppercase tracking-wide transition-colors ${pathname === '/main/ordertraking' ? 'bg-gradient-to-r from-[#00B4DB] to-[#0000FF] bg-clip-text text-transparent' : 'text-gray-600 hover:text-[#00B4DB]'}`}>Track Order</Link>
-                                <Link href="/main/custom-order" onClick={() => setIsMobileMenuOpen(false)} className={`font-bold text-sm uppercase tracking-wide transition-colors ${pathname === '/main/custom-order' ? 'bg-gradient-to-r from-[#00B4DB] to-[#0000FF] bg-clip-text text-transparent' : 'text-gray-600 hover:text-[#00B4DB]'}`}>Custom/Bulk Order</Link>
+                            <div className="pt-6 border-t-[3px] border-black flex flex-col space-y-4">
+                                <Link href="/main/ordertraking" onClick={() => setIsMobileMenuOpen(false)} className={`font-black text-sm uppercase tracking-widest border-2 p-2 transition-all ${pathname === '/main/ordertraking' ? 'border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-[#3b82f6] text-white' : 'border-transparent text-black hover:border-black hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'}`}>Track Order</Link>
+                                <Link href="/main/custom-order" onClick={() => setIsMobileMenuOpen(false)} className={`font-black text-sm uppercase tracking-widest border-2 p-2 transition-all ${pathname === '/main/custom-order' ? 'border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-[#3b82f6] text-white' : 'border-transparent text-black hover:border-black hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'}`}>Custom/Bulk Order</Link>
                             </div>
 
-                            <div className="pt-4 border-t border-gray-100">
-                                <Link href="/main/login" onClick={() => setIsMobileMenuOpen(false)} className="font-bold text-sm uppercase tracking-wide text-gray-600 hover:text-[#00B4DB] transition-colors flex items-center gap-3">
+                            <div className="pt-6 border-t-[3px] border-black">
+                                <Link href="/main/login" onClick={() => setIsMobileMenuOpen(false)} className="font-black text-sm uppercase tracking-widest border-2 border-transparent hover:border-black hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] p-2 transition-all text-black flex items-center gap-3">
                                     <User className="w-5 h-5"/> Account / Login
                                 </Link>
                             </div>

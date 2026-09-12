@@ -71,12 +71,12 @@ const shopProducts = [
 
 export default function ShopPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-white font-sans">
+    <div className="min-h-screen flex flex-col font-sans">
       {/* Main Container */}
       <main className="flex-1 w-full max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         {/* Huge Shop Title */}
-        <div className="w-full py-10 mb-8 border-b border-gray-100">
-          <h1 className="text-6xl sm:text-7xl font-black text-center text-black">Shop</h1>
+        <div className="w-full py-6 md:py-10 mb-8 border-b-[4px] border-black">
+          <h1 className="text-4xl sm:text-6xl md:text-7xl font-black text-center text-black uppercase tracking-tight">Shop</h1>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-10">
@@ -84,24 +84,24 @@ export default function ShopPage() {
           <aside className="w-full lg:w-1/4 flex-shrink-0 space-y-10">
             {/* Search Box */}
             <div>
-              <h3 className="text-sm font-bold uppercase tracking-wide text-gray-900 mb-4">
+              <h3 className="text-base font-black uppercase tracking-widest text-black mb-4">
                 SEARCH IN OUR SHOP
               </h3>
-              <div className="relative">
+              <div className="relative border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white">
                 <input
                   type="text"
                   placeholder="Search..."
-                  className="w-full border border-gray-200 py-2.5 pl-4 pr-10 text-sm focus:outline-none focus:border-gray-400"
+                  className="w-full bg-transparent py-2.5 pl-4 pr-10 text-sm font-bold text-black focus:outline-none rounded-none placeholder-gray-500 uppercase"
                 />
-                <button className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black">
-                  <Search className="w-4 h-4" />
+                <button className="absolute right-3 top-1/2 -translate-y-1/2 text-black hover:text-[#3b82f6] transition-colors">
+                  <Search className="w-5 h-5 font-black" />
                 </button>
               </div>
             </div>
 
             {/* Filter by Categories */}
             <div>
-              <h3 className="text-sm font-bold uppercase tracking-wide text-gray-900 mb-4">
+              <h3 className="text-base font-black uppercase tracking-widest text-black mb-4">
                 FILTER BY CATEGORIES
               </h3>
               <div className="space-y-3">
@@ -115,13 +115,13 @@ export default function ShopPage() {
                       <input
                         type="radio"
                         name="category"
-                        className="w-4 h-4 text-gray-900 focus:ring-0 border-gray-300"
+                        className="w-5 h-5 text-[#3b82f6] focus:ring-0 border-2 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] checked:bg-[#3b82f6]"
                       />
-                      <span className="text-sm text-gray-700 group-hover:text-black">
+                      <span className="text-sm font-bold text-black group-hover:text-[#3b82f6] uppercase transition-colors">
                         {cat.name}
                       </span>
                     </div>
-                    <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-none">
+                    <span className="text-xs px-2 py-0.5 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] font-black bg-white text-black">
                       {cat.count}
                     </span>
                   </label>
@@ -134,66 +134,77 @@ export default function ShopPage() {
           <div className="flex-1">
             {/* Top Bar: Breadcrumb & Sort */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-              <div className="text-xs text-gray-400 uppercase tracking-widest font-medium">
-                <Link href="/" className="hover:text-gray-800 transition-colors">Home</Link>
+              <div className="text-xs text-black uppercase tracking-widest font-black border-2 border-black px-3 py-1.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-white">
+                <Link href="/" className="hover:text-[#3b82f6] transition-colors">Home</Link>
                 <span className="mx-2">/</span>
-                <span className="text-gray-800">Shop</span>
+                <span className="text-[#3b82f6]">Shop</span>
               </div>
 
-              <button className="text-xs font-bold uppercase tracking-wide flex items-center gap-2 text-gray-700 hover:text-black transition-colors">
-                SORT BY POPULARITY <ChevronDown className="w-4 h-4" />
+              <button className="text-xs font-black uppercase tracking-widest flex items-center gap-2 text-black bg-white border-[3px] border-black px-4 py-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all">
+                SORT BY POPULARITY <ChevronDown className="w-5 h-5" />
               </button>
             </div>
 
             {/* Product Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 sm:gap-8">
               {shopProducts.map((product) => (
-                <Link key={product.id} href={`/main/product/motorsport-porsche`} className="group block">
-                  {/* Square Image */}
-                  <div className="relative aspect-square bg-gray-100 overflow-hidden mb-4">
-                    <Image
-                      src={product.image}
-                      alt={product.title}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    />
-                  </div>
+                <div key={product.id} className="group block relative border-[3px] border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-transform bg-white flex flex-col h-full">
+                  <Link href={`/main/product/motorsport-porsche`} className="flex flex-col flex-1 p-3 pb-0">
+                    {/* Square Image */}
+                    <div className="relative aspect-square bg-white overflow-hidden mb-4 rounded-none">
+                      <Image
+                        src={product.image}
+                        alt={product.title}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      />
+                    </div>
 
-                  {/* Title */}
-                  <h3 className="text-sm text-gray-800 font-medium mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
-                    {product.title}
-                  </h3>
+                    {/* Title */}
+                    <h3 className="text-sm text-black font-black uppercase mb-2 group-hover:text-[#3b82f6] transition-colors line-clamp-2 min-h-[40px]">
+                      {product.title}
+                    </h3>
 
-                  {/* Tags */}
-                  <div className="flex flex-wrap gap-1.5 mb-2">
-                    {product.tags.map((tag, i) => (
-                      <span
-                        key={i}
-                        className={`${tag.color} text-white text-[10px] font-bold px-1.5 py-0.5`}
-                      >
-                        {tag.text}
+                    {/* Tags */}
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {product.tags.map((tag, i) => (
+                        <span
+                          key={i}
+                          className={`${tag.color.includes('bg-red-500') ? 'bg-red-500 text-white' : tag.color.includes('bg-black') ? 'bg-black text-white' : tag.color} border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-[10px] font-black px-2 py-1 rounded-none uppercase`}
+                        >
+                          {tag.text}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* Rating */}
+                    <div className="flex text-black text-sm mb-2 gap-1 border-2 border-black w-max px-2 py-0.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                      {[...Array(product.rating)].map((_, i) => (
+                        <span key={i}>★</span>
+                      ))}
+                    </div>
+
+                    {/* Price */}
+                    <div className="flex items-center justify-between border-t-[3px] border-black pt-3 mt-auto mb-3">
+                      <span className="text-black line-through text-sm font-bold">
+                        ৳{product.originalPrice}
                       </span>
-                    ))}
+                      <span className="text-[#3b82f6] font-black text-lg">
+                        ৳{product.price}
+                      </span>
+                    </div>
+                  </Link>
+                  {/* Action Buttons */}
+                  <div className="flex gap-2 p-3 pt-0 mt-auto">
+                    <Link href={`/main/product/motorsport-porsche`} className="flex-1 bg-white text-black text-center text-xs sm:text-sm font-black border-2 border-black py-2 uppercase tracking-wide shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 hover:-translate-x-0.5 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-0 active:translate-x-0 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all">
+                      Details
+                    </Link>
+                    <button className="flex-1 bg-[#3b82f6] text-white text-center text-xs sm:text-sm font-black border-2 border-black py-2 uppercase tracking-wide shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 hover:-translate-x-0.5 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-0 active:translate-x-0 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all" onClick={(e) => { e.preventDefault(); console.log("Added to cart"); }}>
+                      Add to Cart
+                    </button>
                   </div>
-
-                  {/* Rating */}
-                  <div className="flex text-yellow-400 text-[10px] mb-1 gap-0.5">
-                    {[...Array(product.rating)].map((_, i) => (
-                      <span key={i}>★</span>
-                    ))}
-                  </div>
-
-                  {/* Price */}
-                  <div className="flex items-center gap-2">
-                    <span className="text-gray-400 line-through text-xs sm:text-sm">
-                      ৳{product.originalPrice}
-                    </span>
-                    <span className="bg-gradient-to-r from-[#00B4DB] to-[#0000FF] bg-clip-text text-transparent font-bold text-sm sm:text-base">
-                      ৳{product.price}
-                    </span>
-                  </div>
-                </Link>
+                </div>
               ))}
             </div>
           </div>

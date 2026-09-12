@@ -135,10 +135,10 @@ export default function UserManagementPage() {
       {isLoading && <GlobalLoader />}
       <div className="flex flex-col gap-8">
         <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">User Management</h1>
+        <h1 className="text-3xl font-black uppercase tracking-tight text-black">User Management</h1>
         <button 
           onClick={() => setIsModalOpen(true)}
-          className="bg-gray-900 text-white px-6 py-2 text-sm font-medium hover:bg-gray-800 transition-colors dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
+          className="bg-[#3b82f6] text-white px-6 py-2 text-sm font-black uppercase border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all rounded-none"
         >
           Add New User
         </button>
@@ -146,53 +146,53 @@ export default function UserManagementPage() {
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="w-full max-w-lg border bg-white p-6 shadow-lg dark:bg-gray-950 dark:border-gray-800 relative">
+          <div className="w-full max-w-lg border-[3px] border-black bg-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none relative">
             <button 
               onClick={() => setIsModalOpen(false)}
-              className="absolute right-4 top-4 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
+              className="absolute right-4 top-4 text-black hover:scale-110 transition-transform"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="square" strokeLinejoin="miter"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
-            <h2 className="text-xl font-semibold mb-6">Add New User</h2>
+            <h2 className="text-2xl font-black uppercase border-b-4 border-black w-max pb-1 mb-6 text-black">Add New User</h2>
             <form onSubmit={handleCreateUser} className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
-                <label htmlFor="name" className="text-sm font-medium">Full Name</label>
+                <label htmlFor="name" className="text-sm font-black uppercase text-black">Full Name</label>
                 <input 
                   type="text" 
                   id="name" 
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
-                  placeholder="John Doe" 
+                  placeholder="JOHN DOE" 
                   required
-                  className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 dark:bg-gray-900 dark:border-gray-700" 
+                  className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase" 
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label htmlFor="email" className="text-sm font-medium">Email Address</label>
+                <label htmlFor="email" className="text-sm font-black uppercase text-black">Email Address</label>
                 <input 
                   type="email" 
                   id="email" 
                   value={newEmail}
                   onChange={(e) => setNewEmail(e.target.value)}
-                  placeholder="john@example.com" 
+                  placeholder="JOHN@EXAMPLE.COM" 
                   required
-                  className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 dark:bg-gray-900 dark:border-gray-700" 
+                  className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase" 
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label htmlFor="password" className="text-sm font-medium">Password</label>
+                <label htmlFor="password" className="text-sm font-black uppercase text-black">Password</label>
                 <input 
                   type="password" 
                   id="password" 
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Secret password" 
+                  placeholder="SECRET PASSWORD" 
                   required
-                  className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 dark:bg-gray-900 dark:border-gray-700" 
+                  className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase" 
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label htmlFor="role" className="text-sm font-medium">Role</label>
+                <label htmlFor="role" className="text-sm font-black uppercase text-black">Role</label>
                 <SimpleSelect 
                   id="role" 
                   value={newRole}
@@ -204,17 +204,17 @@ export default function UserManagementPage() {
                   ]}
                 />
               </div>
-              <div className="mt-4 flex justify-end gap-2">
+              <div className="mt-6 flex justify-end gap-4">
                 <button 
                   type="button" 
                   onClick={() => setIsModalOpen(false)}
-                  className="border border-gray-300 bg-white px-6 py-2 text-sm font-medium hover:bg-gray-50 transition-colors dark:bg-gray-900 dark:border-gray-700 dark:hover:bg-gray-800"
+                  className="border-2 border-black bg-white px-6 py-2 text-sm font-black uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 hover:-translate-x-0.5 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all text-black rounded-none"
                 >
                   Cancel
                 </button>
                 <button 
                   type="submit" 
-                  className="bg-gray-900 text-white px-6 py-2 text-sm font-medium hover:bg-gray-800 transition-colors dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
+                  className="bg-[#3b82f6] text-white px-6 py-2 text-sm font-black uppercase border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 hover:-translate-x-0.5 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all rounded-none"
                 >
                   Save User
                 </button>
@@ -233,7 +233,7 @@ export default function UserManagementPage() {
           statusOptions={statusOptions}
           searchPlaceholder="Search users..."
         />
-        <div className="border bg-white shadow-sm dark:bg-gray-950 dark:border-gray-800 overflow-x-auto">
+        <div className="border-[3px] border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>

@@ -66,8 +66,8 @@ export default function IncompleteOrdersPage() {
     <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Incomplete Orders</h1>
-          <p className="text-gray-500 mt-1">Manage abandoned carts and follow up with customers</p>
+          <h1 className="text-3xl font-black uppercase tracking-tight text-black">Incomplete Orders</h1>
+          <p className="text-black font-bold uppercase mt-1">Manage abandoned carts and follow up with customers</p>
         </div>
       </div>
 
@@ -80,7 +80,7 @@ export default function IncompleteOrdersPage() {
           statusOptions={statusOptions}
           searchPlaceholder="Search by name, phone or email..."
         />
-        <div className="border bg-white shadow-sm dark:bg-gray-950 dark:border-gray-800">
+        <div className="border-[3px] border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow>

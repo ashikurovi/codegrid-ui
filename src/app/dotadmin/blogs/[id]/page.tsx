@@ -14,40 +14,40 @@ export default function EditBlogPage() {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center gap-4">
-        <Link href="/dotadmin/blogs" className="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50 flex items-center justify-center p-2 border bg-white shadow-sm dark:bg-gray-950 dark:border-gray-800 transition-colors">
+        <Link href="/dotadmin/blogs" className="text-black hover:text-[#3b82f6] flex items-center justify-center p-2 border-[3px] border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 rounded-none">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg>
         </Link>
-        <h1 className="text-3xl font-bold tracking-tight">Edit Blog {blogId}</h1>
+        <h1 className="text-3xl font-black uppercase tracking-tight text-black">Edit Blog {blogId}</h1>
       </div>
 
-      <div className="border bg-white p-6 shadow-sm dark:bg-gray-950 dark:border-gray-800 max-w-4xl">
+      <div className="border-[3px] border-black bg-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none max-w-4xl">
         <form className="flex flex-col gap-6">
           
           <div className="flex flex-col gap-4 border-b pb-6 dark:border-gray-800">
-            <h3 className="text-lg font-semibold mb-2">Blog Content</h3>
+            <h3 className="text-xl font-black uppercase mb-2 text-black border-b-4 border-black w-max pb-1">Blog Content</h3>
             
             <div className="flex flex-col gap-2">
-              <label htmlFor="title" className="text-sm font-medium">Article Title</label>
+              <label htmlFor="title" className="text-sm font-black uppercase text-black">Article Title</label>
               <input 
                 type="text" 
                 id="title" 
                 defaultValue="How to Style Drop Shoulder Tees for Winter"
-                className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 dark:bg-gray-900 dark:border-gray-700" 
+                className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase" 
               />
             </div>
             
             <div className="flex flex-col gap-2">
-              <label htmlFor="excerpt" className="text-sm font-medium">Short Excerpt</label>
+              <label htmlFor="excerpt" className="text-sm font-black uppercase text-black">Short Excerpt</label>
               <textarea 
                 id="excerpt" 
                 rows={2}
                 defaultValue="Discover the best ways to layer your favorite drop shoulder t-shirts to stay warm and stylish this winter season."
-                className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 dark:bg-gray-900 dark:border-gray-700 resize-none" 
+                className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase resize-none" 
               ></textarea>
             </div>
 
             <div className="flex flex-col gap-2">
-              <label htmlFor="content" className="text-sm font-medium">Full Content</label>
+              <label htmlFor="content" className="text-sm font-black uppercase text-black">Full Content</label>
               <RichTextEditor 
                 value="Winter is here, and it's time to talk about layering. Drop shoulder tees are an incredible base layer..."
                 onChange={(val) => console.log(val)} 
@@ -57,21 +57,21 @@ export default function EditBlogPage() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
-                <label htmlFor="date" className="text-sm font-medium">Publish Date</label>
+                <label htmlFor="date" className="text-sm font-black uppercase text-black">Publish Date</label>
                 <input 
                   type="date" 
                   id="date" 
                   defaultValue="2026-01-15"
-                  className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 dark:bg-gray-900 dark:border-gray-700" 
+                  className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase" 
                 />
               </div>
 
               <div className="flex flex-col gap-2">
-                <label htmlFor="status" className="text-sm font-medium">Status</label>
+                <label htmlFor="status" className="text-sm font-black uppercase text-black">Status</label>
                 <select 
                   id="status" 
                   defaultValue="Published"
-                  className="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white dark:bg-gray-900 dark:border-gray-700"
+                  className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase"
                 >
                   <option value="Draft">Draft</option>
                   <option value="Published">Published</option>
@@ -81,7 +81,7 @@ export default function EditBlogPage() {
           </div>
 
           <div className="flex flex-col gap-2 border-b pb-6 dark:border-gray-800">
-            <h3 className="text-lg font-semibold mb-2">Cover Image</h3>
+            <h3 className="text-xl font-black uppercase mb-2 text-black border-b-4 border-black w-max pb-1">Cover Image</h3>
             <div className="flex flex-col sm:flex-row gap-6 items-start">
               <div className="w-full sm:w-1/2 aspect-video relative border rounded bg-gray-100 overflow-hidden">
                 <Image 
@@ -103,14 +103,14 @@ export default function EditBlogPage() {
             <button 
               type="button"
               onClick={() => router.push("/dotadmin/blogs")}
-              className="bg-gray-900 text-white px-8 py-3 text-sm font-medium hover:bg-gray-800 transition-colors dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
+              className="bg-[#3b82f6] text-white px-8 py-3 text-sm font-black uppercase border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all rounded-none disabled:opacity-50"
             >
               Update Blog
             </button>
             <button 
               type="button"
               onClick={() => router.push("/dotadmin/blogs")}
-              className="border border-gray-300 bg-white px-8 py-3 text-sm font-medium hover:bg-gray-50 transition-colors dark:bg-gray-900 dark:border-gray-700 dark:hover:bg-gray-800"
+              className="border-[3px] border-black bg-white px-8 py-3 text-sm font-black uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all rounded-none text-black"
             >
               Cancel
             </button>

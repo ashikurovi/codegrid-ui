@@ -81,8 +81,8 @@ export function Category() {
   return (
     <section className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Header */}
-      <div className="text-center mb-10">
-        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-wider uppercase">
+      <div className="text-center mb-12">
+        <h2 className="text-3xl sm:text-4xl font-black text-black tracking-wide uppercase">
           Featured Categories
         </h2>
       </div>
@@ -93,23 +93,22 @@ export function Category() {
           <Link
             key={category.id}
             href={category.link}
-            className="group relative aspect-square overflow-hidden rounded-none block"
+            className="group relative aspect-square overflow-hidden rounded-none block border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-transform hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] bg-white"
           >
             {/* Image */}
-            <Image
-              src={category.image}
-              alt={category.title}
-              fill
-              className="object-cover transition-transform duration-700 group-hover:scale-105"
-              sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 16vw"
-            />
-
-            {/* Gradient Overlay for better text readability */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
+            <div className="absolute inset-0">
+              <Image
+                src={category.image}
+                alt={category.title}
+                fill
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
+                sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 16vw"
+              />
+            </div>
 
             {/* Title */}
-            <div className="absolute inset-x-0 bottom-2 sm:bottom-4 flex justify-center">
-              <span className="bg-white/30 dark:bg-black/40 backdrop-blur-md text-white border border-white/30 dark:border-white/10 text-[8px] sm:text-[10px] md:text-xs font-bold px-3 sm:px-4 py-1.5 sm:py-2 rounded-none uppercase tracking-widest text-center shadow-lg">
+            <div className="absolute inset-x-0 bottom-4 flex justify-center px-2">
+              <span className="bg-white text-black border-2 border-black text-[10px] sm:text-xs font-black px-4 py-2 rounded-none uppercase tracking-widest text-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                 {category.title}
               </span>
             </div>

@@ -1,36 +1,69 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Calculator, TrendingUp, DollarSign, Percent, Plus, X, Trash2 } from "lucide-react";
+import { getAllCalculations, createCalculation, updateCalculation, deleteCalculation } from "../../../api/calculatorApi";
 
 export default function CalculationPage() {
-  const [products, setProducts] = useState([
-    { id: 1, name: "Premium Drop Shoulder Tee", quantity: 100, buyingPrice: 350, designCost: 150, additionalCost: 50, sellingPrice: 850 },
-    { id: 2, name: "Winter Hoodie", quantity: 50, buyingPrice: 600, designCost: 100, additionalCost: 80, sellingPrice: 1500 },
-    { id: 3, name: "Custom Corporate Mug", quantity: 500, buyingPrice: 120, designCost: 50, additionalCost: 30, sellingPrice: 350 },
-    { id: 4, name: "Basic Polo Shirt", quantity: 200, buyingPrice: 280, designCost: 80, additionalCost: 40, sellingPrice: 600 },
-  ]);
-
+  const [products, setProducts] = useState<any[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [newItem, setNewItem] = useState({
     name: "", quantity: 1, buyingPrice: 0, designCost: 0, additionalCost: 0, sellingPrice: 0
   });
 
-  const handleUpdate = (id: number, field: string, value: number) => {
-    setProducts(products.map(p => p.id === id ? { ...p, [field]: Number(value) } : p));
+  useEffect(() => {
+    fetchCalculations();
+  }, []);
+
+  const fetchCalculations = async () => {
+    try {
+      const data = await getAllCalculations();
+      setProducts(data);
+    } catch (error) {
+      console.error("Failed to fetch calculations", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleAdd = (e: React.FormEvent) => {
+  const handleUpdate = async (id: number, field: string, value: number) => {
+    const updatedValue = Number(value);
+    
+    // Optimistic UI update
+    setProducts(products.map(p => p.id === id ? { ...p, [field]: updatedValue } : p));
+    
+    try {
+      await updateCalculation(id, { [field]: updatedValue });
+    } catch (error) {
+      console.error("Failed to update calculation", error);
+      // Revert on error could be added here
+      fetchCalculations();
+    }
+  };
+
+  const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newItem.name) return;
-    setProducts([...products, { ...newItem, id: Date.now() }]);
-    setNewItem({ name: "", quantity: 1, buyingPrice: 0, designCost: 0, additionalCost: 0, sellingPrice: 0 });
-    setIsModalOpen(false); // Close modal after adding
+    
+    try {
+      const createdItem = await createCalculation(newItem);
+      setProducts([...products, createdItem]);
+      setNewItem({ name: "", quantity: 1, buyingPrice: 0, designCost: 0, additionalCost: 0, sellingPrice: 0 });
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Failed to add calculation", error);
+    }
   };
 
-  const removeProduct = (id: number) => {
-    setProducts(products.filter(p => p.id !== id));
+  const removeProduct = async (id: number) => {
+    try {
+      await deleteCalculation(id);
+      setProducts(products.filter(p => p.id !== id));
+    } catch (error) {
+      console.error("Failed to delete calculation", error);
+    }
   };
 
   // Calculations
@@ -40,14 +73,19 @@ export default function CalculationPage() {
     let totalRevenueValue = 0;
 
     const rows = products.map(p => {
-      const qty = p.quantity || 1;
-      const unitCost = (p.buyingPrice || 0) + (p.designCost || 0) + (p.additionalCost || 0);
-      const unitProfit = (p.sellingPrice || 0) - unitCost;
+      const qty = Number(p.quantity) || 1;
+      const buyingPrice = Number(p.buyingPrice) || 0;
+      const designCost = Number(p.designCost) || 0;
+      const additionalCost = Number(p.additionalCost) || 0;
+      const sellingPrice = Number(p.sellingPrice) || 0;
+
+      const unitCost = buyingPrice + designCost + additionalCost;
+      const unitProfit = sellingPrice - unitCost;
       
       const rowTotalCost = unitCost * qty;
-      const rowTotalRevenue = (p.sellingPrice || 0) * qty;
+      const rowTotalRevenue = sellingPrice * qty;
       const rowTotalProfit = unitProfit * qty;
-      const margin = p.sellingPrice > 0 ? ((unitProfit / p.sellingPrice) * 100).toFixed(2) : "0.00";
+      const margin = sellingPrice > 0 ? ((unitProfit / sellingPrice) * 100).toFixed(2) : "0.00";
       
       totalExpectedProfit += rowTotalProfit;
       totalCostValue += rowTotalCost;
@@ -61,16 +99,20 @@ export default function CalculationPage() {
     return { rows, totalExpectedProfit, totalCostValue, totalRevenueValue, avgMargin };
   }, [products]);
 
+  if (isLoading) {
+    return <div className="p-8 flex justify-center text-gray-500">Loading calculations...</div>;
+  }
+
   return (
     <div className="flex flex-col gap-8 pb-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Profit & Cost Calculator</h1>
-          <p className="text-gray-500 mt-1">Calculate volume based costs, expenses, and expected total profits.</p>
+          <h1 className="text-3xl font-black uppercase tracking-tight text-black">Profit & Cost Calculator</h1>
+          <p className="text-black font-bold uppercase mt-1">Calculate volume based costs, expenses, and expected total profits.</p>
         </div>
         <button 
           onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-2 bg-gray-900 text-white px-6 py-2 text-sm font-medium hover:bg-gray-800 transition-colors dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
+          className="flex items-center gap-2 bg-[#3b82f6] text-white px-6 py-2 text-sm font-black uppercase border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all rounded-none"
         >
           <Plus className="w-4 h-4" /> Add Product
         </button>
@@ -78,7 +120,7 @@ export default function CalculationPage() {
 
       {/* Top Stats */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <div className="border bg-white p-6 shadow-sm dark:bg-gray-950 dark:border-gray-800 flex flex-col gap-2">
+        <div className="border-[3px] border-black bg-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none flex flex-col gap-2">
           <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
             <h3 className="text-sm font-medium tracking-tight">Total Capital Required</h3>
             <DollarSign className="h-4 w-4" />
@@ -86,7 +128,7 @@ export default function CalculationPage() {
           <div className="text-2xl font-bold">৳ {calcData.totalCostValue.toLocaleString()}</div>
         </div>
         
-        <div className="border bg-white p-6 shadow-sm dark:bg-gray-950 dark:border-gray-800 flex flex-col gap-2">
+        <div className="border-[3px] border-black bg-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none flex flex-col gap-2">
           <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
             <h3 className="text-sm font-medium tracking-tight">Total Expected Revenue</h3>
             <TrendingUp className="h-4 w-4 text-blue-500" />
@@ -94,7 +136,7 @@ export default function CalculationPage() {
           <div className="text-2xl font-bold text-blue-600">৳ {calcData.totalRevenueValue.toLocaleString()}</div>
         </div>
 
-        <div className="border bg-white p-6 shadow-sm dark:bg-gray-950 dark:border-gray-800 flex flex-col gap-2">
+        <div className="border-[3px] border-black bg-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none flex flex-col gap-2">
           <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
             <h3 className="text-sm font-medium tracking-tight">Total Expected Profit</h3>
             <Calculator className="h-4 w-4 text-green-500" />
@@ -102,7 +144,7 @@ export default function CalculationPage() {
           <div className="text-2xl font-bold text-green-600">৳ {calcData.totalExpectedProfit.toLocaleString()}</div>
         </div>
 
-        <div className="border bg-white p-6 shadow-sm dark:bg-gray-950 dark:border-gray-800 flex flex-col gap-2">
+        <div className="border-[3px] border-black bg-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none flex flex-col gap-2">
           <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
             <h3 className="text-sm font-medium tracking-tight">Avg. Profit Margin</h3>
             <Percent className="h-4 w-4 text-purple-500" />
@@ -112,7 +154,7 @@ export default function CalculationPage() {
       </div>
 
       {/* Main Calculator Table */}
-      <div className="border bg-white shadow-sm dark:bg-gray-950 dark:border-gray-800 overflow-x-auto w-full">
+      <div className="border-[3px] border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none overflow-x-auto w-full">
         <table className="w-full text-sm text-left">
           <thead className="bg-black text-white font-medium border-b border-gray-900 dark:border-gray-800 uppercase text-[10px] tracking-wider">
             <tr>
@@ -210,9 +252,9 @@ export default function CalculationPage() {
       {/* Add Product Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md dark:bg-gray-950 dark:border dark:border-gray-800">
-            <div className="flex items-center justify-between border-b p-4 dark:border-gray-800">
-              <h3 className="text-lg font-semibold">Add Product to Calculate</h3>
+          <div className="border-[3px] border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none w-full max-w-md">
+            <div className="flex items-center justify-between border-b-4 border-black p-4 mb-2">
+              <h3 className="text-lg font-black uppercase text-black">Add Product to Calculate</h3>
               <button 
                 onClick={() => setIsModalOpen(false)}
                 className="text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
@@ -283,13 +325,13 @@ export default function CalculationPage() {
                 <button 
                   type="button" 
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 text-sm font-medium border border-gray-300 rounded-sm hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+                  className="border-2 border-black bg-white px-6 py-2 text-sm font-black uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 hover:-translate-x-0.5 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all text-black rounded-none"
                 >
                   Cancel
                 </button>
                 <button 
                   type="submit" 
-                  className="bg-gray-900 text-white px-6 py-2 text-sm font-medium hover:bg-gray-800 rounded-sm transition-colors dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
+                  className="bg-[#3b82f6] text-white px-6 py-2 text-sm font-black uppercase border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 hover:-translate-x-0.5 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all rounded-none"
                 >
                   Add Product
                 </button>
@@ -301,3 +343,4 @@ export default function CalculationPage() {
     </div>
   );
 }
+

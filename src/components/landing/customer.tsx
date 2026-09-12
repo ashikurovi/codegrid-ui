@@ -43,13 +43,13 @@ export function Customer() {
   return (
     <section className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
       {/* Header */}
-      <div className="text-center mb-10">
-        <h2 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-wide uppercase mb-3">
+      <div className="text-center mb-12">
+        <h2 className="text-3xl sm:text-4xl font-black text-black tracking-wide uppercase mb-4">
           SEEN WEARING CODEGRID
         </h2>
-        <p className="text-sm sm:text-base text-gray-700 max-w-3xl mx-auto">
-          They trusted <span className="font-bold bg-gradient-to-r from-[#00B4DB] to-[#0000FF] bg-clip-text text-transparent">CodeGrid</span>; because they believe in what&apos;s{" "}
-          <span className="font-bold">real, bold, and built with pride</span>. Now it&apos;s your turn to wear yours.
+        <p className="text-base sm:text-lg text-black font-bold max-w-3xl mx-auto px-4">
+          They trusted <span className="font-black text-white bg-[#3b82f6] border-2 border-black px-1.5 py-0.5 mx-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] uppercase">CodeGrid</span> because they believe in what&apos;s{" "}
+          <span className="font-black text-white bg-black border-2 border-black px-1.5 py-0.5 mx-1 uppercase">real, bold, and built with pride</span>. Now it&apos;s your turn to wear yours.
         </p>
       </div>
 
@@ -58,7 +58,7 @@ export function Customer() {
         {/* Left Arrow */}
         <button
           onClick={scrollLeft}
-          className="absolute left-2 sm:-left-4 top-1/2 -translate-y-1/2 z-10 p-2 sm:p-3 bg-white/30 hover:bg-white/50 backdrop-blur-md border border-white/40 text-gray-900 rounded-none shadow-lg transition-all opacity-0 group-hover:opacity-100 hidden sm:flex items-center justify-center"
+          className="absolute left-2 sm:-left-4 top-1/2 -translate-y-1/2 z-10 p-2 sm:p-3 bg-white border-2 border-black text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:translate-x-1 active:shadow-none transition-all opacity-0 group-hover:opacity-100 hidden sm:flex items-center justify-center rounded-none"
         >
           <ChevronLeft className="w-6 h-6" />
         </button>
@@ -72,10 +72,10 @@ export function Customer() {
           {customers.map((customer) => (
             <div
               key={customer.id}
-              className="min-w-[280px] sm:min-w-[300px] flex-shrink-0 snap-start flex flex-col items-center"
+              className="min-w-[280px] sm:min-w-[300px] flex-shrink-0 snap-start flex flex-col items-center bg-white border-[3px] border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-transform mb-2"
             >
               {/* Image */}
-              <div className="relative w-full aspect-[4/5] overflow-hidden mb-4 bg-gray-100 rounded-none">
+              <div className="relative w-full aspect-[4/5] overflow-hidden border-b-[3px] border-black rounded-none">
                 <Image
                   src={customer.image}
                   alt={customer.name}
@@ -85,9 +85,11 @@ export function Customer() {
                 />
               </div>
               {/* Name */}
-              <p className="text-sm font-medium text-gray-800 text-center px-2">
-                {customer.name}
-              </p>
+              <div className="w-full p-4 bg-white text-center">
+                <p className="text-sm sm:text-base font-black text-black uppercase">
+                  {customer.name}
+                </p>
+              </div>
             </div>
           ))}
         </div>
@@ -95,18 +97,18 @@ export function Customer() {
         {/* Right Arrow */}
         <button
           onClick={scrollRight}
-          className="absolute right-2 sm:-right-4 top-1/2 -translate-y-1/2 z-10 p-2 sm:p-3 bg-white/30 hover:bg-white/50 backdrop-blur-md border border-white/40 text-gray-900 rounded-none shadow-lg transition-all opacity-0 group-hover:opacity-100 hidden sm:flex items-center justify-center"
+          className="absolute right-2 sm:-right-4 top-1/2 -translate-y-1/2 z-10 p-2 sm:p-3 bg-white border-2 border-black text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:translate-x-1 active:shadow-none transition-all opacity-0 group-hover:opacity-100 hidden sm:flex items-center justify-center rounded-none"
         >
           <ChevronRight className="w-6 h-6" />
         </button>
       </div>
 
       {/* Pagination Dots */}
-      <div className="flex justify-center items-center gap-1.5 mt-2">
+      <div className="flex justify-center items-center gap-2 mt-4">
         {customers.map((_, idx) => (
           <div
             key={idx}
-            className={`w-1.5 h-1.5 rounded-none ${idx === 0 ? "bg-[#0066FF]" : "bg-gray-300"}`}
+            className={`w-2.5 h-2.5 rounded-none border-[1px] border-black ${idx === 0 ? "bg-[#3b82f6] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] scale-110" : "bg-white shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]"}`}
           />
         ))}
       </div>

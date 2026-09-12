@@ -84,49 +84,49 @@ export default function CustomOrderPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 font-sans">
+    <div className="min-h-screen flex flex-col font-sans">
       <main className="flex-1 w-full max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
-        <div className="text-center mb-16">
-          <h1 className="text-4xl sm:text-5xl font-black text-gray-900 mb-4">
+        <div className="text-center mb-16 flex flex-col items-center">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-black mb-6 uppercase tracking-tighter bg-white border-[4px] border-black px-6 py-3 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] inline-block w-max">
             Custom & Bulk Orders
           </h1>
-          <p className="text-gray-600 max-w-2xl mx-auto">
+          <p className="text-black font-bold max-w-2xl mx-auto bg-white border-[3px] border-black p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
             Design your own custom t-shirts, bottles, and corporate gifts. Perfect for events, teams, and corporate branding. Upload your own design or choose from our templates.
           </p>
         </div>
 
         {/* Category Selector */}
-        <div className="flex justify-center flex-wrap gap-4 mb-16">
+        <div className="flex justify-center flex-wrap gap-6 mb-16">
           <button
             onClick={() => handleCategoryChange("apparel")}
-            className={`flex items-center gap-2 px-8 py-4 rounded-none font-bold transition-all ${
+            className={`flex items-center gap-3 px-8 py-4 font-black uppercase tracking-widest border-[3px] border-black transition-all ${
               selectedCategory === "apparel"
-                ? "bg-gradient-to-br from-[#00A8FF] to-[#0033FF] text-white shadow-md"
-                : "bg-white text-gray-600 border border-gray-200 hover:border-[#0066FF] hover:bg-gradient-to-r hover:from-[#00B4DB] hover:to-[#0000FF] hover:bg-clip-text hover:text-transparent"
+                ? "bg-[#3b82f6] text-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] -translate-y-1 -translate-x-1"
+                : "bg-white text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:bg-[#3b82f6] hover:text-white"
             }`}
           >
-            <Shirt className="w-5 h-5" /> T-Shirts & Apparel
+            <Shirt className="w-6 h-6" /> T-Shirts & Apparel
           </button>
           <button
             onClick={() => handleCategoryChange("bottles")}
-            className={`flex items-center gap-2 px-8 py-4 rounded-none font-bold transition-all ${
+            className={`flex items-center gap-3 px-8 py-4 font-black uppercase tracking-widest border-[3px] border-black transition-all ${
               selectedCategory === "bottles"
-                ? "bg-gradient-to-br from-[#00A8FF] to-[#0033FF] text-white shadow-md"
-                : "bg-white text-gray-600 border border-gray-200 hover:border-[#0066FF] hover:bg-gradient-to-r hover:from-[#00B4DB] hover:to-[#0000FF] hover:bg-clip-text hover:text-transparent"
+                ? "bg-[#3b82f6] text-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] -translate-y-1 -translate-x-1"
+                : "bg-white text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:bg-[#3b82f6] hover:text-white"
             }`}
           >
-            <Coffee className="w-5 h-5" /> Mugs & Bottles
+            <Coffee className="w-6 h-6" /> Mugs & Bottles
           </button>
           <button
             onClick={() => handleCategoryChange("corporate")}
-            className={`flex items-center gap-2 px-8 py-4 rounded-none font-bold transition-all ${
+            className={`flex items-center gap-3 px-8 py-4 font-black uppercase tracking-widest border-[3px] border-black transition-all ${
               selectedCategory === "corporate"
-                ? "bg-gradient-to-br from-[#00A8FF] to-[#0033FF] text-white shadow-md"
-                : "bg-white text-gray-600 border border-gray-200 hover:border-[#0066FF] hover:bg-gradient-to-r hover:from-[#00B4DB] hover:to-[#0000FF] hover:bg-clip-text hover:text-transparent"
+                ? "bg-[#3b82f6] text-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] -translate-y-1 -translate-x-1"
+                : "bg-white text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:bg-[#3b82f6] hover:text-white"
             }`}
           >
-            <Package className="w-5 h-5" /> Corporate Packages
+            <Package className="w-6 h-6" /> Corporate Packages
           </button>
         </div>
 
@@ -136,17 +136,17 @@ export default function CustomOrderPage() {
             
             {/* Conditional Content based on Category */}
             {selectedCategory !== "corporate" && (
-              <div className="bg-white p-8 rounded-none shadow-sm border border-gray-100 animate-in fade-in duration-500">
-                <h3 className="text-xl font-bold mb-6">1. Choose Your Item</h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8">
+              <div className="bg-white p-8 sm:p-12 border-[4px] border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] animate-in fade-in duration-500">
+                <h3 className="text-2xl font-black text-black uppercase tracking-widest mb-8 border-b-[3px] border-black pb-4 inline-block">1. Choose Your Item</h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 mb-12">
                   {(selectedCategory === "apparel" ? apparelOptions : bottleOptions).map((item) => (
                     <div 
                       key={item.id} 
                       onClick={() => setSelectedBaseItem(item)}
-                      className={`border-2 rounded-none cursor-pointer transition-all overflow-hidden group ${
+                      className={`border-[3px] border-black cursor-pointer transition-all overflow-hidden group shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] ${
                         selectedBaseItem?.id === item.id 
-                          ? "border-[#0066FF] ring-2 ring-[#0066FF]/20 shadow-md" 
-                          : "border-gray-100 hover:border-[#0066FF]"
+                          ? "bg-black text-white" 
+                          : "bg-white text-black"
                       }`}
                     >
                       <div className="aspect-square bg-gray-100 relative">
@@ -157,47 +157,43 @@ export default function CustomOrderPage() {
                           className="object-cover group-hover:scale-105 transition-transform"
                         />
                       </div>
-                      <div className={`p-3 text-center transition-colors ${
-                        selectedBaseItem?.id === item.id ? "bg-blue-50" : "bg-gray-50"
-                      }`}>
-                        <div className="text-sm font-bold text-gray-900">{item.name}</div>
-                        <div className="text-sm font-bold bg-gradient-to-r from-[#00B4DB] to-[#0000FF] bg-clip-text text-transparent mt-1">{item.price}</div>
+                      <div className={`p-4 text-center transition-colors`}>
+                        <div className="text-sm font-black uppercase tracking-widest mb-1">{item.name}</div>
+                        <div className={`text-sm font-black ${selectedBaseItem?.id === item.id ? "text-white" : "text-[#3b82f6]"}`}>{item.price}</div>
                       </div>
                     </div>
                   ))}
                 </div>
 
-                <h3 className="text-xl font-bold mb-4">2. Upload Your Design</h3>
-                <div className="border-2 border-dashed border-gray-300 rounded-none p-12 flex flex-col items-center justify-center bg-gray-50 hover:bg-blue-50 hover:border-[#0066FF] transition-colors cursor-pointer group">
-                  <div className="w-16 h-16 bg-white rounded-none shadow-sm flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <Upload className="w-6 h-6 bg-gradient-to-r from-[#00B4DB] to-[#0000FF] bg-clip-text text-transparent" />
+                <h3 className="text-2xl font-black text-black uppercase tracking-widest mb-6 border-b-[3px] border-black pb-4 inline-block">2. Upload Your Design</h3>
+                <div className="border-[3px] border-black p-12 flex flex-col items-center justify-center bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:bg-[#3b82f6] hover:text-white transition-all cursor-pointer group">
+                  <div className="w-16 h-16 border-[3px] border-black bg-white flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                    <Upload className="w-8 h-8 text-black" />
                   </div>
-                  <p className="font-bold text-gray-800 mb-1">Click to upload your logo or design</p>
-                  <p className="text-sm text-gray-500">Supports PNG, SVG, JPG (Max 5MB)</p>
+                  <p className="font-black uppercase tracking-widest text-lg mb-2 group-hover:text-white">Click to upload your logo</p>
+                  <p className="text-sm font-bold group-hover:text-white">Supports PNG, SVG, JPG (Max 5MB)</p>
                 </div>
               </div>
             )}
 
             {selectedCategory === "corporate" && !selectedPackageId && (
               <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <h3 className="text-2xl font-bold text-gray-900">Select a Corporate Package</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <h3 className="text-3xl md:text-4xl font-black text-black uppercase tracking-tighter bg-white border-[4px] border-black p-4 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] w-max max-w-full">Select a Corporate Package</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                   {corporatePackages.map((pkg) => (
-                    <div key={pkg.id} className={`${pkg.color} ${pkg.textColor} p-8 rounded-none shadow-sm border border-gray-200 flex flex-col`}>
-                      <h4 className="text-xl font-black mb-2">{pkg.name}</h4>
-                      <div className="text-lg font-bold opacity-80 mb-6">{pkg.price}</div>
-                      <ul className="space-y-3 mb-8 flex-1">
+                    <div key={pkg.id} className={`bg-white text-black p-8 border-[4px] border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex flex-col hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] transition-all`}>
+                      <h4 className="text-2xl font-black uppercase tracking-tighter mb-4 border-b-[3px] border-black pb-4">{pkg.name}</h4>
+                      <div className="text-xl font-black text-[#3b82f6] mb-8">{pkg.price}</div>
+                      <ul className="space-y-4 mb-10 flex-1">
                         {pkg.items.map((item, i) => (
-                          <li key={i} className="flex items-center gap-2 text-sm font-medium">
-                            <CheckCircle2 className="w-4 h-4" /> {item.name}
+                          <li key={i} className="flex items-center gap-3 text-sm font-bold text-black uppercase tracking-widest">
+                            <CheckCircle2 className="w-5 h-5 text-black" /> {item.name}
                           </li>
                         ))}
                       </ul>
                       <button 
                         onClick={() => setSelectedPackageId(pkg.id)}
-                        className={`w-full font-bold py-3 rounded-none transition-colors ${
-                          pkg.id === "basic" ? "bg-black text-white hover:bg-gray-800" : "bg-white text-black hover:bg-gray-100"
-                        }`}
+                        className="w-full bg-black text-white font-black text-sm uppercase tracking-widest py-4 border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all"
                       >
                         View Details
                       </button>
@@ -208,31 +204,32 @@ export default function CustomOrderPage() {
             )}
 
             {selectedCategory === "corporate" && selectedPackage && (
-              <div className="bg-white p-8 rounded-none shadow-sm border border-gray-100 animate-in fade-in slide-in-from-right-8 duration-500">
+              <div className="bg-white p-8 sm:p-12 border-[4px] border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] animate-in fade-in slide-in-from-right-8 duration-500">
                 <button 
                   onClick={() => setSelectedPackageId(null)}
-                  className="flex items-center gap-2 text-sm font-bold bg-gradient-to-r from-[#00B4DB] to-[#0000FF] bg-clip-text text-transparent hover:text-[#0033FF] transition-colors mb-6"
+                  className="group flex items-center w-max bg-white border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-black font-black uppercase tracking-widest px-5 py-3 hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all mb-10"
                 >
-                  <ArrowLeft className="w-4 h-4" /> Back to Packages
+                  <ArrowLeft className="w-5 h-5 mr-3 font-black" />
+                  Back to Packages
                 </button>
                 
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 gap-6 border-[4px] border-black p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] bg-white">
                   <div>
-                    <h3 className="text-3xl font-black text-gray-900">{selectedPackage.name}</h3>
-                    <p className="text-gray-500 mt-2 max-w-lg">{selectedPackage.description}</p>
+                    <h3 className="text-3xl md:text-4xl font-black text-black uppercase tracking-tighter">{selectedPackage.name}</h3>
+                    <p className="text-black font-bold mt-2 max-w-lg">{selectedPackage.description}</p>
                   </div>
-                  <div className="text-right">
-                    <span className="block text-sm text-gray-500 font-bold uppercase tracking-wider">Package Price</span>
-                    <span className="text-2xl font-bold bg-gradient-to-r from-[#00B4DB] to-[#0000FF] bg-clip-text text-transparent">{selectedPackage.price}</span>
+                  <div className="text-right sm:text-left bg-black text-white p-4 border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                    <span className="block text-xs font-black uppercase tracking-widest mb-1">Package Price</span>
+                    <span className="text-3xl font-black">{selectedPackage.price}</span>
                   </div>
                 </div>
 
-                <div className="w-full h-[1px] bg-gray-100 mb-8"></div>
+                <div className="w-full h-[4px] bg-black mb-10"></div>
 
-                <h4 className="font-bold text-gray-900 mb-6 uppercase tracking-wider text-sm">Package Contents:</h4>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <h4 className="font-black text-black mb-6 uppercase tracking-widest text-lg inline-block border-b-[3px] border-black pb-2">Package Contents:</h4>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
                   {selectedPackage.items.map((item, idx) => (
-                    <div key={idx} className="group border border-gray-100 rounded-none overflow-hidden bg-gray-50 hover:border-[#0066FF] transition-colors">
+                    <div key={idx} className="group border-[3px] border-black overflow-hidden bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all">
                       <div className="aspect-square relative overflow-hidden">
                         <Image
                           src={item.image}
@@ -241,41 +238,41 @@ export default function CustomOrderPage() {
                           className="object-cover group-hover:scale-110 transition-transform duration-500"
                         />
                       </div>
-                      <div className="p-3 text-center">
-                        <p className="text-sm font-bold text-gray-800">{item.name}</p>
+                      <div className="p-4 text-center">
+                        <p className="text-xs font-black uppercase tracking-widest text-black">{item.name}</p>
                       </div>
                     </div>
                   ))}
                 </div>
 
-                <div className="bg-blue-50 p-6 rounded-none border border-blue-100 flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
+                <div className="bg-[#3b82f6] p-8 border-[4px] border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] flex flex-col sm:flex-row items-center justify-between gap-6 mb-12 text-white">
                   <div>
-                    <h5 className="font-bold text-gray-900 mb-1">Ready to order this package?</h5>
-                    <p className="text-sm text-gray-600">Provide your branding details below and fill out the request form on the right.</p>
+                    <h5 className="font-black text-2xl uppercase tracking-tighter mb-2">Ready to order this package?</h5>
+                    <p className="text-sm font-bold">Provide your branding details below and fill out the request form on the right.</p>
                   </div>
-                  <div className="w-12 h-12 bg-white rounded-none flex items-center justify-center shadow-sm">
-                    <Package className="w-6 h-6 bg-gradient-to-r from-[#00B4DB] to-[#0000FF] bg-clip-text text-transparent" />
+                  <div className="w-16 h-16 bg-white border-[3px] border-black text-black flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                    <Package className="w-8 h-8" />
                   </div>
                 </div>
 
-                <h4 className="font-bold text-gray-900 mb-4 uppercase tracking-wider text-sm">Design & Branding Details:</h4>
-                <div className="space-y-6 bg-gray-50 p-6 rounded-none border border-gray-100">
+                <h4 className="font-black text-black mb-6 uppercase tracking-widest text-lg inline-block border-b-[3px] border-black pb-2">Design & Branding Details:</h4>
+                <div className="space-y-8 bg-white p-8 border-[4px] border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
                   <div>
-                    <label className="block text-sm font-bold text-gray-900 mb-2">Upload Brand Logo or Assets</label>
-                    <div className="border-2 border-dashed border-gray-300 rounded-none p-8 flex flex-col items-center justify-center bg-white hover:bg-blue-50 hover:border-[#0066FF] transition-colors cursor-pointer group">
-                      <div className="w-12 h-12 bg-gray-50 rounded-none shadow-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                        <Upload className="w-5 h-5 bg-gradient-to-r from-[#00B4DB] to-[#0000FF] bg-clip-text text-transparent" />
+                    <label className="block text-sm font-black text-black uppercase tracking-widest mb-3">Upload Brand Logo or Assets</label>
+                    <div className="border-[3px] border-black p-10 flex flex-col items-center justify-center bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:bg-[#3b82f6] hover:text-white transition-all cursor-pointer group">
+                      <div className="w-16 h-16 border-[3px] border-black bg-white text-black flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                        <Upload className="w-8 h-8" />
                       </div>
-                      <p className="font-bold text-gray-800 text-sm mb-1">Click to upload files</p>
-                      <p className="text-xs text-gray-500">Supports PNG, SVG, AI (Max 10MB)</p>
+                      <p className="font-black uppercase tracking-widest text-lg mb-2 group-hover:text-white">Click to upload files</p>
+                      <p className="text-sm font-bold group-hover:text-white">Supports PNG, SVG, AI (Max 10MB)</p>
                     </div>
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-bold text-gray-900 mb-2">Brand Overview & Customization Instructions</label>
+                    <label className="block text-sm font-black text-black uppercase tracking-widest mb-3">Brand Overview & Customization Instructions</label>
                     <textarea 
                       rows={4} 
-                      className="w-full px-4 py-3 rounded-none border border-gray-200 text-sm focus:outline-none focus:border-[#0066FF] bg-white" 
+                      className="w-full bg-white border-[3px] border-black py-4 px-5 text-sm font-bold text-black focus:outline-none focus:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-1 focus:-translate-x-1 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] placeholder-gray-500" 
                       placeholder="e.g. We want the logo printed on the chest of the polo, and laser engraved on the bottle. Brand colors are Navy and Gold..."
                     ></textarea>
                   </div>
@@ -286,41 +283,43 @@ export default function CustomOrderPage() {
 
           {/* Right Side: Order Request Form */}
           <div className="w-full lg:w-1/3">
-            <div className="bg-white p-8 rounded-none shadow-sm border border-gray-100 sticky top-24">
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">Request a Quote</h3>
-              <p className="text-sm text-gray-500 mb-6">Fill out the details below and our team will get back to you with pricing.</p>
+            <div className="bg-white p-8 sm:p-10 border-[4px] border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] sticky top-24">
+              <h3 className="text-3xl font-black text-black uppercase tracking-tighter mb-4">Request a Quote</h3>
+              <p className="text-sm font-bold text-black mb-8 border-b-[3px] border-black pb-4">Fill out the details below and our team will get back to you with pricing.</p>
               
-              <form className="space-y-4">
+              <form className="space-y-6">
                 <div>
-                  <label className="block text-xs font-bold text-gray-900 mb-1">Name / Company Name</label>
-                  <input type="text" className="w-full px-4 py-3 rounded-none border border-gray-200 text-sm focus:outline-none focus:border-[#0066FF]" placeholder="Enter your name or company" />
+                  <label className="block text-sm font-black text-black uppercase tracking-widest mb-3">Name / Company Name</label>
+                  <input type="text" className="w-full bg-white border-[3px] border-black py-4 px-5 text-sm font-bold text-black focus:outline-none focus:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-1 focus:-translate-x-1 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] placeholder-gray-500" placeholder="Enter your name or company" />
                 </div>
                 
-                <div className="flex gap-4">
+                <div className="flex flex-col sm:flex-row gap-6">
                   <div className="flex-1">
-                    <label className="block text-xs font-bold text-gray-900 mb-1">Phone</label>
-                    <input type="text" className="w-full px-4 py-3 rounded-none border border-gray-200 text-sm focus:outline-none focus:border-[#0066FF]" placeholder="+880..." />
+                    <label className="block text-sm font-black text-black uppercase tracking-widest mb-3">Phone</label>
+                    <input type="text" className="w-full bg-white border-[3px] border-black py-4 px-5 text-sm font-bold text-black focus:outline-none focus:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-1 focus:-translate-x-1 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] placeholder-gray-500" placeholder="+880..." />
                   </div>
-                  <div className="w-1/3">
-                    <label className="block text-xs font-bold text-gray-900 mb-1">Quantity</label>
-                    <input type="number" className="w-full px-4 py-3 rounded-none border border-gray-200 text-sm focus:outline-none focus:border-[#0066FF]" placeholder="Min. 10" />
+                  <div className="w-full sm:w-1/3">
+                    <label className="block text-sm font-black text-black uppercase tracking-widest mb-3">Quantity</label>
+                    <input type="number" className="w-full bg-white border-[3px] border-black py-4 px-5 text-sm font-bold text-black focus:outline-none focus:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-1 focus:-translate-x-1 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] placeholder-gray-500" placeholder="Min. 10" />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-900 mb-1">Additional Details</label>
+                  <label className="block text-sm font-black text-black uppercase tracking-widest mb-3">Additional Details</label>
                   <textarea 
                     key={getDetailsText()}
                     rows={4} 
-                    className="w-full px-4 py-3 rounded-none border border-gray-200 text-sm focus:outline-none focus:border-[#0066FF]" 
+                    className="w-full bg-white border-[3px] border-black py-4 px-5 text-sm font-bold text-black focus:outline-none focus:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-1 focus:-translate-x-1 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] placeholder-gray-500" 
                     placeholder="Tell us about colors, sizes, or special requirements..."
                     defaultValue={getDetailsText()}
                   ></textarea>
                 </div>
 
-                <button type="button" className="w-full bg-gradient-to-br from-[#00A8FF] to-[#0033FF] hover:from-[#0099EE] hover:to-[#0022DD] text-white font-bold py-4 rounded-none transition-all shadow-sm mt-4">
-                  Submit Request
-                </button>
+                <div className="pt-4">
+                  <button type="button" className="w-full bg-[#3b82f6] text-white font-black text-lg uppercase tracking-widest py-5 border-[3px] border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 active:translate-x-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                    Submit Request
+                  </button>
+                </div>
               </form>
             </div>
           </div>

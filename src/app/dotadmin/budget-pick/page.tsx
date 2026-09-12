@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -14,6 +14,8 @@ import {
 import { TableControls } from "@/components/admin/table-controls";
 import { TablePagination } from "@/components/admin/table-pagination";
 import { Eye, Edit, Trash2 } from "lucide-react";
+import { deleteBudgetPick, getAllBudgetPicks } from "@/api/buget-pickApi";
+
 
 export default function BudgetPickManagementPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -21,40 +23,33 @@ export default function BudgetPickManagementPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  const budgetProducts = [
-    {
-      id: 1,
-      title: "Best Deal: Solid Half Sleeve (3 Pieces)",
-      image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop",
-      price: 899,
-      originalPrice: 1050,
-      status: "Active",
-    },
-    {
-      id: 2,
-      title: "Best Deal: Solid Drop Shoulder (3 Pieces)",
-      image: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?q=80&w=800&auto=format&fit=crop",
-      price: 999,
-      originalPrice: 1170,
-      status: "Active",
-    },
-    {
-      id: 3,
-      title: "Best Deal: Solid Full Sleeve T-Shirt (2 Pieces)",
-      image: "https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?q=80&w=800&auto=format&fit=crop",
-      price: 749,
-      originalPrice: 900,
-      status: "Inactive",
-    },
-    {
-      id: 4,
-      title: "FIFA World Cup 2026 T-Shirt: Portugal (Combo)",
-      image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=800&auto=format&fit=crop",
-      price: 249,
-      originalPrice: 590,
-      status: "Active",
-    },
-  ];
+  const [budgetProducts, setBudgetProducts] = useState<any[]>([]);
+
+  const fetchProducts = async () => {
+    try {
+      const res = await getAllBudgetPicks();
+      setBudgetProducts(res.data || []);
+    } catch (error) {
+      console.error("Failed to fetch budget picks", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const handleDelete = async (id: number | string) => {
+    if (window.confirm("Are you sure you want to delete this budget pick package?")) {
+      try {
+        await deleteBudgetPick(id);
+        alert("Deleted successfully");
+        fetchProducts();
+      } catch (error) {
+        console.error("Failed to delete", error);
+        alert("Failed to delete product");
+      }
+    }
+  };
 
   const statusOptions = [
     { label: "All Status", value: "All" },
@@ -65,7 +60,7 @@ export default function BudgetPickManagementPage() {
   // Filter and Search logic
   const filteredProducts = useMemo(() => {
     return budgetProducts.filter((product) => {
-      const matchesSearch = product.title.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = product.title?.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStatus = statusFilter === "All" || product.status === statusFilter;
       return matchesSearch && matchesStatus;
     });
@@ -81,17 +76,17 @@ export default function BudgetPickManagementPage() {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Budget Pick Management</h1>
-        <Link 
+        <h1 className="text-3xl font-black uppercase tracking-tight text-black">Budget Pick Management</h1>
+        <Link
           href="/dotadmin/budget-pick/add"
-          className="bg-gray-900 text-white px-6 py-2 text-sm font-medium hover:bg-gray-800 transition-colors dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
+          className="bg-[#3b82f6] text-white px-6 py-2 text-sm font-black uppercase border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all rounded-none"
         >
           Add Budget Pick Package
         </Link>
       </div>
 
       <div>
-        <TableControls 
+        <TableControls
           searchQuery={searchQuery}
           setSearchQuery={(val) => { setSearchQuery(val); setCurrentPage(1); }}
           statusFilter={statusFilter}
@@ -99,7 +94,7 @@ export default function BudgetPickManagementPage() {
           statusOptions={statusOptions}
           searchPlaceholder="Search budget packages..."
         />
-        <div className="border bg-white shadow-sm dark:bg-gray-950 dark:border-gray-800">
+        <div className="border-[3px] border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow>
@@ -125,17 +120,21 @@ export default function BudgetPickManagementPage() {
                     <TableCell className="font-medium">BP-{product.id}</TableCell>
                     <TableCell>
                       <div className="relative w-12 h-12 bg-gray-100 rounded-md overflow-hidden">
-                        <Image
-                          src={product.image}
-                          alt={product.title}
-                          fill
-                          className="object-cover"
-                        />
+                        {product.thumbnail ? (
+                          <Image
+                            src={product.thumbnail}
+                            alt={product.title}
+                            fill
+                            className="object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">No Img</div>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell>{product.title}</TableCell>
                     <TableCell className="line-through text-gray-500">৳{product.originalPrice}</TableCell>
-                    <TableCell className="font-bold text-blue-600">৳{product.price}</TableCell>
+                    <TableCell className="font-bold text-blue-600">৳{product.currentPrice}</TableCell>
                     <TableCell>
                       <span className={`px-2 py-1 text-xs font-medium rounded ${product.status === "Active" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"}`}>
                         {product.status}
@@ -143,22 +142,23 @@ export default function BudgetPickManagementPage() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <Link 
+                        <Link
                           href={`/dotadmin/budget-pick/${product.id}`}
                           className="p-1 text-gray-500 hover:text-blue-600 transition-colors"
                           title="View Details"
                         >
                           <Eye className="w-4 h-4" />
                         </Link>
-                        <Link 
+                        <Link
                           href={`/dotadmin/budget-pick/${product.id}/edit`}
                           className="p-1 text-gray-500 hover:text-green-600 transition-colors"
                           title="Edit"
                         >
                           <Edit className="w-4 h-4" />
                         </Link>
-                        <button 
+                        <button
                           type="button"
+                          onClick={() => handleDelete(product.id)}
                           className="p-1 text-gray-500 hover:text-red-600 transition-colors"
                           title="Delete"
                         >
@@ -172,7 +172,7 @@ export default function BudgetPickManagementPage() {
             </TableBody>
           </Table>
         </div>
-        <TablePagination 
+        <TablePagination
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={setCurrentPage}

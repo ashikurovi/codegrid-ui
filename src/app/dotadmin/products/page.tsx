@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import {
   Table,
@@ -13,22 +13,42 @@ import {
 import { TableControls } from "@/components/admin/table-controls";
 import { TablePagination } from "@/components/admin/table-pagination";
 import { Eye, Edit, Trash2 } from "lucide-react";
+import { getAllProducts, deleteProduct } from "../../../api/productApi";
 
 export default function ProductsManagementPage() {
+  const [products, setProducts] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
   const itemsPerPage = 5;
 
-  const products = [
-    { id: 1, name: "iPhone 14 Pro", category: "Smartphones", price: "$999", stock: 45, status: "Active" },
-    { id: 2, name: "MacBook Pro 16\"", category: "Laptops", price: "$2499", stock: 12, status: "Active" },
-    { id: 3, name: "AirPods Pro", category: "Electronics", price: "$249", stock: 150, status: "Active" },
-    { id: 4, name: "Nike Air Max", category: "Men's Wear", price: "$120", stock: 0, status: "Inactive" },
-    { id: 5, name: "Samsung Galaxy S23", category: "Smartphones", price: "$899", stock: 28, status: "Active" },
-    { id: 6, name: "Levi's Denim Jacket", category: "Clothing", price: "$90", stock: 65, status: "Active" },
-    { id: 7, name: "Yoga Mat", category: "Fitness", price: "$25", stock: 200, status: "Active" },
-  ];
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      setIsLoading(true);
+      const res = await getAllProducts();
+      setProducts(res.data || []);
+    } catch (error) {
+      console.error("Failed to fetch products", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (confirm("Are you sure you want to delete this product?")) {
+      try {
+        await deleteProduct(id);
+        setProducts(products.filter(p => p.id !== id));
+      } catch (error) {
+        console.error("Failed to delete product", error);
+      }
+    }
+  };
 
   const statusOptions = [
     { label: "All Status", value: "All" },
@@ -39,9 +59,9 @@ export default function ProductsManagementPage() {
   // Filter and Search logic
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
-      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                            product.category.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesStatus = statusFilter === "All" || product.status === statusFilter;
+      const matchesSearch = (product.title || "").toLowerCase().includes(searchQuery.toLowerCase()) || 
+                            (product.category?.name || "").toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStatus = statusFilter === "All" || "Active" === statusFilter;
       return matchesSearch && matchesStatus;
     });
   }, [products, searchQuery, statusFilter]);
@@ -56,10 +76,10 @@ export default function ProductsManagementPage() {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Products Management</h1>
+        <h1 className="text-3xl font-black uppercase tracking-tight text-black">Products Management</h1>
         <Link 
           href="/dotadmin/products/add"
-          className="bg-gray-900 text-white px-6 py-2 text-sm font-medium hover:bg-gray-800 transition-colors dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
+          className="bg-[#3b82f6] text-white px-6 py-2 text-sm font-black uppercase border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all rounded-none"
         >
           Add New Product
         </Link>
@@ -74,7 +94,7 @@ export default function ProductsManagementPage() {
           statusOptions={statusOptions}
           searchPlaceholder="Search products..."
         />
-        <div className="border bg-white shadow-sm dark:bg-gray-950 dark:border-gray-800">
+        <div className="border-[3px] border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow>
@@ -98,13 +118,13 @@ export default function ProductsManagementPage() {
                 paginatedProducts.map((product) => (
                   <TableRow key={product.id}>
                     <TableCell className="font-medium">PRD-{product.id}</TableCell>
-                    <TableCell>{product.name}</TableCell>
-                    <TableCell>{product.category}</TableCell>
-                    <TableCell>{product.price}</TableCell>
-                    <TableCell>{product.stock}</TableCell>
+                    <TableCell>{product.title || "Untitled"}</TableCell>
+                    <TableCell>{product.category?.name || "Uncategorized"}</TableCell>
+                    <TableCell>৳{product.currentPrice || 0}</TableCell>
+                    <TableCell>{product.stock || 0}</TableCell>
                     <TableCell>
-                      <span className={`px-2 py-1 text-xs font-medium ${product.status === "Active" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"}`}>
-                        {product.status}
+                      <span className={`px-2 py-1 text-xs font-medium ${"Active" === "Active" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"}`}>
+                        Active
                       </span>
                     </TableCell>
                     <TableCell className="text-right">
@@ -125,6 +145,7 @@ export default function ProductsManagementPage() {
                         </Link>
                         <button 
                           type="button"
+                          onClick={() => handleDelete(product.id)}
                           className="p-1 text-gray-500 hover:text-red-600 transition-colors"
                           title="Delete"
                         >
