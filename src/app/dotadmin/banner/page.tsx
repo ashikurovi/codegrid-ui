@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -14,6 +14,7 @@ import {
 import { TableControls } from "@/components/admin/table-controls";
 import { TablePagination } from "@/components/admin/table-pagination";
 import { Eye, Edit, Trash2, Plus } from "lucide-react";
+import { getAllBanners, deleteBanner } from "@/api/bannerApi";
 
 export default function BannerManagementPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -21,53 +22,33 @@ export default function BannerManagementPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  const banners = [
-    {
-        id: 1,
-        title: "YOUR DESIGN HERE",
-        subtitle: "CUSTOMIZED YOUR T-SHIRT",
-        image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop",
-        link: "#",
-        tag: "#DEARAAZ",
-        status: "Active"
-    },
-    {
-        id: 2,
-        title: "Casual in Confidence",
-        subtitle: "ORDER HERE",
-        image: "https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?q=80&w=800&auto=format&fit=crop",
-        link: "#",
-        tag: "",
-        status: "Active"
-    },
-    {
-        id: 3,
-        title: "Deshi Collection",
-        subtitle: "for Deshi People",
-        image: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?q=80&w=800&auto=format&fit=crop",
-        link: "#",
-        tag: "",
-        status: "Active"
-    },
-    {
-        id: 4,
-        title: "Winter Collection",
-        subtitle: "STAY WARM",
-        image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=800&auto=format&fit=crop",
-        link: "#",
-        tag: "NEW",
-        status: "Inactive"
-    },
-    {
-        id: 5,
-        title: "Summer Vibes",
-        subtitle: "COOL STUFF",
-        image: "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=800&auto=format&fit=crop",
-        link: "#",
-        tag: "HOT",
-        status: "Active"
-    },
-  ];
+  const [banners, setBanners] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadBanners();
+  }, []);
+
+  const loadBanners = () => {
+    setLoading(true);
+    getAllBanners()
+      .then((res) => {
+        if (res.data) setBanners(res.data);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  };
+
+  const handleDelete = async (id: number) => {
+    if (confirm("Are you sure you want to delete this banner?")) {
+      try {
+        await deleteBanner(id);
+        loadBanners();
+      } catch (err) {
+        console.error("Failed to delete banner", err);
+      }
+    }
+  };
 
   const statusOptions = [
     { label: "All Status", value: "All" },
@@ -78,9 +59,9 @@ export default function BannerManagementPage() {
   // Filter and Search logic
   const filteredBanners = useMemo(() => {
     return banners.filter((banner) => {
-      const matchesSearch = banner.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                            banner.subtitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            banner.tag.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = (banner.title || "").toLowerCase().includes(searchQuery.toLowerCase()) || 
+                            (banner.subtitle || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            (banner.tag || "").toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStatus = statusFilter === "All" || banner.status === statusFilter;
       return matchesSearch && matchesStatus;
     });
@@ -130,7 +111,13 @@ export default function BannerManagementPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paginatedBanners.length === 0 ? (
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-6 text-gray-500 font-bold uppercase">
+                    Loading banners...
+                  </TableCell>
+                </TableRow>
+              ) : paginatedBanners.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center py-6 text-gray-500">
                     No banners found.
@@ -140,8 +127,12 @@ export default function BannerManagementPage() {
                 paginatedBanners.map((banner) => (
                   <TableRow key={banner.id}>
                     <TableCell>
-                      <div className="w-20 h-12 relative overflow-hidden bg-gray-100 rounded-sm">
-                        <Image src={banner.image} alt={banner.title} fill className="object-cover" />
+                      <div className="w-20 h-12 relative overflow-hidden bg-gray-100 rounded-sm border-2 border-black">
+                        {banner.image ? (
+                          <Image src={banner.image} alt={banner.title} fill className="object-cover" />
+                        ) : (
+                          <div className="flex items-center justify-center w-full h-full text-xs font-bold text-gray-400">NO IMG</div>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -175,6 +166,7 @@ export default function BannerManagementPage() {
                           <Edit className="w-4 h-4" />
                         </Link>
                         <button 
+                          onClick={() => handleDelete(banner.id)}
                           type="button"
                           className="p-1 text-gray-500 hover:text-red-600 transition-colors"
                           title="Delete"

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import {
   Table,
@@ -13,6 +13,7 @@ import {
 import { TableControls } from "@/components/admin/table-controls";
 import { TablePagination } from "@/components/admin/table-pagination";
 import { Eye, Edit, Trash2 } from "lucide-react";
+import { getAllCustomOrders, deleteCustomOrder } from "@/api/customOrderApi";
 
 export default function CustomOrdersManagementPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -20,15 +21,30 @@ export default function CustomOrdersManagementPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  const orders = [
-    { id: 2001, customer: "Tech Innovators Inc.", phone: "+880 1711-000001", category: "Corporate", item: "Premium Kit", quantity: 50, date: "2023-10-25", status: "New Request" },
-    { id: 2002, customer: "John Doe", phone: "+880 1811-000002", category: "Apparel", item: "Winter Hoodie", quantity: 15, date: "2023-10-26", status: "Quoted" },
-    { id: 2003, customer: "Creative Studio", phone: "+880 1911-000003", category: "Bottles", item: "Ceramic Mug", quantity: 100, date: "2023-10-26", status: "In Production" },
-    { id: 2004, customer: "Global Logistics", phone: "+880 1611-000004", category: "Corporate", item: "Executive Kit", quantity: 20, date: "2023-10-27", status: "Delivered" },
-    { id: 2005, customer: "Sarah Williams", phone: "+880 1511-000005", category: "Apparel", item: "Classic T-Shirt", quantity: 200, date: "2023-10-28", status: "Cancelled" },
-    { id: 2006, customer: "Event Planners Ltd", phone: "+880 1311-000006", category: "Bottles", item: "Steel Water Bottle", quantity: 75, date: "2023-10-28", status: "In Production" },
-    { id: 2007, customer: "Startup XYZ", phone: "+880 1411-000007", category: "Corporate", item: "Basic Kit", quantity: 30, date: "2023-10-29", status: "New Request" },
-  ];
+  const [orders, setOrders] = useState<any[]>([]);
+
+  useEffect(() => {
+    loadOrders();
+  }, []);
+
+  const loadOrders = () => {
+    getAllCustomOrders()
+      .then((res) => {
+        if (res.data) setOrders(res.data);
+      })
+      .catch(console.error);
+  };
+
+  const handleDelete = async (id: number) => {
+    if (confirm("Are you sure you want to delete this custom order?")) {
+      try {
+        await deleteCustomOrder(id);
+        loadOrders();
+      } catch (err) {
+        console.error("Failed to delete order", err);
+      }
+    }
+  };
 
   const statusOptions = [
     { label: "All Status", value: "All" },
@@ -42,9 +58,11 @@ export default function CustomOrdersManagementPage() {
   // Filter and Search logic
   const filteredOrders = useMemo(() => {
     return orders.filter((order) => {
-      const matchesSearch = order.customer.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      const customerName = order.customerName || (order.user?.name) || "Unknown Customer";
+      const customerPhone = order.customerPhone || (order.user?.phone) || "";
+      const matchesSearch = customerName.toLowerCase().includes(searchQuery.toLowerCase()) || 
                             order.id.toString().includes(searchQuery) ||
-                            order.phone.includes(searchQuery);
+                            customerPhone.includes(searchQuery);
       const matchesStatus = statusFilter === "All" || order.status === statusFilter;
       return matchesSearch && matchesStatus;
     });
@@ -114,15 +132,15 @@ export default function CustomOrdersManagementPage() {
                   <TableRow key={order.id}>
                     <TableCell className="font-medium">CUST-{order.id}</TableCell>
                     <TableCell>
-                      <div>{order.customer}</div>
-                      <div className="text-xs text-gray-500">{order.phone}</div>
+                      <div>{order.customerName || order.user?.name || "Unknown Customer"}</div>
+                      <div className="text-xs text-gray-500">{order.customerPhone || order.user?.phone || "-"}</div>
                     </TableCell>
                     <TableCell>
                       <div>{order.category}</div>
                       <div className="text-xs text-gray-500">{order.item}</div>
                     </TableCell>
                     <TableCell>{order.quantity}</TableCell>
-                    <TableCell>{order.date}</TableCell>
+                    <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
                     <TableCell>
                       <span className={`px-2 py-1 text-xs font-medium ${getStatusColor(order.status)}`}>
                         {order.status}
@@ -146,6 +164,7 @@ export default function CustomOrdersManagementPage() {
                         </Link>
                         <button 
                           type="button"
+                          onClick={() => handleDelete(order.id)}
                           className="p-1 text-gray-500 hover:text-red-600 transition-colors"
                           title="Delete"
                         >

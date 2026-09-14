@@ -2,11 +2,100 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createCustomOrder } from "@/api/customOrderApi";
+import { getAllUsers } from "@/api/userApi";
+import { getAllCustomProducts } from "@/api/customproductsApi";
 
 export default function AddCustomOrderPage() {
   const router = useRouter();
-  const [category, setCategory] = useState("Apparel");
+  
+  const [customerName, setCustomerName] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
+  const [customerEmail, setCustomerEmail] = useState("");
+  const [userId, setUserId] = useState<number | "">("");
+  const [users, setUsers] = useState<any[]>([]);
+  const [customProducts, setCustomProducts] = useState<any[]>([]);
+  const [category, setCategory] = useState("");
+  const [item, setItem] = useState("");
+  const [quantity, setQuantity] = useState(10);
+  const [details, setDetails] = useState("");
+  const [status, setStatus] = useState("New Request");
+  const [price, setPrice] = useState("");
+  
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    getAllUsers()
+      .then(data => setUsers(data?.data || []))
+      .catch(console.error);
+      
+    getAllCustomProducts()
+      .then(data => {
+        const products = data?.data || [];
+        setCustomProducts(products);
+        if (products.length > 0) {
+          const firstCat = products[0].category;
+          setCategory(firstCat);
+          const firstItem = products.find((p: any) => p.category === firstCat)?.productName;
+          setItem(firstItem || "");
+        }
+      })
+      .catch(console.error);
+  }, []);
+
+  const categories = Array.from(new Set(customProducts.map(p => p.category)));
+  const availableItems = customProducts.filter(p => p.category === category).map(p => p.productName);
+
+  useEffect(() => {
+    if (availableItems.length > 0 && !availableItems.includes(item)) {
+      setItem(availableItems[0]);
+    }
+  }, [category, customProducts, availableItems, item]);
+
+  useEffect(() => {
+    if (item && quantity) {
+      const selectedProduct = customProducts.find(p => p.productName === item);
+      if (selectedProduct) {
+        const basePrice = Number(selectedProduct.price) || 0;
+        setPrice((basePrice * quantity).toString());
+      }
+    }
+  }, [item, quantity, customProducts]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError(null);
+    
+    try {
+      const payload: any = {
+        category,
+        item,
+        quantity: Number(quantity),
+        status,
+      };
+
+      if (userId) payload.userId = Number(userId);
+      if (customerName) payload.customerName = customerName;
+      if (customerPhone) payload.customerPhone = customerPhone;
+      if (customerEmail) payload.customerEmail = customerEmail;
+      if (details) payload.details = details;
+      if (price) payload.price = Number(price);
+
+      const res = await createCustomOrder(payload);
+      if (res.data) {
+        router.push("/dotadmin/customorders");
+      } else {
+        setError(res.message || "Failed to create custom order.");
+      }
+    } catch (err: any) {
+      setError(err.message || "An error occurred while saving.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="flex flex-col gap-8">
@@ -18,16 +107,41 @@ export default function AddCustomOrderPage() {
       </div>
 
       <div className="border bg-white p-6 shadow-sm dark:bg-gray-950 dark:border-gray-800 max-w-3xl">
-        <form className="flex flex-col gap-6">
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            {error}
+          </div>
+        )}
+        <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
           
           <div className="flex flex-col gap-2 border-b pb-6 dark:border-gray-800">
             <h3 className="text-xl font-black uppercase mb-2 text-black border-b-4 border-black w-max pb-1">Customer Information</h3>
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-2">
+                <label htmlFor="userId" className="text-sm font-black uppercase text-black">Select User (Optional)</label>
+                <select 
+                  id="userId"
+                  value={userId}
+                  onChange={(e) => setUserId(e.target.value === "" ? "" : Number(e.target.value))}
+                  className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase"
+                >
+                  <option value="">Guest (No Account)</option>
+                  {users.map(user => (
+                    <option key={user.id} value={user.id}>{user.fullName} ({user.email})</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
               <div className="flex flex-col gap-2 md:col-span-2">
                 <label htmlFor="customerName" className="text-sm font-black uppercase text-black">Name / Company Name</label>
                 <input 
                   type="text" 
                   id="customerName" 
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
                   placeholder="e.g. John Doe / Tech Innovators" 
                   className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase" 
                 />
@@ -37,6 +151,8 @@ export default function AddCustomOrderPage() {
                 <input 
                   type="text" 
                   id="customerPhone" 
+                  value={customerPhone}
+                  onChange={(e) => setCustomerPhone(e.target.value)}
                   placeholder="+880 1..." 
                   className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase" 
                 />
@@ -46,6 +162,8 @@ export default function AddCustomOrderPage() {
                 <input 
                   type="email" 
                   id="customerEmail" 
+                  value={customerEmail}
+                  onChange={(e) => setCustomerEmail(e.target.value)}
                   placeholder="john@example.com" 
                   className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase" 
                 />
@@ -64,9 +182,9 @@ export default function AddCustomOrderPage() {
                   onChange={(e) => setCategory(e.target.value)}
                   className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase"
                 >
-                  <option value="Apparel">T-Shirts & Apparel</option>
-                  <option value="Bottles">Mugs & Bottles</option>
-                  <option value="Corporate">Corporate Packages</option>
+                  {categories.map((cat: any) => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
                 </select>
               </div>
               
@@ -74,29 +192,13 @@ export default function AddCustomOrderPage() {
                 <label htmlFor="item" className="text-sm font-black uppercase text-black">Specific Item / Package</label>
                 <select 
                   id="item" 
+                  value={item}
+                  onChange={(e) => setItem(e.target.value)}
                   className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase"
                 >
-                  {category === "Apparel" && (
-                    <>
-                      <option value="Classic T-Shirt">Classic T-Shirt</option>
-                      <option value="Premium Polo">Premium Polo</option>
-                      <option value="Winter Hoodie">Winter Hoodie</option>
-                    </>
-                  )}
-                  {category === "Bottles" && (
-                    <>
-                      <option value="Ceramic Mug">Ceramic Mug</option>
-                      <option value="Steel Water Bottle">Steel Water Bottle</option>
-                      <option value="Insulated Flask">Insulated Flask</option>
-                    </>
-                  )}
-                  {category === "Corporate" && (
-                    <>
-                      <option value="Basic Kit">Basic Kit</option>
-                      <option value="Premium Kit">Premium Kit</option>
-                      <option value="Executive Kit">Executive Kit</option>
-                    </>
-                  )}
+                  {availableItems.map((itm: any) => (
+                    <option key={itm} value={itm}>{itm}</option>
+                  ))}
                 </select>
               </div>
 
@@ -105,7 +207,8 @@ export default function AddCustomOrderPage() {
                 <input 
                   type="number" 
                   id="quantity" 
-                  defaultValue={10}
+                  value={quantity}
+                  onChange={(e) => setQuantity(Number(e.target.value))}
                   min={1}
                   className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase" 
                 />
@@ -116,6 +219,8 @@ export default function AddCustomOrderPage() {
               <label htmlFor="details" className="text-sm font-black uppercase text-black">Additional Details & Instructions</label>
               <textarea 
                 id="details" 
+                value={details}
+                onChange={(e) => setDetails(e.target.value)}
                 rows={4}
                 placeholder="Details about colors, sizes, logo placement..." 
                 className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase resize-none" 
@@ -128,6 +233,8 @@ export default function AddCustomOrderPage() {
               <label htmlFor="status" className="text-sm font-black uppercase text-black">Order Status</label>
               <select 
                 id="status" 
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
                 className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase"
               >
                 <option value="New Request">New Request</option>
@@ -141,6 +248,8 @@ export default function AddCustomOrderPage() {
               <input 
                 type="number" 
                 id="price" 
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
                 placeholder="Optional" 
                 className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase" 
               />
@@ -149,11 +258,11 @@ export default function AddCustomOrderPage() {
 
           <div className="mt-4 flex gap-4">
             <button 
-              type="button"
-              onClick={() => router.push("/dotadmin/customorders")}
+              type="submit"
+              disabled={isSubmitting}
               className="bg-[#3b82f6] text-white px-8 py-3 text-sm font-black uppercase border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all rounded-none disabled:opacity-50"
             >
-              Save Custom Order
+              {isSubmitting ? "Saving..." : "Save Custom Order"}
             </button>
             <button 
               type="button"

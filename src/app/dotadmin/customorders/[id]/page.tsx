@@ -2,10 +2,50 @@
 
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { getCustomOrderById, updateCustomOrder } from "@/api/customOrderApi";
 
 export default function CustomOrderDetailsPage() {
   const params = useParams();
   const orderId = params.id;
+  
+  const [order, setOrder] = useState<any>(null);
+  const [status, setStatus] = useState("New Request");
+  const [price, setPrice] = useState<number | "">("");
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (orderId) {
+      getCustomOrderById(orderId as string).then((res) => {
+        if (res.data) {
+          setOrder(res.data);
+          setStatus(res.data.status || "New Request");
+          setPrice(res.data.price || "");
+        }
+      });
+    }
+  }, [orderId]);
+
+  const handleUpdate = async () => {
+    setIsSaving(true);
+    try {
+      await updateCustomOrder(orderId as string, { status, price: price === "" ? undefined : Number(price) });
+      alert("Order updated successfully!");
+      const res = await getCustomOrderById(orderId as string);
+      if (res.data) setOrder(res.data);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to update order");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (!order) return <div className="p-8 font-bold">Loading...</div>;
+
+  const customerName = order.customerName || order.user?.name || "Unknown";
+  const customerPhone = order.customerPhone || order.user?.phone || "N/A";
+  const customerEmail = order.customerEmail || order.user?.email || "N/A";
 
   return (
     <div className="flex flex-col gap-8">
@@ -14,11 +54,20 @@ export default function CustomOrderDetailsPage() {
           <Link href="/dotadmin/customorders" className="text-black hover:text-[#3b82f6] flex items-center justify-center p-2 border-[3px] border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 rounded-none">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg>
           </Link>
-          <h1 className="text-3xl font-black uppercase tracking-tight text-black">Custom Request: CUST-{orderId}</h1>
+          <h1 className="text-3xl font-black uppercase tracking-tight text-black">Custom Request: CUST-{order.id}</h1>
         </div>
-        <span className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 px-3 py-1 text-sm font-medium border border-blue-200 dark:border-blue-800/50">
-          New Request
-        </span>
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={() => window.open(`/dotadmin/customorders/${order.id}/invoice`, '_blank')}
+            className="flex items-center gap-2 bg-white text-black px-4 py-2 text-sm font-black uppercase border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all rounded-none"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+            Print Invoice
+          </button>
+          <span className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 px-3 py-1 text-sm font-medium border border-blue-200 dark:border-blue-800/50">
+            {order.status}
+          </span>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -32,52 +81,44 @@ export default function CustomOrderDetailsPage() {
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 bg-gray-50 dark:bg-gray-900 p-4 rounded-md">
                 <div className="flex flex-col gap-1">
                   <span className="text-xs text-gray-500 font-medium uppercase tracking-wider">Category</span>
-                  <p className="font-medium">Corporate</p>
+                  <p className="font-medium">{order.category}</p>
                 </div>
                 <div className="flex flex-col gap-1">
                   <span className="text-xs text-gray-500 font-medium uppercase tracking-wider">Item/Package</span>
-                  <p className="font-medium">Executive Kit</p>
+                  <p className="font-medium">{order.item}</p>
                 </div>
                 <div className="flex flex-col gap-1">
                   <span className="text-xs text-gray-500 font-medium uppercase tracking-wider">Quantity</span>
-                  <p className="font-medium text-blue-600">20 Units</p>
+                  <p className="font-medium text-blue-600">{order.quantity} Units</p>
                 </div>
               </div>
 
               <div>
                 <h4 className="text-sm font-semibold mb-2">Instructions & Customization Info</h4>
                 <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed bg-white border dark:bg-gray-950 dark:border-gray-800 p-4 rounded-md">
-                  I am interested in ordering the Executive Kit. Please include our company logo on the jacket chest and engrave it on the flask. Brand colors are Navy and Gold. Attached are our logo files in SVG. Need delivery by 15th of next month.
+                  {order.details || "No additional details provided."}
                 </p>
               </div>
 
               <div className="border-t pt-6 mt-2 dark:border-gray-800">
                 <h4 className="text-sm font-semibold mb-4">Pricing Quote</h4>
                 <div className="flex flex-col gap-3">
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-gray-500">Base Price (Executive Kit)</span>
-                    <span>৳ 6,000 / kit</span>
-                  </div>
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-gray-500">Customization & Setup Fee</span>
-                    <span>৳ 2,500</span>
-                  </div>
-                  <div className="flex justify-between items-center text-sm border-t pt-3 mt-1 dark:border-gray-800">
-                    <span className="font-medium">Calculated Subtotal</span>
-                    <span>৳ 122,500</span>
-                  </div>
-                  
-                  <div className="mt-4 pt-4 border-t border-dashed dark:border-gray-800">
+                  <div className="mt-2 pt-4 border-t border-dashed dark:border-gray-800">
                     <label htmlFor="quotedTotal" className="text-xs font-bold block mb-1">Final Quoted Total to Customer (৳)</label>
                     <div className="flex gap-2 items-center">
                       <input 
                         type="number"
                         id="quotedTotal"
-                        defaultValue={120000}
-                        className="border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white dark:bg-gray-900 dark:border-gray-700 flex-1 max-w-[200px]"
+                        value={price}
+                        onChange={(e) => setPrice(e.target.value === "" ? "" : Number(e.target.value))}
+                        className="border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase flex-1 max-w-[200px]"
                       />
-                      <button className="bg-gray-900 text-white px-4 py-2 text-sm font-medium hover:bg-gray-800 transition-colors">
-                        Save Quote
+                      <button 
+                        onClick={handleUpdate}
+                        disabled={isSaving}
+                        className="bg-[#3b82f6] text-white px-6 py-2 text-sm font-black uppercase border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all rounded-none disabled:opacity-50"
+                      >
+                        {isSaving ? "Saving..." : "Save Quote"}
                       </button>
                     </div>
                   </div>
@@ -92,8 +133,9 @@ export default function CustomOrderDetailsPage() {
             <div className="flex items-center gap-4">
               <select 
                 id="status" 
-                defaultValue="New Request"
-                className="w-full max-w-xs border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white dark:bg-gray-900 dark:border-gray-700"
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+                className="w-full max-w-xs border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase"
               >
                 <option value="New Request">New Request</option>
                 <option value="Quoted">Quoted</option>
@@ -103,9 +145,11 @@ export default function CustomOrderDetailsPage() {
               </select>
               <button 
                 type="button"
-                className="bg-[#3b82f6] text-white px-6 py-2 text-sm font-black uppercase border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all rounded-none"
+                onClick={handleUpdate}
+                disabled={isSaving}
+                className="bg-black text-white px-6 py-2 text-sm font-black uppercase border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all rounded-none"
               >
-                Update Status
+                {isSaving ? "Updating..." : "Update Status"}
               </button>
             </div>
           </div>
@@ -117,45 +161,56 @@ export default function CustomOrderDetailsPage() {
             <h2 className="text-xl font-semibold border-b pb-4 dark:border-gray-800">Customer Details</h2>
             <div className="flex flex-col gap-1">
               <span className="text-sm text-gray-500 dark:text-gray-400">Name / Company</span>
-              <p className="font-medium">Global Logistics</p>
+              <p className="font-medium">{customerName}</p>
             </div>
             <div className="flex flex-col gap-1">
               <span className="text-sm text-gray-500 dark:text-gray-400">Phone Number</span>
-              <p className="font-medium">+880 1611-000004</p>
+              <p className="font-medium">{customerPhone}</p>
             </div>
             <div className="flex flex-col gap-1">
               <span className="text-sm text-gray-500 dark:text-gray-400">Email</span>
-              <p className="font-medium text-blue-600 hover:underline cursor-pointer">procurement@globallogistics.com</p>
+              <p className="font-medium text-blue-600 hover:underline cursor-pointer">{customerEmail}</p>
             </div>
-            <button className="border border-gray-300 bg-white px-4 py-2 mt-2 text-sm font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-              Call Customer
-            </button>
+            <div className="flex flex-col gap-1">
+              <span className="text-sm text-gray-500 dark:text-gray-400">Date Requested</span>
+              <p className="font-medium">{order.createdAt ? new Date(order.createdAt).toLocaleString() : "N/A"}</p>
+            </div>
           </div>
 
-          <div className="border bg-white p-6 shadow-sm dark:bg-gray-950 dark:border-gray-800 flex flex-col gap-6">
-            <h2 className="text-xl font-semibold border-b pb-4 dark:border-gray-800">Uploaded Assets</h2>
-            <div className="flex flex-col gap-3">
-              <a href="#" className="flex items-center gap-3 p-3 border rounded-md hover:bg-gray-50 transition-colors">
-                <div className="bg-blue-100 text-blue-600 p-2 rounded">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+          {order.user && (
+            <div className="border bg-white p-6 shadow-sm dark:bg-gray-950 dark:border-gray-800 flex flex-col gap-6">
+              <h2 className="text-xl font-semibold border-b pb-4 dark:border-gray-800">Linked Account</h2>
+              <div className="flex items-center gap-4">
+                {order.user.picture ? (
+                  <img src={order.user.picture} alt={order.user.name} className="w-12 h-12 rounded-full object-cover border-[2px] border-black" />
+                ) : (
+                  <div className="w-12 h-12 rounded-full bg-gray-200 border-[2px] border-black flex items-center justify-center text-gray-600 font-bold">
+                    {order.user.name?.charAt(0) || "U"}
+                  </div>
+                )}
+                <div>
+                  <p className="font-bold text-black">{order.user.name}</p>
+                  <p className="text-xs text-gray-500 font-bold uppercase">{order.user.role}</p>
                 </div>
-                <div className="flex-1 overflow-hidden">
-                  <p className="text-sm font-medium truncate">brand_logo_gold.svg</p>
-                  <p className="text-xs text-gray-500">145 KB</p>
+              </div>
+              <div className="flex flex-col gap-2 text-sm">
+                <div className="flex justify-between border-b pb-1 dark:border-gray-800">
+                  <span className="text-gray-500 font-bold uppercase">Account ID</span>
+                  <span className="font-bold">#{order.user.id}</span>
                 </div>
-              </a>
-              <a href="#" className="flex items-center gap-3 p-3 border rounded-md hover:bg-gray-50 transition-colors">
-                <div className="bg-green-100 text-green-600 p-2 rounded">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                <div className="flex justify-between border-b pb-1 dark:border-gray-800">
+                  <span className="text-gray-500 font-bold uppercase">Email</span>
+                  <span className="font-bold">{order.user.email}</span>
                 </div>
-                <div className="flex-1 overflow-hidden">
-                  <p className="text-sm font-medium truncate">branding_guidelines.pdf</p>
-                  <p className="text-xs text-gray-500">1.2 MB</p>
-                </div>
-              </a>
+                {order.user.phone && (
+                  <div className="flex justify-between border-b pb-1 dark:border-gray-800">
+                    <span className="text-gray-500 font-bold uppercase">Phone</span>
+                    <span className="font-bold">{order.user.phone}</span>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
       </div>

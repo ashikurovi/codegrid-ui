@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -42,6 +43,7 @@ const navGroups = [
   {
     title: "Marketing & Content",
     links: [
+      { name: "Campaigns", href: "/dotadmin/campaign", icon: ImageIcon },
       { name: "Banners", href: "/dotadmin/banner", icon: ImageIcon },
       { name: "Blogs", href: "/dotadmin/blogs", icon: PenTool },
       { name: "Customer Feedback", href: "/dotadmin/customer-feedback", icon: MessageSquareHeart },
@@ -61,6 +63,18 @@ const navGroups = [
 export default function Sideber() {
     const pathname = usePathname();
     const router = useRouter();
+    const [user, setUser] = useState<any>(null);
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            try {
+                setUser(JSON.parse(storedUser));
+            } catch (e) {
+                console.error("Failed to parse user data", e);
+            }
+        }
+    }, []);
 
     const handleLogout = () => {
         logoutUser();
@@ -115,17 +129,21 @@ export default function Sideber() {
                 <div className="p-4 border-t-[3px] border-black bg-white">
                     <div className="flex items-center justify-between gap-3 px-3 py-2 bg-white border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                         <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 border-2 border-black bg-[#3b82f6] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center text-white font-black text-xs rounded-none">
-                                A
+                            <div className="w-8 h-8 border-2 border-black bg-[#3b82f6] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center text-white font-black text-xs rounded-none overflow-hidden relative">
+                                {user?.picture ? (
+                                    <img src={user.picture} alt={user.name} className="w-full h-full object-cover" />
+                                ) : (
+                                    user?.name ? user.name.charAt(0).toUpperCase() : 'A'
+                                )}
                             </div>
-                            <div className="flex flex-col">
-                                <span className="text-sm font-black text-black uppercase">Admin User</span>
-                                <span className="text-[10px] font-bold text-gray-600 uppercase">admin@codegrid.com</span>
+                            <div className="flex flex-col truncate max-w-[120px]">
+                                <span className="text-sm font-black text-black uppercase truncate">{user?.name || "Admin User"}</span>
+                                <span className="text-[10px] font-bold text-gray-600 uppercase truncate">{user?.email || "admin@codegrid.com"}</span>
                             </div>
                         </div>
                         <button 
                             onClick={handleLogout}
-                            className="p-2 text-black border-2 border-transparent hover:border-black hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-red-500 hover:text-white transition-all rounded-none"
+                            className="p-2 text-black border-2 border-transparent hover:border-black hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-red-500 hover:text-white transition-all rounded-none shrink-0"
                             title="Logout"
                         >
                             <LogOut className="w-4 h-4 font-black" />

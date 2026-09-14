@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 
 interface RichTextEditorProps {
+  id?: string;
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
@@ -14,10 +15,11 @@ interface RichTextEditorProps {
 }
 
 export function RichTextEditor({ 
+  id,
   value, 
   onChange, 
   placeholder = "Write your content here...",
-  minHeight = "200px" 
+  minHeight = "400px" 
 }: RichTextEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
   const [isFocused, setIsFocused] = useState(false);
@@ -48,11 +50,23 @@ export function RichTextEditor({
     }
   };
 
+  const handleContainerClick = () => {
+    // If the user clicks on the container (e.g. empty space), focus the editor
+    if (document.activeElement !== editorRef.current) {
+      editorRef.current?.focus();
+    }
+  };
+
   const ToolbarButton = ({ onClick, icon: Icon, title }: { onClick: () => void, icon: React.ElementType, title: string }) => (
     <button
       type="button"
+      onMouseDown={(e) => {
+        // VERY IMPORTANT: Prevent default on mousedown so the contentEditable doesn't lose focus
+        e.preventDefault(); 
+      }}
       onClick={(e) => {
         e.preventDefault();
+        e.stopPropagation();
         onClick();
       }}
       title={title}
@@ -63,13 +77,19 @@ export function RichTextEditor({
   );
 
   return (
-    <div className={`w-full border rounded-md overflow-hidden transition-colors ${
-      isFocused 
-        ? "border-gray-400 ring-1 ring-gray-400 dark:border-gray-500 dark:ring-gray-500" 
-        : "border-gray-300 dark:border-gray-700"
-    }`}>
+    <div 
+      className={`w-full border rounded-md overflow-hidden transition-colors cursor-text ${
+        isFocused 
+          ? "border-gray-400 ring-1 ring-gray-400 dark:border-gray-500 dark:ring-gray-500" 
+          : "border-gray-300 dark:border-gray-700"
+      }`}
+      onClick={handleContainerClick}
+    >
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-1 border-b p-1.5 bg-gray-50 dark:bg-gray-900 dark:border-gray-700">
+      <div 
+        className="flex flex-wrap items-center gap-1 border-b p-1.5 bg-gray-50 dark:bg-gray-900 dark:border-gray-700 cursor-default"
+        onClick={(e) => e.stopPropagation()} // Prevent clicking toolbar from focusing editor unintentionally
+      >
         <ToolbarButton onClick={() => execCommand('bold')} icon={Bold} title="Bold" />
         <ToolbarButton onClick={() => execCommand('italic')} icon={Italic} title="Italic" />
         <ToolbarButton onClick={() => execCommand('underline')} icon={Underline} title="Underline" />
@@ -86,6 +106,7 @@ export function RichTextEditor({
 
       {/* Editor Area */}
       <div 
+        id={id}
         ref={editorRef}
         contentEditable
         className="w-full p-4 text-sm focus:outline-none dark:bg-gray-950 prose dark:prose-invert max-w-none"

@@ -1,48 +1,53 @@
 "use client";
 
-import React from "react";
-import Image from "next/image";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-
-const recentBlogs = [
-  {
-    id: 1,
-    title: "How to Style Drop Shoulder Tees for Winter",
-    excerpt: "Discover the best ways to layer your favorite drop shoulder t-shirts to stay warm and stylish this winter season.",
-    date: "Jan 15, 2026",
-    image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop",
-    link: "/main/blogs/1",
-  },
-  {
-    id: 2,
-    title: "The Rise of Streetwear in Bangladesh",
-    excerpt: "Exploring how local brands are reshaping the fashion landscape and bringing global streetwear trends to the streets of Dhaka.",
-    date: "Feb 02, 2026",
-    image: "https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?q=80&w=800&auto=format&fit=crop",
-    link: "/main/blogs/2",
-  },
-  {
-    id: 3,
-    title: "Understanding Fabric: What Makes a Good T-Shirt?",
-    excerpt: "From GSM to cotton blends, we break down everything you need to know to choose a t-shirt that lasts longer and feels better.",
-    date: "Feb 18, 2026",
-    image: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?q=80&w=800&auto=format&fit=crop",
-    link: "/main/blogs/3",
-  },
-];
+import { getAllBlogs } from "@/api/blogApi";
 
 export function RecentBlog() {
+  const [recentBlogs, setRecentBlogs] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        const res = await getAllBlogs();
+        if (res.data) {
+          const published = res.data.filter((b: any) => b.status === "Published" || !b.status);
+          published.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+          setRecentBlogs(published.slice(0, 3));
+        }
+      } catch (error) {
+        console.error("Failed to fetch blogs", error);
+      }
+    };
+    fetchBlogs();
+  }, []);
+
+  const getImgUrl = (url: string) => {
+    if (!url) return "";
+    if (url.startsWith('http')) return url;
+    return `http://localhost:8000${url.startsWith('/') ? '' : '/'}${url}`;
+  };
+
+  const formatDate = (dateStr: string) => {
+    if (!dateStr) return "";
+    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: '2-digit' };
+    return new Date(dateStr).toLocaleDateString('en-US', options);
+  };
+
+  if (recentBlogs.length === 0) return null;
+
   return (
     <section className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-center mb-12 gap-4">
-        <h2 className="text-3xl sm:text-4xl font-black text-black tracking-wide uppercase">
+        <h2 className="text-3xl sm:text-4xl font-bold text-black tracking-wide uppercase">
           LATEST FROM THE BLOG
         </h2>
-        <Link 
-          href="/main/blogs" 
-          className="text-sm font-black uppercase tracking-widest text-black border-[3px] border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:translate-x-1 active:shadow-none transition-all px-6 py-3 flex items-center gap-2 rounded-none"
+        <Link
+          href="/main/blogs"
+          className="text-sm font-medium uppercase tracking-widest text-black border-[1px] border-black bg-white hover:bg-gray-100 transition-colors px-6 py-3 hidden sm:flex items-center gap-2 rounded-none shadow-sm"
         >
           VIEW ALL <ArrowRight className="w-4 h-4" />
         </Link>
@@ -51,55 +56,59 @@ export function RecentBlog() {
       {/* Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
         {recentBlogs.map((blog, index) => (
-          <Link 
-            key={blog.id} 
-            href={blog.link} 
-            className={`group flex flex-col block bg-white border-[3px] border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-transform hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] ${
-              index === 0 ? "md:col-span-2 lg:col-span-2" : "col-span-1"
-            }`}
+          <Link
+            key={blog.id}
+            href={`/main/blogs/${blog.id}`}
+            className={`group flex flex-col block bg-transparent transition-transform hover:-translate-y-1 ${index === 0 ? "md:col-span-2 lg:col-span-2" : "col-span-1"
+              }`}
           >
             {/* Image Container */}
-            <div 
-              className={`relative bg-gray-100 overflow-hidden border-b-[3px] border-black rounded-none ${
-                index === 0 ? "aspect-video md:aspect-[2/1] lg:aspect-[16/9]" : "aspect-video lg:aspect-[4/3]"
-              }`}
+            <div
+              className={`relative bg-gray-100 overflow-hidden rounded-none ${index === 0 ? "aspect-video md:aspect-[2/1] lg:aspect-[16/9]" : "aspect-video lg:aspect-[4/3]"
+                }`}
             >
-              <Image
-                src={blog.image}
+              <img
+                src={getImgUrl(blog.image)}
                 alt={blog.title}
-                fill
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
-                sizes={index === 0 ? "(max-width: 1024px) 100vw, 66vw" : "(max-width: 1024px) 100vw, 33vw"}
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 group-hover:opacity-90"
               />
             </div>
 
             {/* Content */}
-            <div className="flex flex-col flex-1 p-6 sm:p-8">
-              <span className="inline-block bg-white text-black border-2 border-black px-3 py-1 text-[10px] sm:text-xs font-black tracking-widest uppercase w-max shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-4 group-hover:bg-[#3b82f6] group-hover:text-white transition-colors">
-                {blog.date}
+            <div className="flex flex-col flex-1 pt-6 pb-2">
+              <span className="inline-block bg-black text-white px-3 py-1 text-[10px] sm:text-xs font-bold tracking-widest uppercase w-max mb-4">
+                {formatDate(blog.date || blog.createdAt)}
               </span>
-              <h3 
-                className={`font-black text-black mb-4 leading-tight ${
-                  index === 0 ? "text-2xl sm:text-3xl lg:text-4xl" : "text-xl sm:text-2xl line-clamp-2"
-                }`}
+              <h3
+                className={`font-semibold text-black mb-4 leading-tight group-hover:text-gray-600 transition-colors ${index === 0 ? "text-2xl sm:text-3xl lg:text-4xl" : "text-xl sm:text-2xl line-clamp-2"
+                  }`}
               >
                 {blog.title}
               </h3>
-              <p 
-                className={`text-gray-800 flex-1 mb-6 font-medium ${
-                  index === 0 ? "text-base sm:text-lg line-clamp-3" : "text-sm line-clamp-2"
-                }`}
+              <p
+                className={`text-gray-500 flex-1 mb-6 font-medium ${index === 0 ? "text-base sm:text-lg line-clamp-3" : "text-sm line-clamp-2"
+                  }`}
               >
-                {blog.excerpt}
+                {blog.excerpt || (blog.content ? blog.content.replace(/<[^>]+>/g, '').substring(0, 100) + '...' : '')}
               </p>
               <div className="mt-auto">
-                <span className="inline-flex items-center gap-2 bg-[#3b82f6] text-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] px-4 py-2 text-[10px] sm:text-xs font-black uppercase tracking-widest transition-transform group-hover:-translate-y-1 group-hover:-translate-x-1 group-hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+                <span className="inline-flex items-center gap-2 text-black text-[10px] sm:text-xs font-bold uppercase tracking-widest transition-transform group-hover:translate-x-1">
                   READ MORE <ArrowRight className="w-4 h-4" />
                 </span>
               </div>
             </div>
           </Link>
         ))}
+      </div>
+
+      {/* Mobile View All Button */}
+      <div className="mt-8 flex sm:hidden w-full">
+        <Link
+          href="/main/blogs"
+          className="text-sm w-full justify-center font-medium uppercase tracking-widest text-black border-[1px] border-black bg-white hover:bg-gray-100 transition-colors px-6 py-4 flex items-center gap-2 rounded-none shadow-sm"
+        >
+          VIEW ALL <ArrowRight className="w-4 h-4" />
+        </Link>
       </div>
     </section>
   );

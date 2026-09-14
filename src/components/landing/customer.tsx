@@ -41,15 +41,15 @@ export function Customer() {
   }, []);
 
   return (
-    <section className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <section className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 ">
       {/* Header */}
       <div className="text-center mb-12">
-        <h2 className="text-3xl sm:text-4xl font-black text-black tracking-wide uppercase mb-4">
+        <h2 className="text-3xl sm:text-4xl font-bold text-black tracking-wide uppercase mb-4">
           SEEN WEARING CODEGRID
         </h2>
-        <p className="text-base sm:text-lg text-black font-bold max-w-3xl mx-auto px-4">
-          They trusted <span className="font-black text-white bg-[#3b82f6] border-2 border-black px-1.5 py-0.5 mx-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] uppercase">CodeGrid</span> because they believe in what&apos;s{" "}
-          <span className="font-black text-white bg-black border-2 border-black px-1.5 py-0.5 mx-1 uppercase">real, bold, and built with pride</span>. Now it&apos;s your turn to wear yours.
+        <p className="text-base sm:text-lg text-gray-600 font-medium max-w-3xl mx-auto px-4">
+          They trusted <span className="font-bold text-black bg-white px-2 py-0.5 mx-1 border-[1px] border-black uppercase">CodeGrid</span> because they believe in what&apos;s{" "}
+          <span className="font-bold text-black bg-white px-2 py-0.5 mx-1 border-[1px] border-black uppercase">real, bold, and built with pride</span>. Now it&apos;s your turn to wear yours.
         </p>
       </div>
 
@@ -58,7 +58,7 @@ export function Customer() {
         {/* Left Arrow */}
         <button
           onClick={scrollLeft}
-          className="absolute left-2 sm:-left-4 top-1/2 -translate-y-1/2 z-10 p-2 sm:p-3 bg-white border-2 border-black text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:translate-x-1 active:shadow-none transition-all opacity-0 group-hover:opacity-100 hidden sm:flex items-center justify-center rounded-none"
+          className="absolute left-2 sm:-left-4 top-1/2 -translate-y-1/2 z-10 p-2 sm:p-3 bg-white border-[1px] border-black text-black hover:bg-gray-100 transition-colors opacity-0 group-hover:opacity-100 hidden sm:flex items-center justify-center rounded-none shadow-sm"
         >
           <ChevronLeft className="w-6 h-6" />
         </button>
@@ -72,21 +72,21 @@ export function Customer() {
           {customers.map((customer) => (
             <div
               key={customer.id}
-              className="min-w-[280px] sm:min-w-[300px] flex-shrink-0 snap-start flex flex-col items-center bg-white border-[3px] border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-transform mb-2"
+              className="min-w-[280px] sm:min-w-[300px] flex-shrink-0 snap-start flex flex-col items-center bg-transparent transition-transform mb-2 group-card hover:-translate-y-1"
             >
               {/* Image */}
-              <div className="relative w-full aspect-[4/5] overflow-hidden border-b-[3px] border-black rounded-none">
+              <div className="relative w-full aspect-[4/5] overflow-hidden rounded-none">
                 <Image
                   src={customer.image}
                   alt={customer.name}
                   fill
-                  className="object-cover"
+                  className="object-cover transition-transform duration-500 hover:opacity-90"
                   sizes="(max-width: 640px) 280px, 300px"
                 />
               </div>
               {/* Name */}
-              <div className="w-full p-4 bg-white text-center">
-                <p className="text-sm sm:text-base font-black text-black uppercase">
+              <div className="w-full pt-4 bg-transparent text-center">
+                <p className="text-sm sm:text-base font-semibold text-black uppercase tracking-wider">
                   {customer.name}
                 </p>
               </div>
@@ -97,7 +97,7 @@ export function Customer() {
         {/* Right Arrow */}
         <button
           onClick={scrollRight}
-          className="absolute right-2 sm:-right-4 top-1/2 -translate-y-1/2 z-10 p-2 sm:p-3 bg-white border-2 border-black text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:translate-x-1 active:shadow-none transition-all opacity-0 group-hover:opacity-100 hidden sm:flex items-center justify-center rounded-none"
+          className="absolute right-2 sm:-right-4 top-1/2 -translate-y-1/2 z-10 p-2 sm:p-3 bg-white border-[1px] border-black text-black hover:bg-gray-100 transition-colors opacity-0 group-hover:opacity-100 hidden sm:flex items-center justify-center rounded-none shadow-sm"
         >
           <ChevronRight className="w-6 h-6" />
         </button>
@@ -108,7 +108,7 @@ export function Customer() {
         {customers.map((_, idx) => (
           <div
             key={idx}
-            className={`w-2.5 h-2.5 rounded-none border-[1px] border-black ${idx === 0 ? "bg-[#3b82f6] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] scale-110" : "bg-white shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]"}`}
+            className={`w-2 h-2 rounded-full transition-all duration-300 ${idx === 0 ? "bg-black w-6" : "bg-gray-300"}`}
           />
         ))}
       </div>

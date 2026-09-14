@@ -1,118 +1,170 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { ChevronRight, ShieldCheck, RefreshCw, Lock } from "lucide-react";
-
-const product = {
-  id: "motorsport-porsche",
-  title: "Motorsport Racing T-Shirt: Porsche",
-  originalPrice: 750,
-  currentPrice: 690,
-  variantLabel: "Half/Drop Available",
-  description: "A motorsport-inspired T-shirt featuring bold racing graphics and sponsor-style details. Made for those who carry the racing spirit beyond the track.",
-  features: [
-    "Premium and Exclusive design & print",
-    "Limited edition",
-    "Free Physical discount card",
-    "Good packaging",
-    "and many more",
-  ],
-  images: [
-    "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?q=80&w=800&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?q=80&w=800&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=800&auto=format&fit=crop",
-  ],
-  sizes: ["S", "M", "L", "XL", "XXL"],
-  types: ["DROP SHOULDER", "HALF SLEEVE"],
-};
-
-const relatedProducts = [
-  { id: 1, title: "Drop Shoulder T-Shirt (Restart Limited)", price: 560, image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=150&auto=format&fit=crop" },
-  { id: 2, title: "Solid Drop Shoulder T-Shirt (Maroon)", price: 590, image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=150&auto=format&fit=crop" },
-  { id: 3, title: "Solid Drop Shoulder T-Shirt (Black)", price: 590, image: "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?q=80&w=150&auto=format&fit=crop" },
-];
+import { useRouter, useParams } from "next/navigation";
+import { ChevronRight, ShieldCheck, RefreshCw, Lock, Minus, Plus } from "lucide-react";
+import { useCartStore } from "@/store/useCartStore";
+import { getProductById, getAllProducts } from "@/api/productApi";
+import { getAllBudgetPicks } from "@/api/buget-pickApi";
 
 export default function ProductDetailPage() {
   const [activeImage, setActiveImage] = useState(0);
-  const [selectedSize, setSelectedSize] = useState("M");
-  const [selectedType, setSelectedType] = useState("DROP SHOULDER");
+  const [selectedSize, setSelectedSize] = useState("");
+  const [selectedType, setSelectedType] = useState("");
   const [activeTab, setActiveTab] = useState("DESCRIPTION");
+  const [product, setProduct] = useState<any>(null);
+  const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
+  const [budgetPicks, setBudgetPicks] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const router = useRouter();
+  const params = useParams();
+  const id = params?.id as string;
+
+  const { items, addToCart, updateQuantity, removeFromCart, openCart } = useCartStore();
+
+  useEffect(() => {
+    if (!id) return;
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        const res = await getProductById(id);
+        if (res.data) {
+          setProduct(res.data);
+          if (res.data.sizes && res.data.sizes.length > 0) {
+            setSelectedSize(res.data.sizes[0].name);
+          }
+          if (res.data.types && res.data.types.length > 0) {
+            setSelectedType(res.data.types[0].name);
+          }
+
+          // Fetch related products from the same category
+          if (res.data.category?.id) {
+            const allRes = await getAllProducts();
+            if (allRes.data) {
+              const filtered = allRes.data.filter(
+                (p: any) => p.category?.id === res.data.category.id && String(p.id) !== String(res.data.id)
+              ).slice(0, 4);
+              setRelatedProducts(filtered);
+            }
+          }
+
+          // Fetch budget picks
+          try {
+            const budgetRes = await getAllBudgetPicks();
+            if (budgetRes.data) {
+              setBudgetPicks(budgetRes.data);
+            }
+          } catch (e) {
+            console.error("Failed to fetch budget picks:", e);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch product:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProduct();
+  }, [id]);
+
+  if (loading) {
+    return <div className="text-center py-20 font-black uppercase text-xl">Loading product...</div>;
+  }
+
+  if (!product) {
+    return <div className="text-center py-20 font-black uppercase text-xl text-red-500">Product not found!</div>;
+  }
+
+  // Parse images if needed
+  let images = [];
+  if (product.images) {
+    if (Array.isArray(product.images)) {
+      images = product.images;
+    } else if (typeof product.images === 'string') {
+      try {
+        images = JSON.parse(product.images);
+      } catch (e) {
+        // fallback
+      }
+    }
+  }
+
+  if (images.length === 0 && product.thumbnail) {
+    images = [product.thumbnail];
+  }
+
+  // Helper for image URLs
+  const getImgUrl = (url: string) => {
+    if (!url) return "";
+    if (url.startsWith('http')) return url;
+    return `http://localhost:8000${url.startsWith('/') ? '' : '/'}${url}`;
+  };
+
+  const productImages = images.map(getImgUrl);
+  const mainImage = productImages.length > 0 ? productImages[activeImage] || productImages[0] : "";
+  const features = product.features || [];
+  const sizes = product.sizes || [];
+  const types = product.types || [];
 
   return (
-    <div className="w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans text-gray-900">
-      <div className="flex flex-col lg:flex-row gap-12">
+    <div className="w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans text-black">
+      <div className="flex flex-col lg:flex-row gap-12 lg:gap-16">
         {/* Left Column: Images & Tabs */}
         <div className="w-full lg:w-1/2 flex flex-col gap-10">
           {/* Image Gallery */}
           <div className="flex flex-col sm:flex-row gap-4">
             {/* Thumbnails */}
             <div className="flex sm:flex-col gap-3 order-2 sm:order-1 overflow-x-auto sm:overflow-visible">
-              {product.images.map((img, idx) => (
+              {productImages.map((img: string, idx: number) => (
                 <button
                   key={idx}
                   onClick={() => setActiveImage(idx)}
-                  className={`relative w-16 h-20 sm:w-20 sm:h-24 flex-shrink-0 border-[3px] transition-all ${
-                    activeImage === idx ? "border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] -translate-y-1 -translate-x-1" : "border-black hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1"
-                  }`}
+                  className={`relative w-16 h-20 sm:w-20 sm:h-24 flex-shrink-0 border-[1px] transition-colors bg-gray-100 ${activeImage === idx ? "border-black" : "border-transparent hover:border-gray-300"
+                    }`}
                 >
-                  <Image src={img} alt={`Thumbnail ${idx + 1}`} fill className="object-cover" />
+                  <img src={img} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>
             {/* Main Image */}
-            <div className="relative w-full aspect-[4/5] bg-white order-1 sm:order-2 border-[4px] border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-              <Image src={product.images[activeImage]} alt={product.title} fill className="object-cover" priority />
+            <div className="relative w-full aspect-[4/5] bg-gray-100 order-1 sm:order-2">
+              {mainImage ? (
+                <img src={mainImage} alt={product.title} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center font-medium text-gray-400">No Image</div>
+              )}
             </div>
           </div>
 
           {/* Tabs Section */}
-          <div className="mt-8 border-[3px] border-black bg-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] p-4 sm:p-6">
-            <div className="flex flex-wrap gap-3 border-b-[3px] border-black pb-4">
+          <div className="mt-4">
+            <div className="flex gap-6 border-b-[1px] border-gray-200 pb-3">
               {["DESCRIPTION", "ADDITIONAL INFORMATION", "REVIEWS"].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`px-4 py-2 text-xs sm:text-sm font-black tracking-wide uppercase transition-all border-[3px] border-black ${
-                    activeTab === tab ? "bg-black text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] -translate-y-1 -translate-x-1" : "bg-white text-black hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1"
-                  }`}
+                  className={`text-xs sm:text-sm font-semibold tracking-wide uppercase transition-colors relative ${activeTab === tab ? "text-black" : "text-gray-400 hover:text-black"
+                    }`}
                 >
                   {tab}
+                  {activeTab === tab && (
+                    <span className="absolute -bottom-[13px] left-0 w-full h-[1px] bg-black"></span>
+                  )}
                 </button>
               ))}
             </div>
-            <div className="py-6 text-sm text-black font-medium leading-relaxed space-y-4">
+            <div className="py-6 text-sm text-gray-700 font-medium leading-relaxed space-y-4">
               {activeTab === "DESCRIPTION" && (
-                <>
-                  <p>
-                    Bring the energy of motorsport into your everyday style with the Motorsport Racing T-Shirt. 
-                    Featuring bold racing-inspired graphics, detailed sleeve elements, and a clean premium look, 
-                    this tee is designed to stand out without trying too hard.
-                  </p>
-                  <p>
-                    Its versatile streetwear aesthetic makes it easy to pair with jeans, cargos, or relaxed-fit pants
-                    —whether you're heading out with friends, going for a casual drive, or simply adding a racing edge
-                    to your everyday outfit.
-                  </p>
-                  <div>
-                    <strong className="text-black block mb-2 mt-4">Key Features</strong>
-                    <ul className="list-disc pl-5 space-y-1">
-                      <li>Motorsport-inspired graphic design</li>
-                      <li>Front, back & sleeve detailing</li>
-                      <li>Comfortable everyday fit</li>
-                      <li>Soft and breathable fabric feel</li>
-                      <li>Premium print finish</li>
-                      <li>Easy to style with casual & streetwear outfits</li>
-                      <li>Designed for racing and automotive enthusiasts</li>
-                    </ul>
-                  </div>
-                </>
+                <div dangerouslySetInnerHTML={{ __html: product.description || "No description available." }} />
               )}
-              {activeTab !== "DESCRIPTION" && (
-                <p className="italic text-gray-400">Content for {activeTab.toLowerCase()} goes here.</p>
+              {activeTab === "ADDITIONAL INFORMATION" && (
+                <div dangerouslySetInnerHTML={{ __html: product.additionalInfo || "No additional info available." }} />
+              )}
+              {activeTab === "REVIEWS" && (
+                <p className="italic text-gray-400">No reviews yet.</p>
               )}
             </div>
           </div>
@@ -121,168 +173,269 @@ export default function ProductDetailPage() {
         {/* Right Column: Product Details */}
         <div className="w-full lg:w-1/2 flex flex-col">
           {/* Breadcrumbs */}
-          <nav className="flex items-center text-xs text-black font-black uppercase tracking-widest mb-6 space-x-2 border-2 border-black px-3 py-1.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-white w-max">
-            <Link href="/" className="hover:text-[#3b82f6] transition-colors">HOME</Link>
-            <ChevronRight className="w-4 h-4" />
-            <Link href="#" className="hover:text-[#3b82f6] transition-colors">SIGNATURE SERIES</Link>
-            <ChevronRight className="w-4 h-4" />
-            <span className="text-[#3b82f6] truncate max-w-[150px] sm:max-w-none">{product.title}</span>
+          <nav className="flex items-center text-[10px] sm:text-xs text-gray-500 font-semibold uppercase tracking-widest mb-6 space-x-2">
+            <Link href="/" className="hover:text-black transition-colors">HOME</Link>
+            <ChevronRight className="w-3 h-3" />
+            <Link href="/main/shop" className="hover:text-black transition-colors">SHOP</Link>
+            <ChevronRight className="w-3 h-3" />
+            <span className="text-black truncate max-w-[150px] sm:max-w-none">{product.category?.name || "Product"}</span>
           </nav>
 
           {/* Variant Label */}
-          <div className="mb-4">
-            <span className="bg-white border-2 border-black text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-[10px] sm:text-xs font-black px-3 py-1.5 uppercase tracking-widest">
-              {product.variantLabel}
-            </span>
-          </div>
+          {product.variantLabel && (
+            <div className="mb-4">
+              <span className="bg-gray-100 text-black text-[10px] sm:text-xs font-semibold px-3 py-1 uppercase tracking-widest">
+                {product.variantLabel}
+              </span>
+            </div>
+          )}
 
           {/* Title */}
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black mb-6 leading-tight uppercase tracking-tight text-black">{product.title}</h1>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 leading-tight uppercase tracking-tight text-black">{product.title}</h1>
 
           {/* Price */}
-          <div className="flex items-center space-x-4 mb-8 bg-white border-[3px] border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] p-4 w-max">
-            <span className="text-black line-through text-lg font-bold">৳{product.originalPrice}</span>
-            <span className="text-[#3b82f6] font-black text-3xl">৳{product.currentPrice}</span>
+          <div className="flex items-end space-x-4 mb-8">
+            <span className="text-black font-semibold text-3xl">৳{product.currentPrice || product.originalPrice}</span>
+            {Number(product.originalPrice) > Number(product.currentPrice) && (
+              <span className="text-gray-400 line-through text-lg font-medium mb-1">৳{product.originalPrice}</span>
+            )}
           </div>
 
-          {/* Short Description */}
-          <p className="text-sm font-bold text-black mb-4 border-[3px] border-black p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white">{product.description}</p>
-          <ul className="list-square pl-6 text-sm font-bold text-black mb-6 space-y-2">
-            {product.features.map((feat, i) => (
-              <li key={i}>{feat}</li>
-            ))}
-          </ul>
+          {/* Short Description Features */}
+          {features.length > 0 && (
+            <ul className="list-disc pl-5 text-sm font-medium text-gray-700 mb-6 space-y-2">
+              {features.map((feat: string, i: number) => (
+                <li key={i}>{feat}</li>
+              ))}
+            </ul>
+          )}
 
-          <button className="text-[#3b82f6] bg-white border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-xs font-black uppercase px-3 py-1.5 mb-8 self-start hover:-translate-y-0.5 hover:-translate-x-0.5 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all">
+          <button className="text-gray-500 hover:text-black underline text-xs font-semibold uppercase mb-8 self-start transition-colors">
             Size Chart
           </button>
 
           {/* Size Selector */}
-          <div className="mb-6">
-            <span className="block text-sm font-black text-black mb-3 uppercase tracking-widest">Size</span>
-            <div className="flex flex-wrap gap-3">
-              {product.sizes.map((size) => (
-                <button
-                  key={size}
-                  onClick={() => setSelectedSize(size)}
-                  className={`w-12 h-12 flex items-center justify-center text-sm font-black border-[3px] transition-all uppercase ${
-                    selectedSize === size
-                      ? "bg-black text-white border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] -translate-y-1 -translate-x-1"
-                      : "bg-white text-black border-black hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1"
-                  }`}
-                >
-                  {size}
-                </button>
-              ))}
+          {sizes.length > 0 && (
+            <div className="mb-6">
+              <span className="block text-sm font-semibold text-black mb-3 uppercase tracking-widest">Size</span>
+              <div className="flex flex-wrap gap-3">
+                {sizes.map((size: any) => (
+                  <button
+                    key={size.id}
+                    onClick={() => setSelectedSize(size.name)}
+                    className={`w-12 h-12 flex items-center justify-center text-sm font-semibold border-[1px] transition-colors uppercase ${selectedSize === size.name
+                      ? "bg-black text-white border-black"
+                      : "bg-transparent text-black border-gray-300 hover:border-black"
+                      }`}
+                  >
+                    {size.name}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Type Selector */}
-          <div className="mb-10">
-            <span className="block text-sm font-black text-black mb-3 uppercase tracking-widest">Type</span>
-            <div className="flex flex-wrap gap-4">
-              {product.types.map((type) => (
-                <button
-                  key={type}
-                  onClick={() => setSelectedType(type)}
-                  className={`px-6 py-3 text-sm font-black uppercase border-[3px] transition-all ${
-                    selectedType === type
-                      ? "bg-black text-white border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] -translate-y-1 -translate-x-1"
-                      : "bg-white text-black border-black hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1"
-                  }`}
-                >
-                  {type}
-                </button>
-              ))}
+          {types.length > 0 && (
+            <div className="mb-10">
+              <span className="block text-sm font-semibold text-black mb-3 uppercase tracking-widest">Type</span>
+              <div className="flex flex-wrap gap-3">
+                {types.map((type: any) => (
+                  <button
+                    key={type.id}
+                    onClick={() => setSelectedType(type.name)}
+                    className={`px-6 py-3 text-sm font-semibold uppercase border-[1px] transition-colors ${selectedType === type.name
+                      ? "bg-black text-white border-black"
+                      : "bg-transparent text-black border-gray-300 hover:border-black"
+                      }`}
+                  >
+                    {type.name}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Action Buttons */}
-          <div className="flex flex-col gap-4 mb-10">
-            <button className="w-full bg-[#3b82f6] text-white font-black uppercase tracking-widest py-4 border-[3px] border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all">
-              ADD TO CART
-            </button>
-            <button 
-              onClick={() => router.push("/main/checkout")}
-              className="w-full bg-black text-white font-black uppercase tracking-widest py-4 border-[3px] border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all"
+          <div className="flex flex-col gap-3 mb-10">
+            {(() => {
+              const cartItem = items.find((i) => i.id === product.id);
+              if (cartItem) {
+                return (
+                  <div className="flex items-center justify-between border-[1px] border-black bg-transparent w-full">
+                    <button
+                      className="px-6 py-4 font-medium text-xl hover:bg-gray-100 border-r-[1px] border-black transition-colors"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (cartItem.quantity === 1) {
+                          removeFromCart(cartItem.id);
+                        } else {
+                          updateQuantity(cartItem.id, cartItem.quantity - 1);
+                        }
+                      }}
+                    >
+                      <Minus className="w-5 h-5" />
+                    </button>
+                    <span className="font-semibold text-lg px-4">
+                      {cartItem.quantity}
+                    </span>
+                    <button
+                      className="px-6 py-4 font-medium text-xl hover:bg-gray-100 border-l-[1px] border-black transition-colors"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        updateQuantity(cartItem.id, cartItem.quantity + 1);
+                      }}
+                      disabled={cartItem.quantity >= product.stock}
+                    >
+                      <Plus className="w-5 h-5" />
+                    </button>
+                  </div>
+                );
+              }
+
+              return (
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (product.stock <= 0) return;
+                    addToCart({
+                      id: product.id,
+                      title: product.title,
+                      price: product.currentPrice || product.originalPrice,
+                      image: mainImage,
+                      quantity: 1,
+                    });
+                    openCart();
+                  }}
+                  disabled={product.stock <= 0}
+                  className="w-full bg-transparent text-black font-semibold uppercase tracking-widest py-4 border-[1px] border-black hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {product.stock > 0 ? "Add to Cart" : "Out of Stock"}
+                </button>
+              );
+            })()}
+            <button
+              onClick={() => {
+                if (product.stock <= 0) return;
+                const cartItem = items.find((i) => i.id === product.id);
+                if (!cartItem) {
+                  addToCart({
+                    id: product.id,
+                    title: product.title,
+                    price: product.currentPrice || product.originalPrice,
+                    image: mainImage,
+                    quantity: 1,
+                  });
+                }
+                router.push("/main/checkout");
+              }}
+              disabled={product.stock <= 0}
+              className="w-full bg-black text-white font-semibold uppercase tracking-widest py-4 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              BUY NOW
+              Buy Now
             </button>
           </div>
 
           {/* Shipping & Trust Info */}
-          <div className="space-y-3 text-sm text-black mb-8 font-black border-[3px] border-black bg-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] p-5">
-            <p className="flex items-center gap-3"><span className="w-3 h-3 border-2 border-black bg-green-500 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]" /> Nationwide Delivery via Pathao Courier</p>
-            <p className="flex items-center gap-3"><span className="w-3 h-3 border-2 border-black bg-green-500 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]" /> Fast and Reliable Delivery</p>
-            <p className="flex items-center gap-3"><span className="w-3 h-3 border-2 border-black bg-green-500 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]" /> Trusted by 100,000+ Customers</p>
+          <div className="space-y-3 text-sm text-gray-700 mb-8 font-medium bg-gray-50 p-5 rounded-sm">
+            <p className="flex items-center gap-3">
+              <ShieldCheck className="w-4 h-4 text-green-600" /> Nationwide Delivery via Pathao Courier
+            </p>
+            <p className="flex items-center gap-3">
+              <ShieldCheck className="w-4 h-4 text-green-600" /> Fast and Reliable Delivery
+            </p>
+            <p className="flex items-center gap-3">
+              <ShieldCheck className="w-4 h-4 text-green-600" /> Trusted by 100,000+ Customers
+            </p>
           </div>
 
           {/* Value Props Box */}
-          <div className="grid grid-cols-3 border-[3px] border-black divide-x-[3px] divide-black mb-10 bg-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-            <div className="flex flex-col items-center justify-center p-4 text-center gap-2 text-black hover:bg-gray-100 transition-colors">
-              <ShieldCheck className="w-6 h-6" />
-              <div className="text-[10px] font-black uppercase">AAZ Guarantee<br/><span className="font-bold text-gray-600">Quality Trust</span></div>
+          <div className="grid grid-cols-3 divide-x-[1px] divide-gray-200 mb-12 border-y-[1px] border-gray-200 py-4">
+            <div className="flex flex-col items-center justify-center p-2 text-center gap-2 text-black">
+              <ShieldCheck className="w-5 h-5 text-gray-400" />
+              <div className="text-[10px] font-semibold uppercase">AAZ Guarantee<br /><span className="text-gray-500 font-medium">Quality Trust</span></div>
             </div>
-            <div className="flex flex-col items-center justify-center p-4 text-center gap-2 text-black hover:bg-gray-100 transition-colors">
-              <RefreshCw className="w-6 h-6" />
-              <div className="text-[10px] font-black uppercase">Easy Exchange<br/><span className="font-bold text-gray-600">Free Returns</span></div>
+            <div className="flex flex-col items-center justify-center p-2 text-center gap-2 text-black">
+              <RefreshCw className="w-5 h-5 text-gray-400" />
+              <div className="text-[10px] font-semibold uppercase">Easy Exchange<br /><span className="text-gray-500 font-medium">Free Returns</span></div>
             </div>
-            <div className="flex flex-col items-center justify-center p-4 text-center gap-2 text-black hover:bg-gray-100 transition-colors">
-              <Lock className="w-6 h-6" />
-              <div className="text-[10px] font-black uppercase">Secure Pay<br/><span className="font-bold text-gray-600">Trusted E-Com</span></div>
+            <div className="flex flex-col items-center justify-center p-2 text-center gap-2 text-black">
+              <Lock className="w-5 h-5 text-gray-400" />
+              <div className="text-[10px] font-semibold uppercase">Secure Pay<br /><span className="text-gray-500 font-medium">Trusted E-Com</span></div>
             </div>
           </div>
 
           {/* Most Wanted Section */}
-          <div className="bg-white border-[3px] border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] p-5 sm:p-6 mb-10">
-            <h3 className="text-sm font-black uppercase tracking-widest mb-5 border-b-[3px] border-black pb-3 text-black">
-              Most Wanted in this category
-            </h3>
-            <div className="flex flex-col gap-4">
-              {relatedProducts.map((rp) => (
-                <div key={rp.id} className="group flex items-center justify-between bg-white p-3 border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-transform">
-                  <div className="flex items-center gap-4">
-                    <div className="relative w-12 h-14 border-[3px] border-black overflow-hidden bg-white">
-                      <Image src={rp.image} alt={rp.title} fill className="object-cover group-hover:scale-110 transition-transform" />
+          {relatedProducts.length > 0 && (
+            <div className="mb-12">
+              <h3 className="text-sm font-semibold uppercase tracking-widest mb-6 border-b-[1px] border-gray-200 pb-3 text-black">
+                Most Wanted in this category
+              </h3>
+              <div className="flex flex-col gap-4">
+                {relatedProducts.map((rp) => {
+                  let rpImgUrl = rp.thumbnail;
+                  if (!rpImgUrl && rp.images) {
+                    if (Array.isArray(rp.images) && rp.images.length > 0) {
+                      rpImgUrl = rp.images[0];
+                    } else if (typeof rp.images === 'string') {
+                      try {
+                        const parsed = JSON.parse(rp.images);
+                        if (Array.isArray(parsed) && parsed.length > 0) {
+                          rpImgUrl = parsed[0];
+                        }
+                      } catch (e) { }
+                    }
+                  }
+                  rpImgUrl = getImgUrl(rpImgUrl);
+
+                  return (
+                    <div key={rp.id} className="group flex items-center justify-between p-3 hover:bg-gray-50 transition-colors border-[1px] border-transparent hover:border-gray-200">
+                      <div className="flex items-center gap-4">
+                        <div className="relative w-12 h-14 overflow-hidden bg-gray-100">
+                          {rpImgUrl ? (
+                            <img src={rpImgUrl} alt={rp.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-[8px] font-medium text-gray-400">NO IMG</div>
+                          )}
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-xs sm:text-sm font-semibold text-black uppercase truncate max-w-[140px] sm:max-w-[200px] group-hover:text-gray-600 transition-colors">
+                            {rp.title}
+                          </span>
+                          <span className="text-xs font-medium text-gray-600 mt-1">৳{rp.currentPrice || rp.originalPrice}</span>
+                        </div>
+                      </div>
+                      <Link href={`/main/product/${rp.id}`} className="text-xs font-semibold text-black uppercase tracking-widest hover:text-gray-500 transition-colors">
+                        View
+                      </Link>
                     </div>
-                    <div className="flex flex-col">
-                      <span className="text-xs sm:text-sm font-black text-black uppercase truncate max-w-[140px] sm:max-w-[200px] group-hover:text-[#3b82f6] transition-colors">
-                        {rp.title}
-                      </span>
-                      <span className="text-xs font-bold text-black mt-1">৳{rp.price}</span>
-                    </div>
-                  </div>
-                  <button className="bg-[#3b82f6] text-white border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-[10px] font-black px-4 py-2 uppercase transition-all hover:-translate-y-0.5 hover:-translate-x-0.5 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                    VIEW
-                  </button>
-                </div>
-              ))}
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Offers & More */}
-          <div className="mt-2">
-            <h3 className="text-sm font-black uppercase tracking-widest mb-5 border-b-[3px] border-black pb-3 flex items-center gap-2 text-black">
-              <span className="text-[#3b82f6] text-xl leading-none">★</span> Offers & More
-            </h3>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between text-xs sm:text-sm border-[3px] border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4 hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-transform">
-                <span className="font-black text-black uppercase">Buy 2 and Save 100TK</span>
-                <span className="bg-[#3b82f6] text-white border-2 border-black px-3 py-1 font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-[10px] tracking-widest">SAVING</span>
+          {budgetPicks.length > 0 && (
+            <div>
+              <h3 className="text-sm font-semibold uppercase tracking-widest mb-6 border-b-[1px] border-gray-200 pb-3 flex items-center gap-2 text-black">
+                Offers & More
+              </h3>
+              <div className="space-y-3">
+                {budgetPicks.map((bp) => (
+                  <div key={bp.id} className="flex items-center justify-between text-xs sm:text-sm border-[1px] border-gray-200 bg-white p-4 hover:border-gray-300 transition-colors">
+                    <span className="font-medium text-black uppercase">{bp.title}</span>
+                    <span className="bg-gray-100 text-black px-3 py-1 font-semibold text-[10px] tracking-widest uppercase">
+                      ৳{bp.packagePrice}
+                    </span>
+                  </div>
+                ))}
               </div>
-              <div className="flex items-center justify-between text-xs sm:text-sm border-[3px] border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4 hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-transform">
-                <span className="font-black text-black uppercase">Buy 3 and Save 300TK</span>
-                <span className="bg-[#3b82f6] text-white border-2 border-black px-3 py-1 font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-[10px] tracking-widest">SAVING</span>
-              </div>
+              <p className="text-[11px] font-medium text-gray-400 mt-4 text-center uppercase tracking-wide">
+                (Items added to cart must exactly equal the conditions of offer / target tk.)
+              </p>
             </div>
-            <p className="text-[11px] font-bold text-gray-500 mt-4 text-center uppercase tracking-wide">
-              (Items added to cart must exactly equal the conditions of offer / target tk.)
-            </p>
-            <button className="w-full mt-6 bg-[#3b82f6] text-white font-black uppercase py-4 border-[3px] border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] text-xs sm:text-sm tracking-widest hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all">
-              SEE CUSTOMER REVIEW PHOTOS
-            </button>
-          </div>
-
+          )}
         </div>
       </div>
     </div>

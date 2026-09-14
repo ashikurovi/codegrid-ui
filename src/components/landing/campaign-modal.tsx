@@ -4,27 +4,50 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { X } from 'lucide-react';
+import { getAllCampaignNotices } from '@/api/campaignApi';
 
 export function CampaignModal() {
   const [isVisible, setIsVisible] = useState(false);
   const [isRendered, setIsRendered] = useState(false);
+  const [campaign, setCampaign] = useState<any>(null);
+
+  const getImgUrl = (url: string) => {
+    if (!url) return "";
+    if (url.startsWith('http')) return url;
+    return `http://localhost:8000${url.startsWith('/') ? '' : '/'}${url}`;
+  };
 
   useEffect(() => {
-    // Ensure it only shows exactly once per full page load (reloads).
-    // If the user navigates around client-side, it won't show again.
+    // Only fetch if we haven't shown it yet this session
     if (typeof window !== 'undefined') {
-      if ((window as any).hasShownCampaignModal) {
+      if (sessionStorage.getItem('hasShownCampaignModal')) {
         return;
       }
-      (window as any).hasShownCampaignModal = true;
     }
 
-    // Show the modal 1.5 seconds after landing on the site
-    const timer = setTimeout(() => {
-      setIsRendered(true);
-      setTimeout(() => setIsVisible(true), 50); // slight delay for CSS transition
-    }, 1500);
-    return () => clearTimeout(timer);
+    getAllCampaignNotices()
+      .then(res => {
+        if (res.data && res.data.length > 0) {
+          // Find the first active campaign
+          const activeCampaign = res.data.find((c: any) => c.isActive);
+          if (activeCampaign) {
+            setCampaign(activeCampaign);
+            
+            // Mark as shown for the session
+            if (typeof window !== 'undefined') {
+              sessionStorage.setItem('hasShownCampaignModal', 'true');
+            }
+
+            // Show the modal 1.5 seconds after landing
+            const timer = setTimeout(() => {
+              setIsRendered(true);
+              setTimeout(() => setIsVisible(true), 50); // slight delay for CSS transition
+            }, 1500);
+            return () => clearTimeout(timer);
+          }
+        }
+      })
+      .catch(console.error);
   }, []);
 
   const handleClose = () => {
@@ -32,7 +55,7 @@ export function CampaignModal() {
     setTimeout(() => setIsRendered(false), 300); // Wait for transition to finish
   };
 
-  if (!isRendered) return null;
+  if (!isRendered || !campaign) return null;
 
   return (
     <div 
@@ -48,29 +71,35 @@ export function CampaignModal() {
           <X className="w-5 h-5" />
         </button>
         
-        <Link href="/main/big-sale" onClick={handleClose} className="block group">
-          <div className="relative w-full aspect-[4/5] sm:aspect-square bg-gray-100 overflow-hidden rounded-none">
-            <Image 
-              src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=800&auto=format&fit=crop" 
-              alt="Flash Sale Campaign" 
-              fill 
-              sizes="(max-width: 640px) 100vw, 500px"
-              className="object-cover transition-transform duration-700 group-hover:scale-105"
-            />
+        <Link href={campaign.link || "/main/shop"} onClick={handleClose} className="block group">
+          <div className="relative w-full aspect-[4/5] sm:aspect-square bg-gray-100 overflow-hidden rounded-none border-4 border-transparent group-hover:border-[#0066FF] transition-all duration-300">
+            {campaign.image ? (
+              <img 
+                src={getImgUrl(campaign.image)} 
+                alt={campaign.campaignName || "Campaign"} 
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center bg-gray-200">
+                <span className="font-black text-gray-400 text-xl uppercase">No Image</span>
+              </div>
+            )}
             
             {/* Dark Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10 flex flex-col justify-end items-center p-8 text-center border-4 border-transparent group-hover:border-[#0066FF] transition-all duration-300">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10 flex flex-col justify-end items-center p-8 text-center">
                
-               <div className="bg-red-600 text-white text-[10px] font-black px-3 py-1 uppercase tracking-widest mb-4 shadow-sm">
-                 Limited Time Offer
-               </div>
+               {campaign.date && (
+                 <div className="bg-red-600 text-white text-[10px] font-black px-3 py-1 uppercase tracking-widest mb-4 shadow-sm">
+                   {campaign.date}
+                 </div>
+               )}
                
                <h2 className="text-4xl sm:text-5xl font-black text-white uppercase tracking-tighter mb-2">
-                 Flash Sale
+                 {campaign.campaignName}
                </h2>
                
                <p className="text-gray-200 text-sm sm:text-base mb-8 max-w-xs leading-relaxed">
-                 Grab your favorite CodeGrid apparel before they're gone. Huge discounts inside!
+                 {campaign.offerText}
                </p>
                
                <div className="bg-[#0066FF] text-white font-bold py-4 px-10 uppercase tracking-widest text-sm rounded-none group-hover:bg-white group-hover:bg-gradient-to-r group-hover:from-[#00B4DB] group-hover:to-[#0000FF] group-hover:bg-clip-text group-hover:text-transparent transition-colors shadow-lg border border-transparent group-hover:border-[#0066FF]">

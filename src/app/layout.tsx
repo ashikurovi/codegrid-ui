@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Manjari } from "next/font/google";
 import "./globals.css";
-
+import { CartDrawer } from "@/components/cart/CartDrawer";
 const manjari = Manjari({
   variable: "--font-sans",
   subsets: ["latin"],
@@ -21,6 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <body className="min-h-full flex flex-col bg-white dark:bg-black">
         {children}
+        <CartDrawer />
       </body>
     </html>
   );

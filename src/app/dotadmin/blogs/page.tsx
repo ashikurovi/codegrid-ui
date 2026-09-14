@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -14,6 +14,7 @@ import {
 import { TableControls } from "@/components/admin/table-controls";
 import { TablePagination } from "@/components/admin/table-pagination";
 import { Edit, Trash2, Plus } from "lucide-react";
+import { getAllBlogs, deleteBlog } from "@/api/blogApi";
 
 export default function BlogManagementPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -21,33 +22,33 @@ export default function BlogManagementPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  const blogs = [
-    {
-      id: 1,
-      title: "How to Style Drop Shoulder Tees for Winter",
-      excerpt: "Discover the best ways to layer your favorite drop shoulder t-shirts to stay warm and stylish this winter season.",
-      date: "Jan 15, 2026",
-      image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop",
-      status: "Published",
-    },
-    {
-      id: 2,
-      title: "The Rise of Streetwear in Bangladesh",
-      excerpt: "Exploring how local brands are reshaping the fashion landscape and bringing global streetwear trends to the streets of Dhaka.",
-      date: "Feb 02, 2026",
-      image: "https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?q=80&w=800&auto=format&fit=crop",
-      status: "Published",
-    },
-    {
-      id: 3,
-      title: "Understanding Fabric: What Makes a Good T-Shirt?",
-      excerpt: "From GSM to cotton blends, we break down everything you need to know to choose a t-shirt that lasts longer and feels better.",
-      date: "Feb 18, 2026",
-      image: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?q=80&w=800&auto=format&fit=crop",
-      status: "Draft",
-    },
-  ];
+  const [blogs, setBlogs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    loadBlogs();
+  }, []);
+
+  const loadBlogs = () => {
+    setLoading(true);
+    getAllBlogs()
+      .then((res) => {
+        if (res.data) setBlogs(res.data);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  };
+
+  const handleDelete = async (id: number) => {
+    if (confirm("Are you sure you want to delete this blog?")) {
+      try {
+        await deleteBlog(id);
+        loadBlogs();
+      } catch (err) {
+        console.error("Failed to delete blog", err);
+      }
+    }
+  };
   const statusOptions = [
     { label: "All Status", value: "All" },
     { label: "Published", value: "Published" },
@@ -56,8 +57,8 @@ export default function BlogManagementPage() {
 
   const filteredBlogs = useMemo(() => {
     return blogs.filter((blog) => {
-      const matchesSearch = blog.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                            blog.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = (blog.title || "").toLowerCase().includes(searchQuery.toLowerCase()) || 
+                            (blog.excerpt || "").toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStatus = statusFilter === "All" || blog.status === statusFilter;
       return matchesSearch && matchesStatus;
     });
@@ -105,7 +106,13 @@ export default function BlogManagementPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paginatedBlogs.length === 0 ? (
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-6 text-gray-500 font-bold uppercase">
+                    Loading blogs...
+                  </TableCell>
+                </TableRow>
+              ) : paginatedBlogs.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-6 text-gray-500">
                     No blogs found.
@@ -115,8 +122,12 @@ export default function BlogManagementPage() {
                 paginatedBlogs.map((blog) => (
                   <TableRow key={blog.id}>
                     <TableCell>
-                      <div className="w-20 h-14 relative overflow-hidden bg-gray-100 rounded-sm">
-                        <Image src={blog.image} alt={blog.title} fill className="object-cover" />
+                      <div className="w-20 h-14 relative overflow-hidden bg-gray-100 rounded-sm border-2 border-black">
+                        {blog.image ? (
+                          <Image src={blog.image} alt={blog.title} fill className="object-cover" />
+                        ) : (
+                          <div className="flex items-center justify-center w-full h-full text-xs font-bold text-gray-400">NO IMG</div>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell className="max-w-md">
@@ -124,7 +135,9 @@ export default function BlogManagementPage() {
                       <div className="text-sm text-gray-500 truncate">{blog.excerpt}</div>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm text-gray-500">{blog.date}</span>
+                      <span className="text-sm text-gray-500">
+                        {blog.date ? new Date(blog.date).toLocaleDateString() : '-'}
+                      </span>
                     </TableCell>
                     <TableCell>
                       <span className={`px-2 py-1 text-xs font-medium ${blog.status === "Published" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400"}`}>
@@ -141,6 +154,7 @@ export default function BlogManagementPage() {
                           <Edit className="w-4 h-4" />
                         </Link>
                         <button 
+                          onClick={() => handleDelete(blog.id)}
                           type="button"
                           className="p-1 text-gray-500 hover:text-red-600 transition-colors"
                           title="Delete"

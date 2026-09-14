@@ -1,126 +1,254 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Check, ChevronRight } from "lucide-react";
+import { useCartStore } from "@/store/useCartStore";
+import { createOrder } from "@/api/orderApi";
+import { createIncompleteOrder, updateIncompleteOrder, deleteIncompleteOrder } from "@/api/incompleteOrderApi";
 
 export default function CheckoutPage() {
-  const [shippingMethod, setShippingMethod] = useState("inside_dhaka");
-  const [paymentMethod, setPaymentMethod] = useState("cod");
+  const router = useRouter();
+  const { items, clearCart } = useCartStore();
+  const [shippingMethod, setShippingMethod] = useState("INSIDE_DHAKA");
+  const [paymentMethod, setPaymentMethod] = useState("COD");
 
-  // Mock product data for the checkout
-  const product = {
-    name: "Drop Shoulder T-Shirt (Raimons)",
-    size: "L",
-    type: "Drop Shoulder",
-    quantity: 1,
-    price: 560,
-  };
+  const [formData, setFormData] = useState({
+    fullName: "",
+    address: "",
+    district: "",
+    phone: "+880",
+    email: "",
+    notes: ""
+  });
+  const [loading, setLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const incompleteOrderIdRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        setFormData(prev => ({
+          ...prev,
+          fullName: parsedUser.name || prev.fullName,
+          phone: parsedUser.phone || prev.phone,
+          email: parsedUser.email || prev.email,
+          address: parsedUser.deliveryaddress || prev.address,
+          district: parsedUser.district || parsedUser.city || parsedUser.division || prev.district,
+        }));
+      } catch (e) {
+        console.error("Failed to parse user from local storage", e);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!mounted || items.length === 0) return;
+
+    const timeoutId = setTimeout(async () => {
+      // Capture if we have at least phone or name to identify the cart
+      if (formData.phone.length > 4 || formData.fullName.trim() !== "") {
+        const orderData = {
+          customerName: formData.fullName,
+          customerEmail: formData.email || undefined,
+          customerPhone: formData.phone,
+          selectedProducts: items.map(item => ({
+            productId: Number(item.id),
+            quantity: Number(item.quantity),
+            productName: item.title,
+          })),
+        };
+
+        try {
+          if (incompleteOrderIdRef.current) {
+            await updateIncompleteOrder(incompleteOrderIdRef.current, orderData);
+          } else {
+            const res = await createIncompleteOrder(orderData);
+            if (res && res.id) {
+              incompleteOrderIdRef.current = res.id;
+            }
+          }
+        } catch (error) {
+          console.error("Failed to save incomplete order:", error);
+        }
+      }
+    }, 2000);
+
+    return () => clearTimeout(timeoutId);
+  }, [formData, items, mounted]);
 
   const shippingOptions = [
-    { id: "inside_dhaka", label: "INSIDE DHAKA", cost: 65 },
-    { id: "outside_dhaka", label: "OUTSIDE DHAKA", cost: 115 },
-    { id: "dhaka_suburbs", label: "DHAKA SUBURBS", cost: 85 },
+    { id: "INSIDE_DHAKA", label: "Inside Dhaka", cost: 65 },
+    { id: "OUTSIDE_DHAKA", label: "Outside Dhaka", cost: 115 },
+    { id: "DHAKA_SUBURBS", label: "Dhaka Suburbs", cost: 85 },
   ];
 
+  if (!mounted) return null;
+
   const selectedShippingCost = shippingOptions.find(opt => opt.id === shippingMethod)?.cost || 0;
-  const total = product.price + selectedShippingCost;
+  const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const totalAmount = subtotal + selectedShippingCost;
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({ ...prev, [id]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (items.length === 0) {
+      alert("Your cart is empty!");
+      return;
+    }
+
+    const orderData = {
+      items: items.map(item => ({
+        productId: Number(item.id),
+        quantity: Number(item.quantity)
+      })),
+      shippingAddress: `${formData.fullName}\n${formData.address}\n${formData.district}\nPhone: ${formData.phone}\nEmail: ${formData.email}`,
+      customerName: formData.fullName,
+      customerEmail: formData.email,
+      customerPhone: formData.phone,
+      paymentMethod: paymentMethod === 'COD' ? 'COD' : 'Bkash',
+      deliveryType: shippingMethod,
+      deliveryFee: Number(selectedShippingCost),
+      orderNotes: formData.notes,
+      totalAmount: Number(totalAmount),
+      status: "Pending"
+    };
+
+    try {
+      setLoading(true);
+      const res = await createOrder(orderData);
+      if (res) {
+        if (incompleteOrderIdRef.current) {
+          try {
+            await deleteIncompleteOrder(incompleteOrderIdRef.current);
+          } catch (e) {
+            console.error("Failed to clear incomplete order", e);
+          }
+        }
+        alert("Order placed successfully!");
+        clearCart();
+        router.push("/main/shop");
+      }
+    } catch (error) {
+      console.error("Failed to place order:", error);
+      alert("Failed to place order. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen text-black py-12 px-4 sm:px-6 lg:px-8 font-sans">
-      <div className="max-w-5xl mx-auto">
-        {/* Header */}
+    <div className="min-h-screen bg-white text-black py-12 px-4 sm:px-6 lg:px-8 font-sans">
+      <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12 flex flex-col items-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight mb-6 uppercase border-b-[4px] border-black pb-4 inline-block bg-white px-6 md:px-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">Checkout</h1>
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4 text-black">Checkout</h1>
           <div className="flex items-center justify-center text-sm">
-            <span className="text-black flex items-center gap-3 bg-white border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] px-5 py-3 font-bold uppercase tracking-widest">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-              Have a coupon? 
-              <button className="text-[#3b82f6] hover:text-blue-800 font-black underline uppercase tracking-wide transition-colors">
+            <span className="text-gray-600 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              Have a coupon?
+              <button className="text-black font-semibold underline hover:no-underline transition-colors ml-1">
                 Click here to enter your code
               </button>
             </span>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           {/* Left Column - Form */}
           <div className="lg:col-span-7 flex flex-col gap-10">
             <div>
-              <h2 className="text-xl font-black uppercase tracking-widest mb-6 flex items-center gap-2 text-black bg-white border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] w-max px-4 py-2">
-                Billing <span className="text-[#3b82f6]">&</span> Shipping
+              <h2 className="text-lg font-semibold mb-6 pb-2 border-b-[1px] border-gray-200 text-black">
+                Billing & Shipping Details
               </h2>
-              
-              <form className="flex flex-col gap-5">
+
+              <div className="flex flex-col gap-5">
                 <div className="flex flex-col gap-2">
-                  <label htmlFor="fullName" className="text-sm font-black uppercase tracking-widest text-black">Full Name *</label>
-                  <input 
-                    type="text" 
-                    id="fullName" 
-                    placeholder="Your full name" 
-                    className="w-full border-[3px] border-black bg-white p-3.5 text-sm font-bold text-black focus:outline-none focus:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-1 focus:-translate-x-1 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] placeholder-gray-500 rounded-none"
+                  <label htmlFor="fullName" className="text-sm font-semibold text-gray-700">Full Name *</label>
+                  <input
+                    type="text"
+                    id="fullName"
+                    value={formData.fullName}
+                    onChange={handleChange}
+                    placeholder="Your full name"
+                    className="w-full border-[1px] border-gray-300 bg-transparent p-3 text-sm font-medium text-black focus:outline-none focus:border-black transition-colors placeholder-gray-400 rounded-md"
                     required
                   />
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <label htmlFor="address" className="text-sm font-black uppercase tracking-widest text-black">Full Address *</label>
-                  <input 
-                    type="text" 
-                    id="address" 
-                    placeholder="Your full address with thana and district name" 
-                    className="w-full border-[3px] border-black bg-white p-3.5 text-sm font-bold text-black focus:outline-none focus:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-1 focus:-translate-x-1 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] placeholder-gray-500 rounded-none"
+                  <label htmlFor="address" className="text-sm font-semibold text-gray-700">Full Address *</label>
+                  <input
+                    type="text"
+                    id="address"
+                    value={formData.address}
+                    onChange={handleChange}
+                    placeholder="Your full address with thana and district name"
+                    className="w-full border-[1px] border-gray-300 bg-transparent p-3 text-sm font-medium text-black focus:outline-none focus:border-black transition-colors placeholder-gray-400 rounded-md"
                     required
                   />
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <label htmlFor="district" className="text-sm font-black uppercase tracking-widest text-black">District(জেলা) *</label>
-                  <input 
-                    type="text" 
-                    id="district" 
-                    placeholder="District name (for Dhaka, area; ex. Banani)" 
-                    className="w-full border-[3px] border-black bg-white p-3.5 text-sm font-bold text-black focus:outline-none focus:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-1 focus:-translate-x-1 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] placeholder-gray-500 rounded-none"
+                  <label htmlFor="district" className="text-sm font-semibold text-gray-700">District(জেলা) *</label>
+                  <input
+                    type="text"
+                    id="district"
+                    value={formData.district}
+                    onChange={handleChange}
+                    placeholder="District name (for Dhaka, area; ex. Banani)"
+                    className="w-full border-[1px] border-gray-300 bg-transparent p-3 text-sm font-medium text-black focus:outline-none focus:border-black transition-colors placeholder-gray-400 rounded-md"
                     required
                   />
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <label htmlFor="phone" className="text-sm font-black uppercase tracking-widest text-black">Phone *</label>
-                  <input 
-                    type="tel" 
-                    id="phone" 
-                    placeholder="+88" 
-                    defaultValue="+880"
-                    className="w-full border-[3px] border-black bg-white p-3.5 text-sm font-bold text-black focus:outline-none focus:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-1 focus:-translate-x-1 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] placeholder-gray-500 rounded-none"
+                  <label htmlFor="phone" className="text-sm font-semibold text-gray-700">Phone *</label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    placeholder="+88"
+                    className="w-full border-[1px] border-gray-300 bg-transparent p-3 text-sm font-medium text-black focus:outline-none focus:border-black transition-colors placeholder-gray-400 rounded-md"
                     required
                   />
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <label htmlFor="email" className="text-sm font-black uppercase tracking-widest text-black">Email Address</label>
-                  <input 
-                    type="email" 
-                    id="email" 
-                    placeholder="you@example.com" 
-                    className="w-full border-[3px] border-black bg-white p-3.5 text-sm font-bold text-black focus:outline-none focus:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-1 focus:-translate-x-1 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] placeholder-gray-500 rounded-none"
+                  <label htmlFor="email" className="text-sm font-semibold text-gray-700">Email Address (Optional)</label>
+                  <input
+                    type="email"
+                    id="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="you@example.com"
+                    className="w-full border-[1px] border-gray-300 bg-transparent p-3 text-sm font-medium text-black focus:outline-none focus:border-black transition-colors placeholder-gray-400 rounded-md"
                   />
                 </div>
-              </form>
+              </div>
             </div>
 
-            <div className="mt-4">
-              <h2 className="text-xl font-black uppercase tracking-widest mb-6 text-black bg-white border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] w-max px-4 py-2">
+            <div className="mt-2">
+              <h2 className="text-lg font-semibold mb-6 pb-2 border-b-[1px] border-gray-200 text-black">
                 Additional Information
               </h2>
               <div className="flex flex-col gap-2">
-                <label htmlFor="notes" className="text-sm font-black uppercase tracking-widest text-black">Order Notes (Optional)</label>
-                <textarea 
-                  id="notes" 
+                <label htmlFor="notes" className="text-sm font-semibold text-gray-700">Order Notes (Optional)</label>
+                <textarea
+                  id="notes"
+                  value={formData.notes}
+                  onChange={handleChange}
                   rows={4}
-                  placeholder="Notes about your order, e.g. special notes for delivery." 
-                  className="w-full border-[3px] border-black bg-white p-3.5 text-sm font-bold text-black focus:outline-none focus:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-1 focus:-translate-x-1 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] placeholder-gray-500 rounded-none resize-none"
+                  placeholder="Notes about your order, e.g. special notes for delivery."
+                  className="w-full border-[1px] border-gray-300 bg-transparent p-3 text-sm font-medium text-black focus:outline-none focus:border-black transition-colors placeholder-gray-400 rounded-md resize-none"
                 />
               </div>
             </div>
@@ -128,148 +256,137 @@ export default function CheckoutPage() {
 
           {/* Right Column - Receipt / Order Summary */}
           <div className="lg:col-span-5 relative">
-            <div className="bg-white border-[4px] border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8 rounded-none relative">
-              
-              <div className="mb-6 border-b-[3px] border-black pb-4">
-                <div className="flex justify-between text-sm font-black uppercase tracking-widest text-black mb-4">
-                  <span>Product</span>
-                  <span>Subtotal</span>
-                </div>
-                
-                <div className="flex justify-between items-start mb-2">
-                  <div className="flex flex-col gap-1">
-                    <span className="font-black text-sm uppercase tracking-wide">{product.name}</span>
-                    <span className="text-xs font-bold text-gray-600 bg-gray-100 border-2 border-black px-2 py-0.5 w-max shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">QTY: {product.quantity}</span>
-                    <span className="text-xs font-bold text-black border-l-[3px] border-black pl-2 mt-2">Size: {product.size}</span>
-                    <span className="text-xs font-bold text-black border-l-[3px] border-black pl-2">Type: {product.type}</span>
-                  </div>
-                  <span className="font-black text-lg">৳{product.price}</span>
-                </div>
-              </div>
+            <div className="bg-white border-[1px] border-gray-200 shadow-sm p-6 sm:p-8 rounded-xl sticky top-24">
 
-              <div className="flex justify-between items-center mb-6 text-sm">
-                <span className="font-black uppercase tracking-widest text-sm">Subtotal</span>
-                <span className="font-black text-lg">৳{product.price}</span>
-              </div>
+              <div className="mb-6">
+                <h3 className="text-xl font-semibold mb-6 text-black">Order Summary</h3>
 
-              <div className="mb-6 border-b-[3px] border-black pb-6">
-                <div className="flex flex-col gap-4 text-sm">
-                  <span className="font-black uppercase tracking-widest text-sm mb-2 bg-[#3b82f6] text-white border-2 border-black w-max px-3 py-1 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">Shipment</span>
-                  
-                  {shippingOptions.map((option) => (
-                    <label key={option.id} className="flex items-center gap-3 cursor-pointer group p-2 border-[3px] border-transparent hover:border-black transition-colors bg-white">
-                      <div className={`w-6 h-6 rounded-none border-[3px] border-black flex items-center justify-center bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]`}>
-                        {shippingMethod === option.id && <div className="w-3 h-3 bg-[#3b82f6]" />}
+                <div className="flex flex-col gap-4">
+                  {items.map((item, idx) => (
+                    <div key={`${item.id}-${idx}`} className="flex gap-4 items-center pb-4 border-b-[1px] border-gray-100 last:border-b-0 last:pb-0">
+                      <div className="relative w-16 h-16 bg-gray-50 rounded-lg border-[1px] border-gray-200 overflow-visible shrink-0 flex items-center justify-center">
+                        {item.image ? (
+                          <img src={item.image.startsWith('http') ? item.image : `http://localhost:8000${item.image.startsWith('/') ? '' : '/'}${item.image}`} alt={item.title} className="w-full h-full object-cover rounded-lg" />
+                        ) : (
+                          <span className="text-[10px] text-gray-400 font-medium">NO IMG</span>
+                        )}
+                        <span className="absolute -top-2 -right-2 bg-gray-600 text-white text-[11px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-[2px] border-white shadow-sm z-10">
+                          {item.quantity}
+                        </span>
                       </div>
-                      <input 
-                        type="radio" 
-                        name="shipping" 
-                        value={option.id}
-                        className="hidden"
-                        checked={shippingMethod === option.id}
-                        onChange={() => setShippingMethod(option.id)}
-                      />
-                      <span className="text-sm font-black uppercase tracking-widest text-black">
-                        {option.label}: <span className="font-black text-[#3b82f6]">৳{option.cost}</span>
+
+                      <div className="flex-1 flex flex-col justify-center">
+                        <span className="font-semibold text-sm text-black line-clamp-2 leading-tight mb-1">{item.title}</span>
+                        {item.size && <span className="text-xs text-gray-500 font-medium">Size: {item.size}</span>}
+                      </div>
+
+                      <span className="font-semibold text-sm text-black mt-1">
+                        ৳{item.price * item.quantity}
                       </span>
+                    </div>
+                  ))}
+
+                  {items.length === 0 && (
+                    <div className="text-sm font-medium text-red-500 py-4 text-center bg-red-50 rounded-lg">Your cart is empty.</div>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-3 mb-6 text-sm text-gray-600 border-t-[1px] border-gray-100 pt-6">
+                <div className="flex justify-between items-center">
+                  <span>Subtotal</span>
+                  <span className="font-medium text-black">৳{subtotal}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span>Shipping</span>
+                  <span className="font-medium text-black">{selectedShippingCost > 0 ? `৳${selectedShippingCost}` : 'Select shipping'}</span>
+                </div>
+              </div>
+
+              <div className="mb-6 border-b-[1px] border-gray-100 pb-6">
+                <span className="block font-semibold text-sm text-black mb-3">Shipping Method</span>
+                <div className="flex flex-col gap-2">
+                  {shippingOptions.map((option) => (
+                    <label key={option.id} className={`flex items-center justify-between p-3 cursor-pointer rounded-lg border-[1px] transition-colors ${shippingMethod === option.id ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="radio"
+                          name="shipping"
+                          value={option.id}
+                          className="w-4 h-4 text-black border-gray-300 focus:ring-black"
+                          checked={shippingMethod === option.id}
+                          onChange={() => setShippingMethod(option.id)}
+                        />
+                        <span className={`text-sm font-medium ${shippingMethod === option.id ? 'text-black' : 'text-gray-700'}`}>
+                          {option.label}
+                        </span>
+                      </div>
+                      <span className="font-semibold text-sm text-black">৳{option.cost}</span>
                     </label>
                   ))}
                 </div>
               </div>
 
-              <div className="flex justify-between items-center mb-10 bg-black text-white p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] -ml-2 -mr-2 sm:-ml-4 sm:-mr-4">
-                <span className="font-black uppercase tracking-widest text-lg">Total</span>
-                <span className="text-4xl font-black">৳{total}</span>
+              {/* Payment Methods */}
+              <div className="mb-6 border-b-[1px] border-gray-100 pb-6">
+                <span className="block font-semibold text-sm text-black mb-3">Payment Method</span>
+                <label className={`flex items-start gap-3 p-3 cursor-pointer rounded-lg border-[1px] transition-colors ${paymentMethod === 'COD' ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}>
+                  <input
+                    type="radio"
+                    name="payment"
+                    value="COD"
+                    className="mt-0.5 w-4 h-4 text-black border-gray-300 focus:ring-black"
+                    checked={paymentMethod === 'COD'}
+                    onChange={() => setPaymentMethod('COD')}
+                  />
+                  <div className="flex flex-col">
+                    <span className={`text-sm font-medium ${paymentMethod === 'COD' ? 'text-black' : 'text-gray-700'}`}>Cash On Delivery</span>
+                    {paymentMethod === 'COD' && (
+                      <span className="text-xs text-gray-500 mt-1 font-medium">Pay with cash upon delivery.</span>
+                    )}
+                  </div>
+                </label>
               </div>
 
-              {/* Payment Methods */}
-              <div className="flex flex-col gap-4 mb-8">
-                <div className="flex flex-col gap-2">
-                  <label className="flex items-center gap-3 cursor-pointer p-3 border-[3px] border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-transform">
-                    <div className={`w-6 h-6 rounded-none border-[3px] border-black flex items-center justify-center bg-white`}>
-                      {paymentMethod === 'cod' && <div className="w-3 h-3 bg-black" />}
-                    </div>
-                    <input 
-                      type="radio" 
-                      name="payment" 
-                      value="cod"
-                      className="hidden"
-                      checked={paymentMethod === 'cod'}
-                      onChange={() => setPaymentMethod('cod')}
-                    />
-                    <span className="font-black text-sm uppercase tracking-widest">Cash On Delivery</span>
-                  </label>
-                  {paymentMethod === 'cod' && (
-                    <div className="mt-2 bg-yellow-300 border-[3px] border-black p-3 text-sm font-bold text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                      Pay with cash upon delivery. For any further needs, we'll contact you.
-                    </div>
-                  )}
+              <div className="flex justify-between items-end mb-6">
+                <span className="text-base font-medium text-gray-600 mb-1">Total</span>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-sm text-gray-500 font-medium">BDT</span>
+                  <span className="text-3xl font-bold text-black tracking-tight">৳{totalAmount}</span>
                 </div>
-
-                <label className="flex items-center justify-between cursor-pointer p-3 border-[3px] border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-transform">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-6 h-6 rounded-none border-[3px] border-black flex items-center justify-center bg-white`}>
-                      {paymentMethod === 'bkash' && <div className="w-3 h-3 bg-black" />}
-                    </div>
-                    <input 
-                      type="radio" 
-                      name="payment" 
-                      value="bkash"
-                      className="hidden"
-                      checked={paymentMethod === 'bkash'}
-                      onChange={() => setPaymentMethod('bkash')}
-                    />
-                    <span className="font-black text-sm uppercase tracking-widest">Bkash</span>
-                  </div>
-                  <div className="font-black text-pink-600 italic text-xl tracking-tighter">bKash</div>
-                </label>
-
-                <label className="flex items-center justify-between cursor-pointer p-3 border-[3px] border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-transform">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-6 h-6 rounded-none border-[3px] border-black flex items-center justify-center bg-white`}>
-                      {paymentMethod === 'card' && <div className="w-3 h-3 bg-black" />}
-                    </div>
-                    <input 
-                      type="radio" 
-                      name="payment" 
-                      value="card"
-                      className="hidden"
-                      checked={paymentMethod === 'card'}
-                      onChange={() => setPaymentMethod('card')}
-                    />
-                    <span className="font-black text-sm uppercase tracking-widest">Card / NetBanking</span>
-                  </div>
-                  <div className="text-[10px] font-black text-white bg-blue-800 border-2 border-black p-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] leading-tight text-center">
-                    SSL<br/>COMMERZ
-                  </div>
-                </label>
               </div>
 
               {/* Terms and conditions */}
-              <div className="mb-8">
+              <div className="mb-6">
                 <label className="flex items-start gap-3 cursor-pointer group">
-                  <div className="relative flex items-center justify-center w-6 h-6 mt-0.5 border-[3px] border-black bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                    <input type="checkbox" className="peer absolute opacity-0 w-full h-full cursor-pointer" required />
-                    <Check className="w-4 h-4 text-white peer-checked:text-white peer-checked:bg-black opacity-0 peer-checked:opacity-100 transition-opacity" />
-                    <div className="absolute inset-0 bg-black opacity-0 peer-checked:opacity-100 -z-10 rounded-none"></div>
-                  </div>
-                  <span className="text-sm font-bold text-black mt-1">
-                    I agree to the website's <a href="#" className="text-[#3b82f6] underline hover:no-underline font-black uppercase tracking-wider">terms and conditions</a> *
+                  <input type="checkbox" className="mt-1 w-4 h-4 text-black border-gray-300 rounded-sm focus:ring-black transition-colors" required />
+                  <span className="text-xs font-medium text-gray-500 leading-relaxed select-none">
+                    I agree to the website's <a href="#" className="text-black underline hover:no-underline font-semibold">terms and conditions</a> *
                   </span>
                 </label>
               </div>
 
               {/* Place Order Button */}
-              <button 
+              <button
                 type="submit"
-                className="w-full bg-[#3b82f6] text-white font-black uppercase tracking-widest text-lg py-5 border-[3px] border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 active:translate-x-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                disabled={loading || items.length === 0}
+                className={`w-full ${loading ? 'bg-gray-400' : 'bg-black hover:bg-gray-800'} text-white font-semibold text-base py-4 rounded-xl transition-all flex justify-center items-center gap-2 shadow-sm`}
               >
-                Place Order
+                {loading ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Processing...
+                  </>
+                ) : (
+                  "Complete Order"
+                )}
               </button>
             </div>
           </div>
-
-        </div>
+        </form>
       </div>
     </div>
   );

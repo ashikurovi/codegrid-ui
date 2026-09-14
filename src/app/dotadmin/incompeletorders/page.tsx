@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import {
   Table,
@@ -12,7 +12,8 @@ import {
 } from "@/components/ui/table"
 import { TableControls } from "@/components/admin/table-controls";
 import { TablePagination } from "@/components/admin/table-pagination";
-import { Eye, Mail, MessageCircle, ArrowRightLeft } from "lucide-react";
+import { Eye, Mail, MessageCircle, ArrowRightLeft, Trash2 } from "lucide-react";
+import { getAllIncompleteOrders, deleteIncompleteOrder } from "@/api/incompleteOrderApi";
 
 export default function IncompleteOrdersPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -20,31 +21,55 @@ export default function IncompleteOrdersPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  const incompleteOrders = [
-    { id: 3001, customer: "Fahim Rahman", phone: "+8801711000000", email: "fahim@example.com", item: "Winter Hoodie", cartValue: "৳ 850", date: "2023-10-29 14:30", status: "Abandoned", step: "Checkout" },
-    { id: 3002, customer: "Nusrat Jahan", phone: "+8801811000000", email: "nusrat@example.com", item: "Premium Polo x 2", cartValue: "৳ 1100", date: "2023-10-29 11:15", status: "Contacted", step: "Shipping Info" },
-    { id: 3003, customer: "Tanvir Ahmed", phone: "+8801911000000", email: "tanvir@test.com", item: "Ceramic Mug", cartValue: "৳ 250", date: "2023-10-28 18:45", status: "Abandoned", step: "Cart" },
-    { id: 3004, customer: "Sadia Islam", phone: "+8801611000000", email: "sadia@test.com", item: "Basic Corporate Kit", cartValue: "৳ 1500", date: "2023-10-28 10:20", status: "Recovered", step: "Payment" },
-    { id: 3005, customer: "Rakib Hasan", phone: "+8801511000000", email: "rakib@example.com", item: "Steel Water Bottle", cartValue: "৳ 450", date: "2023-10-27 09:10", status: "Abandoned", step: "Checkout" },
-  ];
+  const [orders, setOrders] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadOrders();
+  }, []);
+
+  const loadOrders = () => {
+    setLoading(true);
+    getAllIncompleteOrders()
+      .then((res) => {
+        if (res.data) setOrders(res.data);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  };
+
+  const handleDelete = async (id: number) => {
+    if (confirm("Are you sure you want to delete this incomplete order?")) {
+      try {
+        await deleteIncompleteOrder(id);
+        loadOrders();
+      } catch (err) {
+        console.error("Failed to delete order", err);
+      }
+    }
+  };
 
   const statusOptions = [
     { label: "All Status", value: "All" },
-    { label: "Abandoned", value: "Abandoned" },
-    { label: "Contacted", value: "Contacted" },
+    { label: "Pending", value: "Pending" },
     { label: "Recovered", value: "Recovered" },
+    { label: "Lost", value: "Lost" },
   ];
 
   // Filter and Search logic
   const filteredOrders = useMemo(() => {
-    return incompleteOrders.filter((order) => {
-      const matchesSearch = order.customer.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                            order.phone.includes(searchQuery) ||
-                            order.email.toLowerCase().includes(searchQuery.toLowerCase());
+    return orders.filter((order) => {
+      const customerName = order.customerName || "";
+      const customerPhone = order.customerPhone || "";
+      const customerEmail = order.customerEmail || "";
+      
+      const matchesSearch = customerName.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                            customerPhone.includes(searchQuery) ||
+                            customerEmail.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStatus = statusFilter === "All" || order.status === statusFilter;
       return matchesSearch && matchesStatus;
     });
-  }, [incompleteOrders, searchQuery, statusFilter]);
+  }, [orders, searchQuery, statusFilter]);
 
   // Pagination logic
   const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
@@ -55,8 +80,8 @@ export default function IncompleteOrdersPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "Abandoned": return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
-      case "Contacted": return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400";
+      case "Pending": return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400";
+      case "Lost": return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
       case "Recovered": return "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400";
       default: return "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400";
     }
@@ -86,16 +111,21 @@ export default function IncompleteOrdersPage() {
               <TableRow>
                 <TableHead>Customer Details</TableHead>
                 <TableHead>Cart / Items</TableHead>
-                <TableHead>Left At</TableHead>
                 <TableHead>Date & Time</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paginatedOrders.length === 0 ? (
+              {loading ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-6 text-gray-500">
+                  <TableCell colSpan={5} className="text-center py-6 text-gray-500 font-bold uppercase">
+                    Loading incomplete orders...
+                  </TableCell>
+                </TableRow>
+              ) : paginatedOrders.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-6 text-gray-500">
                     No incomplete orders found.
                   </TableCell>
                 </TableRow>
@@ -103,22 +133,22 @@ export default function IncompleteOrdersPage() {
                 paginatedOrders.map((order) => (
                   <TableRow key={order.id}>
                     <TableCell>
-                      <div className="font-medium">{order.customer}</div>
+                      <div className="font-medium">{order.customerName || "Unknown"}</div>
                       <div className="text-xs text-gray-500 flex flex-col gap-1 mt-1">
-                        <span>{order.phone}</span>
-                        <span>{order.email}</span>
+                        <span>{order.customerPhone || "N/A"}</span>
+                        <span>{order.customerEmail || "N/A"}</span>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div>{order.item}</div>
-                      <div className="font-medium text-sm mt-1">{order.cartValue}</div>
+                      {order.selectedProducts && order.selectedProducts.map((p: any, i: number) => (
+                        <div key={i} className="text-sm">
+                          {p.quantity}x {p.productName || `Product #${p.productId}`}
+                        </div>
+                      ))}
                     </TableCell>
-                    <TableCell>
-                      <span className="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded dark:bg-gray-800 dark:text-gray-300">
-                        {order.step}
-                      </span>
+                    <TableCell className="text-sm text-gray-600 dark:text-gray-400">
+                      {new Date(order.createdAt).toLocaleString()}
                     </TableCell>
-                    <TableCell className="text-sm text-gray-600 dark:text-gray-400">{order.date}</TableCell>
                     <TableCell>
                       <span className={`px-2 py-1 text-xs font-medium rounded-sm ${getStatusColor(order.status)}`}>
                         {order.status}
@@ -126,36 +156,37 @@ export default function IncompleteOrdersPage() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-3">
-                        {/* WhatsApp Action */}
-                        <a 
-                          href={`https://wa.me/${order.phone.replace(/[^0-9]/g, '')}?text=Hi ${order.customer}, we noticed you left some items in your cart...`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="p-1.5 bg-green-50 text-green-600 rounded hover:bg-green-100 hover:text-green-700 transition-colors"
-                          title="Message on WhatsApp"
-                        >
-                          <MessageCircle className="w-4 h-4" />
-                        </a>
+                        {order.customerPhone && (
+                          <a 
+                            href={`https://wa.me/${order.customerPhone.replace(/[^0-9]/g, '')}?text=Hi ${order.customerName}, we noticed you left some items in your cart...`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="p-1.5 bg-green-50 text-green-600 rounded hover:bg-green-100 hover:text-green-700 transition-colors"
+                            title="Message on WhatsApp"
+                          >
+                            <MessageCircle className="w-4 h-4" />
+                          </a>
+                        )}
                         
-                        {/* Email Action */}
-                        <a 
-                          href={`mailto:${order.email}?subject=Your items are waiting!&body=Hi ${order.customer},`}
-                          className="p-1.5 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 hover:text-blue-700 transition-colors"
-                          title="Send Email"
-                        >
-                          <Mail className="w-4 h-4" />
-                        </a>
+                        {order.customerEmail && (
+                          <a 
+                            href={`mailto:${order.customerEmail}?subject=Your items are waiting!&body=Hi ${order.customerName},`}
+                            className="p-1.5 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 hover:text-blue-700 transition-colors"
+                            title="Send Email"
+                          >
+                            <Mail className="w-4 h-4" />
+                          </a>
+                        )}
 
                         <div className="w-px h-6 bg-gray-200 dark:bg-gray-800 mx-1"></div>
 
-                        {/* Convert Action */}
                         <button 
+                          onClick={() => handleDelete(order.id)}
                           type="button"
-                          className="flex items-center gap-1 px-2.5 py-1.5 bg-gray-900 text-white text-xs font-medium rounded hover:bg-gray-800 transition-colors"
-                          title="Convert to Order"
+                          className="p-1.5 text-gray-500 hover:text-red-600 transition-colors"
+                          title="Delete"
                         >
-                          <ArrowRightLeft className="w-3.5 h-3.5" />
-                          Convert
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </TableCell>

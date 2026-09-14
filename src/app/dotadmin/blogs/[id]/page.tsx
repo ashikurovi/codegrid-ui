@@ -1,15 +1,113 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
-import { Upload } from "lucide-react";
-import Image from "next/image";
+import { useRouter, useParams } from "next/navigation";
+import { Upload, X } from "lucide-react";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { getBlogById, updateBlog } from "@/api/blogApi";
+import { uploadImage } from "@/api/cdnApi";
 
 export default function EditBlogPage() {
-  const params = useParams();
-  const blogId = params.id;
   const router = useRouter();
+  const params = useParams();
+  const blogId = params.id as string;
+
+  const [title, setTitle] = useState("");
+  const [excerpt, setExcerpt] = useState("");
+  const [content, setContent] = useState("");
+  const [date, setDate] = useState("");
+  const [status, setStatus] = useState("Draft");
+  
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  
+  const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (blogId) {
+      getBlogById(blogId)
+        .then((res) => {
+          if (res.data) {
+            setTitle(res.data.title || "");
+            setExcerpt(res.data.excerpt || "");
+            setContent(res.data.content || "");
+            
+            if (res.data.date) {
+              // Convert ISO date to YYYY-MM-DD for the input type="date"
+              const d = new Date(res.data.date);
+              const formattedDate = d.toISOString().split('T')[0];
+              setDate(formattedDate);
+            }
+            
+            setStatus(res.data.status || "Draft");
+            if (res.data.image) {
+              setImagePreview(res.data.image);
+            }
+          }
+        })
+        .catch(console.error)
+        .finally(() => setLoading(false));
+    }
+  }, [blogId]);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title || !content) {
+      alert("Please fill in all required fields (Title, Content).");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      let imageUrl = imagePreview; // keep old by default
+      
+      if (imageFile) {
+        const uploadRes = await uploadImage(imageFile);
+        if (uploadRes.data?.url) {
+          imageUrl = uploadRes.data.url;
+        } else {
+          throw new Error("Failed to upload image");
+        }
+      }
+
+      // If imagePreview was cleared but no new file, it means they deleted the image
+      if (!imagePreview && !imageFile) {
+        imageUrl = null;
+      }
+
+      const payload = {
+        title,
+        excerpt: excerpt || null,
+        content,
+        date: date ? new Date(date).toISOString() : new Date().toISOString(),
+        status,
+        image: imageUrl
+      };
+
+      await updateBlog(blogId, payload);
+      alert("Blog updated successfully!");
+      router.push("/dotadmin/blogs");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to update blog.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="p-8 text-xl font-bold uppercase">Loading blog...</div>;
+  }
 
   return (
     <div className="flex flex-col gap-8">
@@ -17,22 +115,25 @@ export default function EditBlogPage() {
         <Link href="/dotadmin/blogs" className="text-black hover:text-[#3b82f6] flex items-center justify-center p-2 border-[3px] border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 rounded-none">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg>
         </Link>
-        <h1 className="text-3xl font-black uppercase tracking-tight text-black">Edit Blog {blogId}</h1>
+        <h1 className="text-3xl font-black uppercase tracking-tight text-black">Edit Blog</h1>
       </div>
 
       <div className="border-[3px] border-black bg-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none max-w-4xl">
-        <form className="flex flex-col gap-6">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           
           <div className="flex flex-col gap-4 border-b pb-6 dark:border-gray-800">
             <h3 className="text-xl font-black uppercase mb-2 text-black border-b-4 border-black w-max pb-1">Blog Content</h3>
             
             <div className="flex flex-col gap-2">
-              <label htmlFor="title" className="text-sm font-black uppercase text-black">Article Title</label>
+              <label htmlFor="title" className="text-sm font-black uppercase text-black">Article Title *</label>
               <input 
                 type="text" 
                 id="title" 
-                defaultValue="How to Style Drop Shoulder Tees for Winter"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="e.g. How to Style Drop Shoulder Tees for Winter" 
                 className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase" 
+                required
               />
             </div>
             
@@ -41,16 +142,19 @@ export default function EditBlogPage() {
               <textarea 
                 id="excerpt" 
                 rows={2}
-                defaultValue="Discover the best ways to layer your favorite drop shoulder t-shirts to stay warm and stylish this winter season."
+                value={excerpt}
+                onChange={(e) => setExcerpt(e.target.value)}
+                placeholder="A short summary of the article..." 
                 className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase resize-none" 
               ></textarea>
             </div>
 
             <div className="flex flex-col gap-2">
-              <label htmlFor="content" className="text-sm font-black uppercase text-black">Full Content</label>
+              <label htmlFor="content" className="text-sm font-black uppercase text-black">Full Content *</label>
               <RichTextEditor 
-                value="Winter is here, and it's time to talk about layering. Drop shoulder tees are an incredible base layer..."
-                onChange={(val) => console.log(val)} 
+                id="content"
+                value={content}
+                onChange={(val) => setContent(val)} 
                 placeholder="Write your article here..."
               />
             </div>
@@ -60,8 +164,9 @@ export default function EditBlogPage() {
                 <label htmlFor="date" className="text-sm font-black uppercase text-black">Publish Date</label>
                 <input 
                   type="date" 
-                  id="date" 
-                  defaultValue="2026-01-15"
+                  id="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)} 
                   className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase" 
                 />
               </div>
@@ -70,7 +175,8 @@ export default function EditBlogPage() {
                 <label htmlFor="status" className="text-sm font-black uppercase text-black">Status</label>
                 <select 
                   id="status" 
-                  defaultValue="Published"
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value)}
                   className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase"
                 >
                   <option value="Draft">Draft</option>
@@ -82,30 +188,42 @@ export default function EditBlogPage() {
 
           <div className="flex flex-col gap-2 border-b pb-6 dark:border-gray-800">
             <h3 className="text-xl font-black uppercase mb-2 text-black border-b-4 border-black w-max pb-1">Cover Image</h3>
-            <div className="flex flex-col sm:flex-row gap-6 items-start">
-              <div className="w-full sm:w-1/2 aspect-video relative border rounded bg-gray-100 overflow-hidden">
-                <Image 
-                  src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop" 
-                  alt="Blog preview" 
-                  fill 
-                  className="object-cover" 
-                />
+            {imagePreview ? (
+              <div className="relative border-[3px] border-black p-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] inline-block group">
+                <img src={imagePreview} alt="Preview" className="w-full max-w-lg object-cover border-2 border-black" />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setImageFile(null);
+                    setImagePreview(null);
+                  }}
+                  className="absolute top-4 right-4 bg-red-500 text-white p-1 border-2 border-black opacity-0 group-hover:opacity-100 transition-opacity shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
-              <div className="flex-1 w-full border-2 border-dashed border-gray-300 rounded-md p-8 flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 dark:bg-gray-900 dark:border-gray-700 dark:hover:bg-gray-800 transition-colors cursor-pointer h-full min-h-[150px]">
-                <Upload className="w-6 h-6 text-gray-400 mb-2" />
-                <p className="font-medium text-gray-600 dark:text-gray-300 text-sm">Upload new image</p>
+            ) : (
+              <div className="relative border-[3px] border-dashed border-black rounded-none p-10 flex flex-col items-center justify-center bg-white hover:bg-gray-100 transition-all cursor-pointer shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 text-black">
+                <input 
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+                <Upload className="w-8 h-8 text-gray-400 mb-2" />
+                <p className="font-medium text-gray-600 dark:text-gray-300 text-sm">Click to upload cover image</p>
                 <p className="text-xs text-gray-500 mt-1">PNG, JPG, WebP up to 5MB</p>
               </div>
-            </div>
+            )}
           </div>
 
           <div className="mt-4 flex gap-4">
             <button 
-              type="button"
-              onClick={() => router.push("/dotadmin/blogs")}
+              type="submit"
+              disabled={isSubmitting}
               className="bg-[#3b82f6] text-white px-8 py-3 text-sm font-black uppercase border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all rounded-none disabled:opacity-50"
             >
-              Update Blog
+              {isSubmitting ? "Updating..." : "Update Blog"}
             </button>
             <button 
               type="button"

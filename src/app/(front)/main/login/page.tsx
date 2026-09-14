@@ -31,7 +31,11 @@ export default function LoginPage() {
     try {
       const res = await loginUser({ email: loginEmail, password: loginPassword });
       if (res.statusCode === 200 || res.statusCode === 201) {
-        window.location.href = "/dotadmin";
+        if (res.data?.user?.role === 'admin') {
+          window.location.href = "/dotadmin";
+        } else {
+          window.location.href = "/main/dashboard";
+        }
       } else {
         setLoginError(res.message || "Login failed");
       }
@@ -60,130 +64,137 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center py-16 px-4 sm:px-6 lg:px-8 font-sans">
-      <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20">
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center py-16 px-4 sm:px-6 lg:px-8 font-sans">
+      <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16">
         
         {/* LOGIN SECTION */}
         <div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-black mb-8 uppercase tracking-tighter bg-white border-[4px] border-black px-6 py-3 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] inline-block w-max">Login</h1>
-          <div className="bg-white border-[4px] border-black p-8 sm:p-10 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] h-full">
-            <form onSubmit={handleLogin} className="space-y-8">
-              {loginError && <p className="text-red-500 text-sm font-bold">{loginError}</p>}
+          <div className="bg-white border-[1px] border-gray-200 rounded-xl p-8 sm:p-10 shadow-sm h-full">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-8 tracking-tight">Log In</h1>
+            <form onSubmit={handleLogin} className="space-y-5">
+              {loginError && <p className="text-red-500 text-sm font-medium">{loginError}</p>}
               
               {/* Username / Email */}
               <div>
-                <label className="block text-sm font-black text-black uppercase tracking-widest mb-3">
-                  USERNAME OR EMAIL ADDRESS <span className="text-red-500">*</span>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Email Address <span className="text-red-500">*</span>
                 </label>
                 <input 
                   type="email" 
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
-                  className="w-full bg-white border-[3px] border-black py-4 px-5 text-sm font-bold text-black focus:outline-none focus:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-1 focus:-translate-x-1 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] placeholder-gray-500"
+                  className="w-full border-[1px] border-gray-300 rounded-md py-3 px-4 text-sm font-medium text-black focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-colors placeholder-gray-400"
+                  placeholder="Enter your email"
                   required
                 />
               </div>
 
               {/* Password */}
               <div>
-                <label className="block text-sm font-black text-black uppercase tracking-widest mb-3">
-                  PASSWORD <span className="text-red-500">*</span>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Password <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <input 
                     type={showLoginPassword ? "text" : "password"} 
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
-                    className="w-full bg-white border-[3px] border-black py-4 px-5 pr-14 text-sm font-bold text-black focus:outline-none focus:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-1 focus:-translate-x-1 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] placeholder-gray-500"
+                    className="w-full border-[1px] border-gray-300 rounded-md py-3 px-4 pr-12 text-sm font-medium text-black focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-colors placeholder-gray-400"
+                    placeholder="Enter your password"
                     required
                   />
                   <button 
                     type="button"
                     onClick={() => setShowLoginPassword(!showLoginPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-black hover:text-[#3b82f6] bg-white border-2 border-transparent focus:outline-none"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black focus:outline-none"
                   >
-                    {showLoginPassword ? <EyeOff className="w-6 h-6" /> : <Eye className="w-6 h-6" />}
+                    {showLoginPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
               </div>
 
               {/* Submit Button */}
-              <button 
-                type="submit" 
-                className="w-full bg-[#3b82f6] text-white font-black text-lg uppercase tracking-widest py-5 border-[3px] border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 active:translate-x-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] mt-6"
-              >
-                LOG IN
-              </button>
+              <div className="pt-2">
+                <button 
+                  type="submit" 
+                  className="w-full bg-black text-white hover:bg-gray-800 font-semibold text-sm py-4 rounded-md transition-colors"
+                >
+                  Log In
+                </button>
+              </div>
             </form>
           </div>
         </div>
 
         {/* REGISTER SECTION */}
         <div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-black mb-8 uppercase tracking-tighter bg-white border-[4px] border-black px-6 py-3 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] inline-block w-max">Register</h1>
-          <div className="bg-white border-[4px] border-black p-8 sm:p-10 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] h-full">
-            <form onSubmit={handleRegister} className="space-y-8">
-              {registerError && <p className="text-red-500 text-sm font-bold">{registerError}</p>}
-              {registerSuccess && <p className="text-green-600 text-sm font-bold">{registerSuccess}</p>}
+          <div className="bg-white border-[1px] border-gray-200 rounded-xl p-8 sm:p-10 shadow-sm h-full">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-8 tracking-tight">Register</h1>
+            <form onSubmit={handleRegister} className="space-y-5">
+              {registerError && <p className="text-red-500 text-sm font-medium">{registerError}</p>}
+              {registerSuccess && <p className="text-green-600 text-sm font-medium">{registerSuccess}</p>}
               
               {/* Name */}
               <div>
-                <label className="block text-sm font-black text-black uppercase tracking-widest mb-3">
-                  FULL NAME <span className="text-red-500">*</span>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Full Name <span className="text-red-500">*</span>
                 </label>
                 <input 
                   type="text" 
                   value={registerName}
                   onChange={(e) => setRegisterName(e.target.value)}
-                  className="w-full bg-white border-[3px] border-black py-4 px-5 text-sm font-bold text-black focus:outline-none focus:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-1 focus:-translate-x-1 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] placeholder-gray-500"
+                  className="w-full border-[1px] border-gray-300 rounded-md py-3 px-4 text-sm font-medium text-black focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-colors placeholder-gray-400"
+                  placeholder="John Doe"
                   required
                 />
               </div>
 
               {/* Email */}
               <div>
-                <label className="block text-sm font-black text-black uppercase tracking-widest mb-3">
-                  EMAIL ADDRESS <span className="text-red-500">*</span>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Email Address <span className="text-red-500">*</span>
                 </label>
                 <input 
                   type="email" 
                   value={registerEmail}
                   onChange={(e) => setRegisterEmail(e.target.value)}
-                  className="w-full bg-white border-[3px] border-black py-4 px-5 text-sm font-bold text-black focus:outline-none focus:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-1 focus:-translate-x-1 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] placeholder-gray-500"
+                  className="w-full border-[1px] border-gray-300 rounded-md py-3 px-4 text-sm font-medium text-black focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-colors placeholder-gray-400"
+                  placeholder="you@example.com"
                   required
                 />
               </div>
               
               {/* Password */}
               <div>
-                <label className="block text-sm font-black text-black uppercase tracking-widest mb-3">
-                  PASSWORD <span className="text-red-500">*</span>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Password <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <input 
                     type={showRegisterPassword ? "text" : "password"} 
                     value={registerPassword}
                     onChange={(e) => setRegisterPassword(e.target.value)}
-                    className="w-full bg-white border-[3px] border-black py-4 px-5 pr-14 text-sm font-bold text-black focus:outline-none focus:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-1 focus:-translate-x-1 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] placeholder-gray-500"
+                    className="w-full border-[1px] border-gray-300 rounded-md py-3 px-4 pr-12 text-sm font-medium text-black focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-colors placeholder-gray-400"
+                    placeholder="Create a password"
                     required
                   />
                   <button 
                     type="button"
                     onClick={() => setShowRegisterPassword(!showRegisterPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-black hover:text-[#3b82f6] bg-white border-2 border-transparent focus:outline-none"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black focus:outline-none"
                   >
-                    {showRegisterPassword ? <EyeOff className="w-6 h-6" /> : <Eye className="w-6 h-6" />}
+                    {showRegisterPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
               </div>
 
               {/* Register Button */}
-              <div className="pt-4">
+              <div className="pt-2">
                 <button 
                   type="submit" 
-                  className="w-full bg-[#3b82f6] text-white font-black text-lg uppercase tracking-widest py-5 border-[3px] border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 active:translate-x-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                  className="w-full bg-black text-white hover:bg-gray-800 font-semibold text-sm py-4 rounded-md transition-colors"
                 >
-                  REGISTER
+                  Register
                 </button>
               </div>
             </form>
