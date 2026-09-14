@@ -21,7 +21,7 @@ state_add = """  const [uploadingImage, setUploadingImage] = useState(false);
       if (res && res.url) {
         let url = res.url;
         if (!url.startsWith('http')) {
-          url = `http://localhost:8000${url.startsWith('/') ? '' : '/'}${url}`;
+          url = `https://codegrid-api.vercel.app${url.startsWith('/') ? '' : '/'}${url}`;
         }
         setDesignReference(url);
         alert("Design uploaded successfully!");

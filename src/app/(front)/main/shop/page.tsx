@@ -23,11 +23,11 @@ export default function ShopPage() {
           getAllProducts(),
           getAllCategories()
         ]);
-        
+
         if (prodRes.data) {
           setProducts(prodRes.data);
         }
-        
+
         if (catRes.data) {
           setCategories(catRes.data);
         }
@@ -37,7 +37,7 @@ export default function ShopPage() {
         setLoading(false);
       }
     };
-    
+
     fetchData();
   }, []);
 
@@ -170,119 +170,119 @@ export default function ShopPage() {
                       }
                     }
                   }
-                  
+
                   if (imgUrl && !imgUrl.startsWith('http')) {
-                    imgUrl = `http://localhost:8000${imgUrl.startsWith('/') ? '' : '/'}${imgUrl}`;
+                    imgUrl = `https://codegrid-api.vercel.app${imgUrl.startsWith('/') ? '' : '/'}${imgUrl}`;
                   }
 
                   return (
-                  <div key={product.id} className="group block relative bg-transparent transition-transform hover:-translate-y-1 flex flex-col h-full">
-                    <Link href={`/main/product/${product.id}`} className="flex flex-col flex-1 pb-0">
-                      {/* Square Image */}
-                      <div className="relative aspect-square bg-gray-100 overflow-hidden mb-4 rounded-none">
-                        {imgUrl ? (
-                          <img
-                            src={imgUrl}
-                            alt={product.title || "Product image"}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:opacity-90"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center font-medium text-gray-400">NO IMAGE</div>
-                        )}
-                      </div>
-
-                      {/* Title */}
-                      <div className="flex flex-col flex-1 px-1">
-                        <h3 className="text-sm font-medium text-black mb-2 line-clamp-2">
-                          {product.title}
-                        </h3>
-
-                        {/* Tags / Badges */}
-                        <div className="flex flex-wrap gap-2 mb-2 min-h-[24px]">
-                          {product.stock > 0 ? (
-                            <span className="bg-black text-white text-[10px] font-bold px-2 py-0.5 rounded-none uppercase">
-                              In Stock
-                            </span>
+                    <div key={product.id} className="group block relative bg-transparent transition-transform hover:-translate-y-1 flex flex-col h-full">
+                      <Link href={`/main/product/${product.id}`} className="flex flex-col flex-1 pb-0">
+                        {/* Square Image */}
+                        <div className="relative aspect-square bg-gray-100 overflow-hidden mb-4 rounded-none">
+                          {imgUrl ? (
+                            <img
+                              src={imgUrl}
+                              alt={product.title || "Product image"}
+                              className="w-full h-full object-cover transition-transform duration-500 group-hover:opacity-90"
+                            />
                           ) : (
-                            <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-none uppercase">
-                              Out of Stock
-                            </span>
+                            <div className="w-full h-full flex items-center justify-center font-medium text-gray-400">NO IMAGE</div>
                           )}
                         </div>
 
-                        {/* Price */}
-                        <div className="flex items-center space-x-2 mt-auto mb-2">
-                          {Number(product.originalPrice) > Number(product.currentPrice) && (
-                            <span className="text-gray-400 line-through text-xs sm:text-sm font-medium">
-                              ৳{product.originalPrice}
-                            </span>
-                          )}
-                          <span className="text-black font-semibold text-sm sm:text-base">
-                            ৳{product.currentPrice || product.originalPrice}
-                          </span>
-                        </div>
-                      </div>
-                    </Link>
-                    {/* Action Buttons */}
-                    <div className="flex gap-2 pt-2 mt-auto px-1">
-                      {(() => {
-                        const cartItem = items.find((i) => i.id === product.id);
-                        if (cartItem) {
-                          return (
-                            <div className="flex items-center justify-between border-[1px] border-black bg-white w-full">
-                              <button
-                                className="px-4 py-2 font-medium text-lg hover:bg-gray-100 border-r-[1px] border-black transition-colors"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  if (cartItem.quantity === 1) {
-                                    removeFromCart(cartItem.id);
-                                  } else {
-                                    updateQuantity(cartItem.id, cartItem.quantity - 1);
-                                  }
-                                }}
-                              >
-                                <Minus className="w-4 h-4" strokeWidth={2} />
-                              </button>
-                              <span className="font-medium text-base px-2">
-                                {cartItem.quantity}
+                        {/* Title */}
+                        <div className="flex flex-col flex-1 px-1">
+                          <h3 className="text-sm font-medium text-black mb-2 line-clamp-2">
+                            {product.title}
+                          </h3>
+
+                          {/* Tags / Badges */}
+                          <div className="flex flex-wrap gap-2 mb-2 min-h-[24px]">
+                            {product.stock > 0 ? (
+                              <span className="bg-black text-white text-[10px] font-bold px-2 py-0.5 rounded-none uppercase">
+                                In Stock
                               </span>
-                              <button
-                                className="px-4 py-2 font-medium text-lg hover:bg-gray-100 border-l-[1px] border-black transition-colors"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  updateQuantity(cartItem.id, cartItem.quantity + 1);
-                                }}
-                                disabled={cartItem.quantity >= product.stock}
-                              >
-                                <Plus className="w-4 h-4" strokeWidth={2} />
-                              </button>
-                            </div>
+                            ) : (
+                              <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-none uppercase">
+                                Out of Stock
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Price */}
+                          <div className="flex items-center space-x-2 mt-auto mb-2">
+                            {Number(product.originalPrice) > Number(product.currentPrice) && (
+                              <span className="text-gray-400 line-through text-xs sm:text-sm font-medium">
+                                ৳{product.originalPrice}
+                              </span>
+                            )}
+                            <span className="text-black font-semibold text-sm sm:text-base">
+                              ৳{product.currentPrice || product.originalPrice}
+                            </span>
+                          </div>
+                        </div>
+                      </Link>
+                      {/* Action Buttons */}
+                      <div className="flex gap-2 pt-2 mt-auto px-1">
+                        {(() => {
+                          const cartItem = items.find((i) => i.id === product.id);
+                          if (cartItem) {
+                            return (
+                              <div className="flex items-center justify-between border-[1px] border-black bg-white w-full">
+                                <button
+                                  className="px-4 py-2 font-medium text-lg hover:bg-gray-100 border-r-[1px] border-black transition-colors"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    if (cartItem.quantity === 1) {
+                                      removeFromCart(cartItem.id);
+                                    } else {
+                                      updateQuantity(cartItem.id, cartItem.quantity - 1);
+                                    }
+                                  }}
+                                >
+                                  <Minus className="w-4 h-4" strokeWidth={2} />
+                                </button>
+                                <span className="font-medium text-base px-2">
+                                  {cartItem.quantity}
+                                </span>
+                                <button
+                                  className="px-4 py-2 font-medium text-lg hover:bg-gray-100 border-l-[1px] border-black transition-colors"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    updateQuantity(cartItem.id, cartItem.quantity + 1);
+                                  }}
+                                  disabled={cartItem.quantity >= product.stock}
+                                >
+                                  <Plus className="w-4 h-4" strokeWidth={2} />
+                                </button>
+                              </div>
+                            );
+                          }
+
+                          return (
+                            <button
+                              className="w-full bg-black text-white text-center text-xs sm:text-sm font-medium py-2.5 uppercase tracking-wide hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                              disabled={product.stock <= 0}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                if (product.stock <= 0) return;
+                                addToCart({
+                                  id: product.id,
+                                  title: product.title,
+                                  price: Number(product.currentPrice) || Number(product.originalPrice) || 0,
+                                  image: imgUrl || "",
+                                  quantity: 1,
+                                });
+                                openCart();
+                              }}
+                            >
+                              {product.stock > 0 ? "Add to Cart" : "Out of Stock"}
+                            </button>
                           );
-                        }
-                        
-                        return (
-                          <button
-                            className="w-full bg-black text-white text-center text-xs sm:text-sm font-medium py-2.5 uppercase tracking-wide hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                            disabled={product.stock <= 0}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              if (product.stock <= 0) return;
-                              addToCart({
-                                id: product.id,
-                                title: product.title,
-                                price: Number(product.currentPrice) || Number(product.originalPrice) || 0,
-                                image: imgUrl || "",
-                                quantity: 1,
-                              });
-                              openCart();
-                            }}
-                          >
-                            {product.stock > 0 ? "Add to Cart" : "Out of Stock"}
-                          </button>
-                        );
-                      })()}
+                        })()}
+                      </div>
                     </div>
-                  </div>
                   );
                 })}
               </div>

@@ -10,7 +10,7 @@ export default function BandDetailsPage() {
   const router = useRouter();
   const brandId = params.id as string;
 
-  const [brand, setBrand] = useState<{name: string, description: string, image: File | null, existingPicture: string}>({
+  const [brand, setBrand] = useState<{ name: string, description: string, image: File | null, existingPicture: string }>({
     name: "",
     description: "",
     image: null,
@@ -27,7 +27,7 @@ export default function BandDetailsPage() {
     try {
       setIsLoading(true);
       const res = await getBrandById(brandId);
-      
+
       if (res) {
         const brandData = res.data || res;
         setBrand({
@@ -82,44 +82,44 @@ export default function BandDetailsPage() {
           <form className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
               <label htmlFor="name" className="text-sm font-black uppercase text-black">Brand Name</label>
-              <input 
-                type="text" 
-                id="name" 
+              <input
+                type="text"
+                id="name"
                 value={brand.name}
-                onChange={(e) => setBrand({...brand, name: e.target.value})}
-                className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase" 
+                onChange={(e) => setBrand({ ...brand, name: e.target.value })}
+                className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase"
               />
             </div>
             <div className="flex flex-col gap-2">
               <label htmlFor="description" className="text-sm font-black uppercase text-black">Description</label>
-              <textarea 
-                id="description" 
+              <textarea
+                id="description"
                 rows={3}
                 value={brand.description}
-                onChange={(e) => setBrand({...brand, description: e.target.value})}
-                className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase resize-none" 
+                onChange={(e) => setBrand({ ...brand, description: e.target.value })}
+                className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase resize-none"
               />
             </div>
             <div className="flex flex-col gap-2">
               <label htmlFor="image" className="text-sm font-black uppercase text-black">Brand Logo / Image</label>
               {brand.existingPicture && !brand.image && (
                 <div className="mb-2">
-                  <img src={`http://localhost:8000${brand.existingPicture}`} alt="Current brand picture" className="w-20 h-20 object-cover border rounded" />
+                  <img src={`https://codegrid-api.vercel.app${brand.existingPicture}`} alt="Current brand picture" className="w-20 h-20 object-cover border rounded" />
                 </div>
               )}
-              <input 
-                type="file" 
-                id="image" 
+              <input
+                type="file"
+                id="image"
                 accept="image/*"
                 onChange={(e) => {
                   const file = e.target.files?.[0] || null;
                   setBrand({ ...brand, image: file });
                 }}
-                className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase" 
+                className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase"
               />
             </div>
             <div className="mt-4 flex gap-2">
-              <button 
+              <button
                 type="button"
                 onClick={handleUpdate}
                 disabled={isSaving || !brand.name}
@@ -134,7 +134,7 @@ export default function BandDetailsPage() {
         <div className="border bg-white p-6 shadow-sm dark:bg-gray-950 dark:border-gray-800 flex flex-col gap-6">
           <h2 className="text-xl font-semibold">Related Products</h2>
           <div className="flex flex-col gap-4">
-             <p className="text-sm text-gray-500">Products API not yet connected.</p>
+            <p className="text-sm text-gray-500">Products API not yet connected.</p>
           </div>
         </div>
       </div>

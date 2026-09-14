@@ -24,7 +24,7 @@ export function Navbar() {
 
     useEffect(() => {
         setMounted(true);
-        
+
         // Check if user is logged in
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
@@ -67,7 +67,7 @@ export function Navbar() {
                 }
             }
             if (imgUrl && !imgUrl.startsWith('http')) {
-                imgUrl = `http://localhost:8000${imgUrl.startsWith('/') ? '' : '/'}${imgUrl}`;
+                imgUrl = `https://codegrid-api.vercel.app${imgUrl.startsWith('/') ? '' : '/'}${imgUrl}`;
             }
             return {
                 id: product.id,

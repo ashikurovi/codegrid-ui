@@ -24,7 +24,7 @@ export default function BrandsManagementPage() {
   const [brands, setBrands] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  
+
   const [newBrand, setNewBrand] = useState<{ name: string; description: string; image: File | null }>({ name: "", description: "", image: null });
 
   useEffect(() => {
@@ -35,7 +35,7 @@ export default function BrandsManagementPage() {
     try {
       setIsLoading(true);
       const response = await getAllBrands();
-      
+
       if (response && Array.isArray(response.data)) {
         setBrands(response.data);
       } else if (Array.isArray(response)) {
@@ -86,8 +86,8 @@ export default function BrandsManagementPage() {
   // Filter and Search logic
   const filteredBrands = useMemo(() => {
     return brands.filter((brand) => {
-      const matchesSearch = brand.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                            (brand.description || "").toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = brand.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (brand.description || "").toLowerCase().includes(searchQuery.toLowerCase());
       return matchesSearch;
     });
   }, [brands, searchQuery]);
@@ -103,7 +103,7 @@ export default function BrandsManagementPage() {
     <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-black uppercase tracking-tight text-black">Brands Management</h1>
-        <button 
+        <button
           onClick={() => setIsModalOpen(true)}
           className="bg-[#3b82f6] text-white px-6 py-2 text-sm font-black uppercase border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all rounded-none"
         >
@@ -114,7 +114,7 @@ export default function BrandsManagementPage() {
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
           <div className="w-full max-w-lg border-[3px] border-black bg-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none relative">
-            <button 
+            <button
               onClick={() => setIsModalOpen(false)}
               className="absolute right-4 top-4 text-black hover:scale-110 transition-transform"
             >
@@ -124,49 +124,49 @@ export default function BrandsManagementPage() {
             <form className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
                 <label htmlFor="name" className="text-sm font-black uppercase text-black">Brand Name</label>
-                <input 
-                  type="text" 
-                  id="name" 
+                <input
+                  type="text"
+                  id="name"
                   value={newBrand.name}
-                  onChange={(e) => setNewBrand({...newBrand, name: e.target.value})}
-                  placeholder="E.G. APPLE" 
-                  className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase" 
+                  onChange={(e) => setNewBrand({ ...newBrand, name: e.target.value })}
+                  placeholder="E.G. APPLE"
+                  className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase"
                 />
               </div>
               <div className="flex flex-col gap-2">
                 <label htmlFor="description" className="text-sm font-black uppercase text-black">Description</label>
-                <textarea 
-                  id="description" 
+                <textarea
+                  id="description"
                   rows={3}
                   value={newBrand.description}
-                  onChange={(e) => setNewBrand({...newBrand, description: e.target.value})}
-                  placeholder="BRAND DESCRIPTION..." 
-                  className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black resize-none uppercase" 
+                  onChange={(e) => setNewBrand({ ...newBrand, description: e.target.value })}
+                  placeholder="BRAND DESCRIPTION..."
+                  className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black resize-none uppercase"
                 />
               </div>
               <div className="flex flex-col gap-2">
                 <label htmlFor="image" className="text-sm font-black uppercase text-black">Brand Logo / Image</label>
-                <input 
-                  type="file" 
-                  id="image" 
+                <input
+                  type="file"
+                  id="image"
                   accept="image/*"
                   onChange={(e) => {
                     const file = e.target.files?.[0] || null;
                     setNewBrand({ ...newBrand, image: file });
                   }}
-                  className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black" 
+                  className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black"
                 />
               </div>
               <div className="mt-6 flex justify-end gap-4">
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={() => setIsModalOpen(false)}
                   className="border-2 border-black bg-white px-6 py-2 text-sm font-black uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 hover:-translate-x-0.5 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all text-black rounded-none"
                 >
                   Cancel
                 </button>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={handleCreateBrand}
                   disabled={isSaving || !newBrand.name}
                   className="bg-[#3b82f6] text-white px-6 py-2 text-sm font-black uppercase border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 hover:-translate-x-0.5 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all rounded-none disabled:opacity-70 flex items-center justify-center gap-2"
@@ -180,12 +180,12 @@ export default function BrandsManagementPage() {
       )}
 
       <div>
-        <TableControls 
+        <TableControls
           searchQuery={searchQuery}
           setSearchQuery={(val) => { setSearchQuery(val); setCurrentPage(1); }}
           statusFilter="All"
-          setStatusFilter={() => {}}
-          statusOptions={[{label: "All Status", value: "All"}]}
+          setStatusFilter={() => { }}
+          statusOptions={[{ label: "All Status", value: "All" }]}
           searchPlaceholder="Search brands..."
         />
         <div className="border-[3px] border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none overflow-hidden">
@@ -218,7 +218,7 @@ export default function BrandsManagementPage() {
                     <TableCell>
                       <div className="flex items-center gap-2">
                         {brand.picture && (
-                          <img src={`http://localhost:8000${brand.picture}`} alt={brand.name} className="w-8 h-8 rounded object-cover border" />
+                          <img src={`https://codegrid-api.vercel.app${brand.picture}`} alt={brand.name} className="w-8 h-8 rounded object-cover border" />
                         )}
                         {brand.name}
                       </div>
@@ -226,21 +226,21 @@ export default function BrandsManagementPage() {
                     <TableCell>{brand.description}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <Link 
+                        <Link
                           href={`/dotadmin/bands/${brand.id}`}
                           className="p-1 text-gray-500 hover:text-blue-600 transition-colors"
                           title="View Details"
                         >
                           <Eye className="w-4 h-4" />
                         </Link>
-                        <Link 
+                        <Link
                           href={`/dotadmin/bands/${brand.id}`}
                           className="p-1 text-gray-500 hover:text-green-600 transition-colors"
                           title="Edit"
                         >
                           <Edit className="w-4 h-4" />
                         </Link>
-                        <button 
+                        <button
                           type="button"
                           onClick={() => handleDeleteBrand(brand.id)}
                           className="p-1 text-gray-500 hover:text-red-600 transition-colors"
@@ -256,7 +256,7 @@ export default function BrandsManagementPage() {
             </TableBody>
           </Table>
         </div>
-        <TablePagination 
+        <TablePagination
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={setCurrentPage}

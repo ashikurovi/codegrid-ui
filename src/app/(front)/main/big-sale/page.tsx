@@ -24,7 +24,7 @@ export default function BigSalePage() {
           getFlashSells(),
           getAllCategories()
         ]);
-        
+
         // find active flash sale
         const activeSale = sales.find((s: any) => s.isActive) || sales[0];
         if (activeSale && activeSale.products) {
@@ -48,7 +48,7 @@ export default function BigSalePage() {
   const getImgUrl = (url: string) => {
     if (!url) return "";
     if (url.startsWith('http')) return url;
-    return `http://localhost:8000${url.startsWith('/') ? '' : '/'}${url}`;
+    return `https://codegrid-api.vercel.app${url.startsWith('/') ? '' : '/'}${url}`;
   };
 
   return (
@@ -154,100 +154,100 @@ export default function BigSalePage() {
                     product.title.toLowerCase().includes(searchQuery.toLowerCase())
                   )
                   .map((product) => {
-                  const primaryImg = product.thumbnail ? getImgUrl(product.thumbnail) : "https://via.placeholder.com/600";
-                  
-                  return (
-                    <div key={product.id} className="group block relative bg-transparent transition-transform hover:-translate-y-1 flex flex-col h-full">
-                      <Link href={`/main/product/${product.id}`} className="flex flex-col flex-1 pb-0">
-                        {/* Square Image */}
-                        <div className="relative aspect-square bg-gray-100 overflow-hidden mb-4 rounded-none ">
-                          <img
-                            src={primaryImg}
-                            alt={product.title}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:opacity-90"
-                          />
-                          {/* FLASH SALE Badge Overlay */}
-                          <div className="absolute left-0 bottom-4 bg-black text-white text-[10px] font-bold px-3 py-1 uppercase tracking-widest z-10">
-                            FLASH SALE
-                          </div>
-                        </div>
+                    const primaryImg = product.thumbnail ? getImgUrl(product.thumbnail) : "https://via.placeholder.com/600";
 
-                        {/* Title */}
-                        <div className="flex flex-col flex-1 px-1">
-                          <h3 className="text-sm font-medium text-black mb-2 line-clamp-2">
-                            {product.title}
-                          </h3>
-
-                          {/* Price */}
-                          <div className="flex items-center space-x-2 mt-auto mb-2">
-                            <span className="text-gray-400 line-through text-xs sm:text-sm font-medium">
-                              ৳{product.originalPrice || 0}
-                            </span>
-                            <span className="text-black font-semibold text-sm sm:text-base">
-                              ৳{product.currentPrice || 0}
-                            </span>
+                    return (
+                      <div key={product.id} className="group block relative bg-transparent transition-transform hover:-translate-y-1 flex flex-col h-full">
+                        <Link href={`/main/product/${product.id}`} className="flex flex-col flex-1 pb-0">
+                          {/* Square Image */}
+                          <div className="relative aspect-square bg-gray-100 overflow-hidden mb-4 rounded-none ">
+                            <img
+                              src={primaryImg}
+                              alt={product.title}
+                              className="w-full h-full object-cover transition-transform duration-500 group-hover:opacity-90"
+                            />
+                            {/* FLASH SALE Badge Overlay */}
+                            <div className="absolute left-0 bottom-4 bg-black text-white text-[10px] font-bold px-3 py-1 uppercase tracking-widest z-10">
+                              FLASH SALE
+                            </div>
                           </div>
-                        </div>
-                      </Link>
-                      {/* Action Buttons */}
-                      <div className="flex gap-2 pt-2 mt-auto px-1">
-                        {(() => {
-                          const cartItem = items.find((i) => i.id === product.id);
-                          if (cartItem) {
+
+                          {/* Title */}
+                          <div className="flex flex-col flex-1 px-1">
+                            <h3 className="text-sm font-medium text-black mb-2 line-clamp-2">
+                              {product.title}
+                            </h3>
+
+                            {/* Price */}
+                            <div className="flex items-center space-x-2 mt-auto mb-2">
+                              <span className="text-gray-400 line-through text-xs sm:text-sm font-medium">
+                                ৳{product.originalPrice || 0}
+                              </span>
+                              <span className="text-black font-semibold text-sm sm:text-base">
+                                ৳{product.currentPrice || 0}
+                              </span>
+                            </div>
+                          </div>
+                        </Link>
+                        {/* Action Buttons */}
+                        <div className="flex gap-2 pt-2 mt-auto px-1">
+                          {(() => {
+                            const cartItem = items.find((i) => i.id === product.id);
+                            if (cartItem) {
+                              return (
+                                <div className="flex items-center justify-between border-[1px] border-black bg-white w-full">
+                                  <button
+                                    className="px-4 py-2 font-medium text-lg hover:bg-gray-100 border-r-[1px] border-black transition-colors"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      if (cartItem.quantity === 1) {
+                                        removeFromCart(cartItem.id);
+                                      } else {
+                                        updateQuantity(cartItem.id, cartItem.quantity - 1);
+                                      }
+                                    }}
+                                  >
+                                    <Minus className="w-4 h-4" strokeWidth={2} />
+                                  </button>
+                                  <span className="font-medium text-base px-2">
+                                    {cartItem.quantity}
+                                  </span>
+                                  <button
+                                    className="px-4 py-2 font-medium text-lg hover:bg-gray-100 border-l-[1px] border-black transition-colors"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      updateQuantity(cartItem.id, cartItem.quantity + 1);
+                                    }}
+                                  >
+                                    <Plus className="w-4 h-4" strokeWidth={2} />
+                                  </button>
+                                </div>
+                              );
+                            }
+
                             return (
-                              <div className="flex items-center justify-between border-[1px] border-black bg-white w-full">
-                                <button
-                                  className="px-4 py-2 font-medium text-lg hover:bg-gray-100 border-r-[1px] border-black transition-colors"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    if (cartItem.quantity === 1) {
-                                      removeFromCart(cartItem.id);
-                                    } else {
-                                      updateQuantity(cartItem.id, cartItem.quantity - 1);
-                                    }
-                                  }}
-                                >
-                                  <Minus className="w-4 h-4" strokeWidth={2} />
-                                </button>
-                                <span className="font-medium text-base px-2">
-                                  {cartItem.quantity}
-                                </span>
-                                <button
-                                  className="px-4 py-2 font-medium text-lg hover:bg-gray-100 border-l-[1px] border-black transition-colors"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    updateQuantity(cartItem.id, cartItem.quantity + 1);
-                                  }}
-                                >
-                                  <Plus className="w-4 h-4" strokeWidth={2} />
-                                </button>
-                              </div>
+                              <button
+                                className="w-full bg-black text-white text-center text-xs sm:text-sm font-medium py-2.5 uppercase tracking-wide hover:bg-gray-800 transition-colors"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  addToCart({
+                                    id: product.id,
+                                    title: product.title,
+                                    price: product.currentPrice || product.originalPrice || 0,
+                                    image: primaryImg,
+                                    quantity: 1,
+                                  });
+                                  openCart();
+                                }}
+                              >
+                                Add to Cart
+                              </button>
                             );
-                          }
-                          
-                          return (
-                            <button
-                              className="w-full bg-black text-white text-center text-xs sm:text-sm font-medium py-2.5 uppercase tracking-wide hover:bg-gray-800 transition-colors"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                addToCart({
-                                  id: product.id,
-                                  title: product.title,
-                                  price: product.currentPrice || product.originalPrice || 0,
-                                  image: primaryImg,
-                                  quantity: 1,
-                                });
-                                openCart();
-                              }}
-                            >
-                              Add to Cart
-                            </button>
-                          );
-                        })()}
+                          })()}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
               </div>
             )}
           </div>

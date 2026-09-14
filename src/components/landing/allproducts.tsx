@@ -42,7 +42,7 @@ export function AllProducts() {
   const getImgUrl = (url: string) => {
     if (!url) return "";
     if (url.startsWith('http')) return url;
-    return `http://localhost:8000${url.startsWith('/') ? '' : '/'}${url}`;
+    return `https://codegrid-api.vercel.app${url.startsWith('/') ? '' : '/'}${url}`;
   };
 
   const filteredProducts = activeCategory === "ALL"
@@ -126,7 +126,7 @@ export function AllProducts() {
                   <h3 className="text-sm sm:text-base font-medium text-black mb-2 line-clamp-2">
                     {product.title}
                   </h3>
-                  
+
                   {/* Variant Label as Badge */}
                   {product.variantLabel && (
                     <div className="bg-black text-white text-[10px] sm:text-xs font-bold px-2 py-1 uppercase mb-2">

@@ -1,10 +1,10 @@
-export const BASE_URL = 'http://localhost:8000';
+export const BASE_URL = 'https://codegrid-api.vercel.app';
 
 export const fetchApi = async (endpoint: string, options: RequestInit = {}) => {
   const url = `${BASE_URL}${endpoint}`;
-  
+
   const defaultHeaders: Record<string, string> = {};
-  
+
   if (!(options.body instanceof FormData)) {
     defaultHeaders['Content-Type'] = 'application/json';
   }

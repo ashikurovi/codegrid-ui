@@ -24,7 +24,7 @@ export function Category() {
   const getImgUrl = (url: string) => {
     if (!url) return "";
     if (url.startsWith('http')) return url;
-    return `http://localhost:8000${url.startsWith('/') ? '' : '/'}${url}`;
+    return `https://codegrid-api.vercel.app${url.startsWith('/') ? '' : '/'}${url}`;
   };
 
   if (categories.length === 0) return null;
