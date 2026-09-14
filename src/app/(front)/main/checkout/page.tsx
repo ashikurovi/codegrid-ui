@@ -7,6 +7,8 @@ import { Check, ChevronRight } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
 import { createOrder } from "@/api/orderApi";
 import { createIncompleteOrder, updateIncompleteOrder, deleteIncompleteOrder } from "@/api/incompleteOrderApi";
+import { updateUser } from "@/api/userApi";
+import { loginUser } from "@/api/authApi";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -23,6 +25,9 @@ export default function CheckoutPage() {
     notes: ""
   });
   const [loading, setLoading] = useState(false);
+  const [orderSuccessUser, setOrderSuccessUser] = useState<{id: number, email: string} | null>(null);
+  const [newPassword, setNewPassword] = useState("");
+  const [settingPassword, setSettingPassword] = useState(false);
   const [mounted, setMounted] = useState(false);
   const incompleteOrderIdRef = useRef<number | null>(null);
 
@@ -81,7 +86,31 @@ export default function CheckoutPage() {
     return () => clearTimeout(timeoutId);
   }, [formData, items, mounted]);
 
-  const shippingOptions = [
+  
+  const handleSetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!orderSuccessUser || !newPassword) return;
+    
+    try {
+      setSettingPassword(true);
+      // Update the user's password
+      await updateUser(orderSuccessUser.id, { password: newPassword });
+      
+      // Log them in
+      await loginUser({ email: orderSuccessUser.email, password: newPassword });
+      
+      alert("Password set successfully! Redirecting to dashboard...");
+      window.location.href = "/dashboard"; // Navigate and force reload to update auth state
+    } catch (error) {
+      console.error("Failed to set password:", error);
+      alert("Failed to set password. You can try resetting it later.");
+      router.push("/main/shop");
+    } finally {
+      setSettingPassword(false);
+    }
+  };
+
+const shippingOptions = [
     { id: "INSIDE_DHAKA", label: "Inside Dhaka", cost: 65 },
     { id: "OUTSIDE_DHAKA", label: "Outside Dhaka", cost: 115 },
     { id: "DHAKA_SUBURBS", label: "Dhaka Suburbs", cost: 85 },
@@ -133,6 +162,14 @@ export default function CheckoutPage() {
             console.error("Failed to clear incomplete order", e);
           }
         }
+        
+        const isGuestCheckout = !localStorage.getItem("user");
+        if (isGuestCheckout && res.data?.user?.id && formData.email) {
+          setOrderSuccessUser({ id: res.data.user.id, email: formData.email });
+          clearCart();
+          return;
+        }
+
         alert("Order placed successfully!");
         clearCart();
         router.push("/main/shop");
@@ -144,6 +181,52 @@ export default function CheckoutPage() {
       setLoading(false);
     }
   };
+
+  if (orderSuccessUser) {
+    return (
+      <div className="min-h-screen bg-white text-black py-12 px-4 sm:px-6 lg:px-8 font-sans flex items-center justify-center">
+        <div className="max-w-md w-full bg-white p-8 rounded-xl shadow-lg border-[1px] border-gray-100 text-center">
+          <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Check size={32} />
+          </div>
+          <h2 className="text-2xl font-bold text-black mb-2">Order Placed Successfully!</h2>
+          <p className="text-gray-600 mb-6 text-sm">
+            We&apos;ve created an account for you with the email <strong>{orderSuccessUser.email}</strong>. 
+            Set a password below to track your orders and manage your account.
+          </p>
+          
+          <form onSubmit={handleSetPassword} className="flex flex-col gap-4 text-left">
+            <div>
+              <label className="text-sm font-semibold text-gray-700 mb-1 block">New Password</label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="w-full border-[1px] border-gray-300 p-3 text-sm rounded-md focus:border-black outline-none transition-colors"
+                placeholder="Enter a secure password"
+                required
+                minLength={6}
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={settingPassword}
+              className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 mt-2"
+            >
+              {settingPassword ? "Setting Password..." : "Set Password & Go to Dashboard"}
+            </button>
+            <button
+              type="button"
+              onClick={() => router.push("/main/shop")}
+              className="w-full bg-gray-100 text-black py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors mt-2"
+            >
+              Skip for now
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white text-black py-12 px-4 sm:px-6 lg:px-8 font-sans">
@@ -361,7 +444,7 @@ export default function CheckoutPage() {
                 <label className="flex items-start gap-3 cursor-pointer group">
                   <input type="checkbox" className="mt-1 w-4 h-4 text-black border-gray-300 rounded-sm focus:ring-black transition-colors" required />
                   <span className="text-xs font-medium text-gray-500 leading-relaxed select-none">
-                    I agree to the website's <a href="#" className="text-black underline hover:no-underline font-semibold">terms and conditions</a> *
+                    I agree to the website&apos;s <a href="#" className="text-black underline hover:no-underline font-semibold">terms and conditions</a> *
                   </span>
                 </label>
               </div>
