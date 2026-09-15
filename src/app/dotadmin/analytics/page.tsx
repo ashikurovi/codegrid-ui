@@ -107,7 +107,7 @@ export default function AnalyticsPage() {
               <div key={idx} className="relative flex-1 group h-full flex items-end justify-center">
                 <div 
                   className="w-full bg-[#3b82f6] border-[2px] border-black hover:bg-blue-600 transition-colors rounded-none"
-                  style={{ height: `${val}%` }}
+                  style={{ height: `${Math.max((val / Math.max(...(analytics?.revenueOverTime ?? [1]), 1)) * 100, val > 0 ? 4 : 0)}%` }}
                 ></div>
                 <div className="opacity-0 group-hover:opacity-100 absolute -top-8 bg-black text-white text-xs font-bold py-1 px-2 border-2 border-black rounded-none whitespace-nowrap transition-opacity">
                   ৳ {(val * 1234).toLocaleString()}
