@@ -23,30 +23,30 @@ export default function AnalyticsPage() {
   const topStats = analytics?.topStats;
 
   return (
-    <div className="flex flex-col gap-8 pb-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="mx-auto flex w-full max-w-screen-2xl flex-col gap-10 px-2 py-4 pb-8 sm:px-4">
+      <div className="flex flex-col justify-between gap-4 border-b border-black pb-6 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-3xl font-black uppercase tracking-tight text-black">Analytics Overview</h1>
+          <h1 className="text-3xl font-bold uppercase tracking-wide text-black">Analytics Overview</h1>
           <p className="text-black font-bold uppercase mt-1">Detailed breakdown of your store&apos;s performance.</p>
         </div>
         <div className="flex items-center gap-4">
-          <select className="border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase">
+          <select className="border border-black bg-white p-2 text-sm font-bold uppercase text-black focus:outline-none focus:ring-0">
             <option>Last 7 Days</option>
             <option>Last 30 Days</option>
             <option>This Quarter</option>
             <option>This Year</option>
           </select>
-          <button className="bg-[#3b82f6] text-white px-6 py-2 text-sm font-black uppercase border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all rounded-none">
+          <button className="border border-black bg-white px-6 py-2 text-sm font-bold uppercase text-black transition-colors hover:bg-gray-100">
             Export Report
           </button>
         </div>
       </div>
       
       {/* Top Stats Row */}
-      {error && <div className="border-[3px] border-red-600 bg-red-50 p-4 font-bold text-red-700">{error}</div>}
+      {error && <div className="border border-red-600 bg-red-50 p-4 font-bold text-red-700">{error}</div>}
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <div className="border-[3px] border-black bg-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none flex flex-col gap-2">
+        <div className="flex flex-col gap-2 border border-black bg-white p-6 transition-colors hover:bg-gray-50">
           <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
             <h3 className="text-sm font-medium tracking-tight">Gross Revenue</h3>
             <BarChart3 className="h-4 w-4" />
@@ -58,7 +58,7 @@ export default function AnalyticsPage() {
           </p>
         </div>
         
-        <div className="border-[3px] border-black bg-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none flex flex-col gap-2">
+        <div className="flex flex-col gap-2 border border-black bg-white p-6 transition-colors hover:bg-gray-50">
           <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
             <h3 className="text-sm font-medium tracking-tight">Total Orders</h3>
             <ShoppingBag className="h-4 w-4" />
@@ -70,7 +70,7 @@ export default function AnalyticsPage() {
           </p>
         </div>
         
-        <div className="border-[3px] border-black bg-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none flex flex-col gap-2">
+        <div className="flex flex-col gap-2 border border-black bg-white p-6 transition-colors hover:bg-gray-50">
           <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
             <h3 className="text-sm font-medium tracking-tight">Conversion Rate</h3>
             <TrendingUp className="h-4 w-4" />
@@ -82,7 +82,7 @@ export default function AnalyticsPage() {
           </p>
         </div>
         
-        <div className="border-[3px] border-black bg-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none flex flex-col gap-2">
+        <div className="flex flex-col gap-2 border border-black bg-white p-6 transition-colors hover:bg-gray-50">
           <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
             <h3 className="text-sm font-medium tracking-tight">New Customers</h3>
             <Users className="h-4 w-4" />
@@ -99,8 +99,8 @@ export default function AnalyticsPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         
         {/* Main Chart */}
-        <div className="border-[3px] border-black bg-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none col-span-4 flex flex-col">
-          <h3 className="text-lg font-black uppercase tracking-tight mb-6">Revenue Over Time</h3>
+        <div className="flex flex-col border border-black bg-white p-6 lg:col-span-4">
+          <h3 className="mb-6 w-max border-b border-black pb-2 text-lg font-bold uppercase tracking-wide">Revenue Over Time</h3>
           
           <div className="h-[300px] flex items-end gap-2 px-2 mt-4">
             {(analytics?.revenueOverTime ?? []).map((val, idx) => (
@@ -133,8 +133,8 @@ export default function AnalyticsPage() {
         </div>
         
         {/* Category Breakdown */}
-        <div className="border-[3px] border-black bg-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none col-span-3 flex flex-col">
-          <h3 className="text-lg font-black uppercase tracking-tight mb-2">Sales by Category</h3>
+        <div className="flex flex-col border border-black bg-white p-6 lg:col-span-3">
+          <h3 className="mb-2 w-max border-b border-black pb-2 text-lg font-bold uppercase tracking-wide">Sales by Category</h3>
           <p className="text-sm font-bold text-black uppercase mb-8">{analytics?.salesByCategory.subtitle ?? "Loading category data..."}</p>
           
           <div className="space-y-6 flex-1 justify-center flex flex-col">

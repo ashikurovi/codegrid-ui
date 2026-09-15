@@ -29,7 +29,7 @@ export function TableControls({
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder={searchPlaceholder}
-          className="w-full border-[3px] border-black p-2 pl-9 text-sm font-bold uppercase placeholder-gray-500 text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white" 
+          className="w-full border border-black bg-white p-2 pl-9 text-sm font-bold uppercase text-black placeholder-gray-500 focus:outline-none focus:ring-0" 
         />
       </div>
       <div className="w-full md:w-auto">

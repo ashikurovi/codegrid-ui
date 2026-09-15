@@ -41,15 +41,15 @@ export default function AdminPage() {
   ];
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between mb-2">
-        <h1 className="text-4xl md:text-5xl font-black tracking-tight uppercase text-black">Dashboard</h1>
+    <div className="mx-auto flex w-full max-w-screen-2xl flex-col gap-10 px-2 py-4 sm:px-4">
+      <div className="mb-2 flex items-center justify-between border-b border-black pb-6">
+        <h1 className="text-3xl font-bold uppercase tracking-wide text-black md:text-4xl">Dashboard</h1>
       </div>
 
-      {error && <div className="border-[3px] border-red-600 bg-red-50 p-4 font-bold text-red-700">{error}</div>}
+      {error && <div className="border border-red-600 bg-red-50 p-4 font-bold text-red-700">{error}</div>}
       
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {cards.map((card) => <div key={card.label} className="border-[3px] border-black bg-white p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] rounded-none hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-transform">
+        {cards.map((card) => <div key={card.label} className="border border-black bg-white p-6 transition-colors hover:bg-gray-50">
           <div className="flex flex-row items-center justify-between pb-2 space-y-0">
             <h3 className="text-sm font-black uppercase tracking-tight text-black">{card.label}</h3>
             <span className="text-lg font-black text-black">{card.icon}</span>
@@ -59,9 +59,9 @@ export default function AdminPage() {
         </div>)}
       </div>
       
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <div className="border-[3px] border-black bg-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] col-span-4 rounded-none">
-          <h3 className="text-2xl font-black uppercase tracking-tight mb-6 text-black border-b-4 border-black w-max pb-2">Overview</h3>
+      <div className="grid gap-8 lg:grid-cols-7">
+        <div className="border border-black bg-white p-6 lg:col-span-4">
+          <h3 className="mb-6 w-max border-b border-black pb-2 text-2xl font-bold uppercase tracking-wide text-black">Overview</h3>
           <div className="h-[300px] flex items-end gap-2 border-b-4 border-l-4 border-black px-2 pb-0 pt-8">
             {dashboard.chartData.map((point) => {
               const maxTotal = Math.max(...dashboard.chartData.map((item) => item.total), 1);
@@ -74,24 +74,30 @@ export default function AdminPage() {
           </div>
         </div>
         
-        <div className="border-[3px] border-black bg-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] col-span-3 rounded-none">
-          <h3 className="text-2xl font-black uppercase tracking-tight mb-2 text-black">Recent Sales</h3>
-          <p className="text-sm font-bold text-gray-500 mb-6 uppercase tracking-widest border-b-4 border-black pb-4">Latest dashboard activity</p>
-          
-          <div className="space-y-6">
-            {dashboard.recentSales.map((sale) => (
-              <div key={sale.id} className="flex items-center">
-                <div className="w-10 h-10 border-[3px] border-black bg-[#3b82f6] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center text-white">
-                  <span className="text-sm font-black">{sale.name.slice(0, 2).toUpperCase()}</span>
-                </div>
-                <div className="ml-4 space-y-0.5">
-                  <p className="text-sm font-black uppercase text-black leading-none">{sale.name}</p>
-                  <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{sale.email}</p>
-                </div>
-                <div className="ml-auto font-black text-[#3b82f6]">{sale.amount}</div>
-              </div>
-            ))}
-            {!loading && dashboard.recentSales.length === 0 && <p className="text-sm font-bold text-gray-500">No recent sales available.</p>}
+        <div className="border border-black bg-white p-6 lg:col-span-3">
+          <h3 className="mb-2 text-2xl font-bold uppercase tracking-wide text-black">Recent Sales</h3>
+          <p className="mb-6 border-b border-black pb-4 text-sm font-bold uppercase tracking-widest text-gray-500">Latest dashboard activity</p>
+
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[420px] border-collapse text-left text-sm">
+              <thead>
+                <tr className="border-b border-black text-[10px] uppercase tracking-widest text-gray-500">
+                  <th className="px-2 py-3 font-bold">Customer</th>
+                  <th className="px-2 py-3 font-bold">Email</th>
+                  <th className="px-2 py-3 text-right font-bold">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {dashboard.recentSales.map((sale) => (
+                  <tr key={sale.id} className="border-b border-gray-200 last:border-b-0">
+                    <td className="px-2 py-4 font-bold uppercase text-black">{sale.name}</td>
+                    <td className="px-2 py-4 text-xs text-gray-500">{sale.email}</td>
+                    <td className="px-2 py-4 text-right font-black text-[#3b82f6]">{sale.amount}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {!loading && dashboard.recentSales.length === 0 && <p className="py-4 text-sm font-bold text-gray-500">No recent sales available.</p>}
           </div>
         </div>
       </div>

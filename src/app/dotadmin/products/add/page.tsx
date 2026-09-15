@@ -127,22 +127,22 @@ export default function AddProductPage() {
   };
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex items-center gap-4">
-        <Link href="/dotadmin/products" className="text-black hover:text-[#3b82f6] flex items-center justify-center p-2 border-[3px] border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 rounded-none">
+    <div className="mx-auto flex w-full max-w-screen-2xl flex-col gap-10 px-2 py-4 sm:px-4">
+      <div className="flex items-center gap-4 border-b border-black pb-6">
+        <Link href="/dotadmin/products" className="flex items-center justify-center border border-black bg-white p-2 text-black transition-colors hover:bg-gray-100 hover:text-[#3b82f6]">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg>
         </Link>
-        <h1 className="text-3xl font-black uppercase tracking-tight text-black">Add New Product</h1>
+        <h1 className="text-3xl font-bold uppercase tracking-wide text-black">Add New Product</h1>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-8 items-start">
         {/* Main Form Area */}
-        <div className="flex-1 w-full border-[3px] border-black bg-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none">
+        <div className="w-full flex-1 border border-black bg-white p-6">
           <form id="productForm" onSubmit={handleSubmit} className="flex flex-col gap-8">
             
             {/* General Information */}
             <div className="flex flex-col gap-6">
-              <h3 className="text-xl font-black uppercase border-b-4 border-black pb-2 text-black">General Information</h3>
+              <h3 className="border-b border-black pb-2 text-xl font-bold uppercase tracking-wide text-black">General Information</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="flex flex-col gap-2">
@@ -194,7 +194,7 @@ export default function AddProductPage() {
 
             {/* Pricing & Inventory */}
             <div className="flex flex-col gap-6">
-              <h3 className="text-xl font-black uppercase border-b-4 border-black pb-2 text-black">Pricing & Inventory</h3>
+              <h3 className="border-b border-black pb-2 text-xl font-bold uppercase tracking-wide text-black">Pricing & Inventory</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="flex flex-col gap-2">
@@ -237,7 +237,7 @@ export default function AddProductPage() {
 
             {/* Variants */}
             <div className="flex flex-col gap-6">
-              <h3 className="text-xl font-black uppercase border-b-4 border-black pb-2 text-black">Available Variants</h3>
+              <h3 className="border-b border-black pb-2 text-xl font-bold uppercase tracking-wide text-black">Available Variants</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="flex flex-col gap-3">
@@ -286,14 +286,14 @@ export default function AddProductPage() {
               <button 
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-[#3b82f6] text-white px-8 py-3 text-sm font-black uppercase border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all rounded-none disabled:opacity-50"
+                className="border border-black bg-black px-8 py-3 text-sm font-bold uppercase text-white transition-colors hover:bg-gray-800 disabled:opacity-50"
               >
                 {isSubmitting ? "Publishing..." : "Publish Product"}
               </button>
               <button 
                 type="button"
                 onClick={() => router.push("/dotadmin/products")}
-                className="border-[3px] border-black bg-white px-8 py-3 text-sm font-black uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all rounded-none text-black"
+                className="border border-black bg-white px-8 py-3 text-sm font-bold uppercase text-black transition-colors hover:bg-gray-100"
               >
                 Cancel
               </button>
@@ -303,8 +303,8 @@ export default function AddProductPage() {
 
         {/* Sidebar Form Area (Images & Categories) */}
         <div className="w-full lg:w-[350px] flex flex-col gap-8">
-          <div className="border-[3px] border-black bg-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none">
-            <h3 className="text-xl font-black uppercase border-b-4 border-black pb-2 mb-4 text-black">Brand</h3>
+          <div className="border border-black bg-white p-6">
+            <h3 className="mb-4 border-b border-black pb-2 text-xl font-bold uppercase tracking-wide text-black">Brand</h3>
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
                 <label htmlFor="brand" className="text-sm font-black uppercase text-black">Select Brand</label>
@@ -323,8 +323,8 @@ export default function AddProductPage() {
             </div>
           </div>
 
-          <div className="border-[3px] border-black bg-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none">
-            <h3 className="text-xl font-black uppercase border-b-4 border-black pb-2 mb-4 text-black">Organization</h3>
+          <div className="border border-black bg-white p-6">
+            <h3 className="mb-4 border-b border-black pb-2 text-xl font-bold uppercase tracking-wide text-black">Organization</h3>
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
                 <label htmlFor="status" className="text-sm font-black uppercase text-black">Status</label>
@@ -369,8 +369,8 @@ export default function AddProductPage() {
             </div>
           </div>
 
-          <div className="border-[3px] border-black bg-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none">
-            <h3 className="text-xl font-black uppercase border-b-4 border-black pb-2 mb-4 text-black">Product Images</h3>
+          <div className="border border-black bg-white p-6">
+            <h3 className="mb-4 border-b border-black pb-2 text-xl font-bold uppercase tracking-wide text-black">Product Images</h3>
             <div className="flex flex-col gap-4">
               <input 
                 type="file" 

@@ -13,12 +13,13 @@ import {
 import { TableControls } from "@/components/admin/table-controls";
 import { TablePagination } from "@/components/admin/table-pagination";
 import { Eye, Edit, Trash2 } from "lucide-react";
-import { getAllOrders, deleteOrder } from "@/api/orderApi";
+import { getAllOrders, deleteOrder, updateOrderStatus } from "@/api/orderApi";
 
 export default function OrdersManagementPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
+  const [updatingStatusId, setUpdatingStatusId] = useState<number | null>(null);
   const itemsPerPage = 5;
 
   const [orders, setOrders] = useState<any[]>([]);
@@ -46,13 +47,25 @@ export default function OrdersManagementPage() {
     }
   };
 
+  const handleStatusChange = async (id: number, status: string) => {
+    setUpdatingStatusId(id);
+    try {
+      await updateOrderStatus(id, { status });
+      loadOrders();
+    } catch (err) {
+      console.error("Failed to update order status", err);
+    } finally {
+      setUpdatingStatusId(null);
+    }
+  };
+
   const statusOptions = [
     { label: "All Status", value: "All" },
     { label: "Pending", value: "Pending" },
     { label: "Processing", value: "Processing" },
     { label: "Shipped", value: "Shipped" },
     { label: "Delivered", value: "Delivered" },
-    { label: "Cancelled", value: "Cancelled" },
+    { label: "Refunded", value: "Refunded" },
   ];
 
   // Filter and Search logic
@@ -80,17 +93,18 @@ export default function OrdersManagementPage() {
       case "Shipped": return "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400";
       case "Pending": return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400";
       case "Cancelled": return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
+      case "Refunded": return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
       default: return "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400";
     }
   };
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-black uppercase tracking-tight text-black">Orders Management</h1>
+    <div className="mx-auto flex w-full max-w-screen-2xl flex-col gap-10 px-2 py-4 sm:px-4">
+      <div className="flex flex-col justify-between gap-4 border-b border-black pb-6 sm:flex-row sm:items-center">
+        <h1 className="text-3xl font-bold uppercase tracking-wide text-black">Orders Management</h1>
         <Link 
           href="/dotadmin/orders/add"
-          className="bg-[#3b82f6] text-white px-6 py-2 text-sm font-black uppercase border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all rounded-none"
+          className="border border-black bg-white px-6 py-2 text-sm font-bold uppercase text-black transition-colors hover:bg-gray-100"
         >
           Create New Order
         </Link>
@@ -105,7 +119,7 @@ export default function OrdersManagementPage() {
           statusOptions={statusOptions}
           searchPlaceholder="Search by customer or order ID..."
         />
-        <div className="border-[3px] border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none overflow-hidden">
+        <div className="overflow-hidden border border-black bg-white">
           <Table>
             <TableHeader>
               <TableRow>
@@ -155,6 +169,17 @@ export default function OrdersManagementPage() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
+                        <select
+                          value={order.status}
+                          onChange={(event) => handleStatusChange(order.id, event.target.value)}
+                          disabled={updatingStatusId === order.id}
+                          aria-label={`Change status for order ${order.id}`}
+                          className="border border-black bg-white px-2 py-1 text-xs font-bold uppercase text-black focus:outline-none disabled:cursor-wait disabled:opacity-50"
+                        >
+                          {statusOptions.slice(1).map((option) => (
+                            <option key={option.value} value={option.value}>{option.label}</option>
+                          ))}
+                        </select>
                         <Link 
                           href={`/dotadmin/orders/${order.id}`}
                           className="p-1 text-gray-500 hover:text-blue-600 transition-colors"

@@ -74,12 +74,12 @@ export default function ProductsManagementPage() {
   );
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-black uppercase tracking-tight text-black">Products Management</h1>
+    <div className="mx-auto flex w-full max-w-screen-2xl flex-col gap-10 px-2 py-4 sm:px-4">
+      <div className="flex flex-col justify-between gap-4 border-b border-black pb-6 sm:flex-row sm:items-center">
+        <h1 className="text-3xl font-bold uppercase tracking-wide text-black">Products Management</h1>
         <Link 
           href="/dotadmin/products/add"
-          className="bg-[#3b82f6] text-white px-6 py-2 text-sm font-black uppercase border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all rounded-none"
+          className="border border-black bg-white px-6 py-2 text-sm font-bold uppercase text-black transition-colors hover:bg-gray-100"
         >
           Add New Product
         </Link>
@@ -94,7 +94,7 @@ export default function ProductsManagementPage() {
           statusOptions={statusOptions}
           searchPlaceholder="Search products..."
         />
-        <div className="border-[3px] border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none overflow-hidden">
+        <div className="overflow-hidden border border-black bg-white">
           <Table>
             <TableHeader>
               <TableRow>
