@@ -31,8 +31,9 @@ export default function CustomOrderPage() {
     setUploadingImage(true);
     try {
       const res = await uploadImage(file);
-      if (res && res.url) {
-        let url = res.url;
+      const uploadedUrl = res?.data?.url ?? res?.url;
+      if (uploadedUrl) {
+        let url = uploadedUrl;
         if (!url.startsWith('http')) {
           url = `https://codegrid-api.vercel.app${url.startsWith('/') ? '' : '/'}${url}`;
         }
@@ -456,8 +457,23 @@ export default function CustomOrderPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-gray-600 uppercase tracking-widest mb-3">Design Reference URL (Optional)</label>
-                    <input type="url" value={designReference} onChange={e => setDesignReference(e.target.value)} className="w-full bg-white border-[1px] border-gray-300 py-3 px-4 text-sm font-medium text-black focus:outline-none focus:border-black transition-colors placeholder-gray-400 rounded-md" placeholder="Link to your design, Google Drive, etc." />
+                    <label className="block text-xs font-semibold text-gray-600 uppercase tracking-widest mb-3">Upload Design (Optional)</label>
+                    <label className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-md border-[1px] border-dashed border-gray-300 bg-white px-4 py-4 text-sm font-semibold text-gray-600 transition-colors hover:border-black hover:text-black">
+                      <Upload className="h-4 w-4" />
+                      {uploadingImage ? "Uploading..." : designReference ? "Change Design Image" : "Choose Design Image"}
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/gif,image/webp"
+                        onChange={handleFileUpload}
+                        disabled={uploadingImage}
+                        className="sr-only"
+                      />
+                    </label>
+                    {designReference && (
+                      <div className="mt-4 overflow-hidden rounded-md border border-gray-200 bg-white">
+                        <img src={designReference} alt="Uploaded design preview" className="max-h-48 w-full object-contain" />
+                      </div>
+                    )}
                   </div>
 
                   <div>

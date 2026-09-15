@@ -1,14 +1,33 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { BarChart3, TrendingUp, Users, ShoppingBag, ArrowUpRight, ArrowDownRight, PackageOpen, Shirt, Coffee, Briefcase } from "lucide-react";
+import { getAnalyticsData } from "@/api/analyticsApi";
+
+type AnalyticsData = {
+  topStats: Record<string, { value: string; trend: string; isPositive: boolean }>;
+  revenueOverTime: number[];
+  salesByCategory: { subtitle: string; categories: { name: string; percentage: number }[] };
+};
 
 export default function AnalyticsPage() {
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    getAnalyticsData()
+      .then(setAnalytics)
+      .catch(() => setError("Unable to load analytics data."));
+  }, []);
+
+  const topStats = analytics?.topStats;
+
   return (
     <div className="flex flex-col gap-8 pb-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-black uppercase tracking-tight text-black">Analytics Overview</h1>
-          <p className="text-black font-bold uppercase mt-1">Detailed breakdown of your store's performance.</p>
+          <p className="text-black font-bold uppercase mt-1">Detailed breakdown of your store&apos;s performance.</p>
         </div>
         <div className="flex items-center gap-4">
           <select className="border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase">
@@ -24,16 +43,18 @@ export default function AnalyticsPage() {
       </div>
       
       {/* Top Stats Row */}
+      {error && <div className="border-[3px] border-red-600 bg-red-50 p-4 font-bold text-red-700">{error}</div>}
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <div className="border-[3px] border-black bg-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none flex flex-col gap-2">
           <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
             <h3 className="text-sm font-medium tracking-tight">Gross Revenue</h3>
             <BarChart3 className="h-4 w-4" />
           </div>
-          <div className="text-2xl font-bold">৳ 1,245,231</div>
-          <p className="text-xs text-green-600 flex items-center font-medium">
-            <ArrowUpRight className="w-3 h-3 mr-1" />
-            +15.3% from last period
+          <div className="text-2xl font-bold">{topStats?.grossRevenue.value ?? "..."}</div>
+          <p className={`text-xs flex items-center font-medium ${topStats?.grossRevenue.isPositive === false ? "text-red-500" : "text-green-600"}`}>
+            {topStats?.grossRevenue.isPositive === false ? <ArrowDownRight className="w-3 h-3 mr-1" /> : <ArrowUpRight className="w-3 h-3 mr-1" />}
+            {topStats?.grossRevenue.trend ?? "Loading..."}
           </p>
         </div>
         
@@ -42,10 +63,10 @@ export default function AnalyticsPage() {
             <h3 className="text-sm font-medium tracking-tight">Total Orders</h3>
             <ShoppingBag className="h-4 w-4" />
           </div>
-          <div className="text-2xl font-bold">3,450</div>
-          <p className="text-xs text-green-600 flex items-center font-medium">
-            <ArrowUpRight className="w-3 h-3 mr-1" />
-            +8.2% from last period
+          <div className="text-2xl font-bold">{topStats?.totalOrders.value ?? "..."}</div>
+          <p className={`text-xs flex items-center font-medium ${topStats?.totalOrders.isPositive === false ? "text-red-500" : "text-green-600"}`}>
+            {topStats?.totalOrders.isPositive === false ? <ArrowDownRight className="w-3 h-3 mr-1" /> : <ArrowUpRight className="w-3 h-3 mr-1" />}
+            {topStats?.totalOrders.trend ?? "Loading..."}
           </p>
         </div>
         
@@ -54,10 +75,10 @@ export default function AnalyticsPage() {
             <h3 className="text-sm font-medium tracking-tight">Conversion Rate</h3>
             <TrendingUp className="h-4 w-4" />
           </div>
-          <div className="text-2xl font-bold">3.24%</div>
-          <p className="text-xs text-red-500 flex items-center font-medium">
-            <ArrowDownRight className="w-3 h-3 mr-1" />
-            -0.4% from last period
+          <div className="text-2xl font-bold">{topStats?.conversionRate.value ?? "..."}</div>
+          <p className={`text-xs flex items-center font-medium ${topStats?.conversionRate.isPositive === false ? "text-red-500" : "text-green-600"}`}>
+            {topStats?.conversionRate.isPositive === false ? <ArrowDownRight className="w-3 h-3 mr-1" /> : <ArrowUpRight className="w-3 h-3 mr-1" />}
+            {topStats?.conversionRate.trend ?? "Loading..."}
           </p>
         </div>
         
@@ -66,10 +87,10 @@ export default function AnalyticsPage() {
             <h3 className="text-sm font-medium tracking-tight">New Customers</h3>
             <Users className="h-4 w-4" />
           </div>
-          <div className="text-2xl font-bold">892</div>
-          <p className="text-xs text-green-600 flex items-center font-medium">
-            <ArrowUpRight className="w-3 h-3 mr-1" />
-            +12.5% from last period
+          <div className="text-2xl font-bold">{topStats?.newCustomers.value ?? "..."}</div>
+          <p className={`text-xs flex items-center font-medium ${topStats?.newCustomers.isPositive === false ? "text-red-500" : "text-green-600"}`}>
+            {topStats?.newCustomers.isPositive === false ? <ArrowDownRight className="w-3 h-3 mr-1" /> : <ArrowUpRight className="w-3 h-3 mr-1" />}
+            {topStats?.newCustomers.trend ?? "Loading..."}
           </p>
         </div>
       </div>
@@ -82,8 +103,7 @@ export default function AnalyticsPage() {
           <h3 className="text-lg font-black uppercase tracking-tight mb-6">Revenue Over Time</h3>
           
           <div className="h-[300px] flex items-end gap-2 px-2 mt-4">
-            {/* CSS-based mock Bar Chart */}
-            {[45, 60, 30, 80, 55, 90, 70, 100, 65, 85, 40, 75].map((val, idx) => (
+            {(analytics?.revenueOverTime ?? []).map((val, idx) => (
               <div key={idx} className="relative flex-1 group h-full flex items-end justify-center">
                 <div 
                   className="w-full bg-[#3b82f6] border-[2px] border-black hover:bg-blue-600 transition-colors rounded-none"
@@ -94,6 +114,7 @@ export default function AnalyticsPage() {
                 </div>
               </div>
             ))}
+            {!analytics && <div className="m-auto text-sm font-bold text-gray-500">Loading analytics...</div>}
           </div>
           <div className="flex justify-between mt-4 text-xs text-black font-bold px-2 uppercase">
             <span>Jan</span>
@@ -114,58 +135,26 @@ export default function AnalyticsPage() {
         {/* Category Breakdown */}
         <div className="border-[3px] border-black bg-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none col-span-3 flex flex-col">
           <h3 className="text-lg font-black uppercase tracking-tight mb-2">Sales by Category</h3>
-          <p className="text-sm font-bold text-black uppercase mb-8">Custom orders are driving 45% of total revenue this month.</p>
+          <p className="text-sm font-bold text-black uppercase mb-8">{analytics?.salesByCategory.subtitle ?? "Loading category data..."}</p>
           
           <div className="space-y-6 flex-1 justify-center flex flex-col">
-            
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center gap-2 font-medium">
-                  <Shirt className="w-4 h-4 text-blue-500" /> Custom Apparel
+            {(analytics?.salesByCategory.categories ?? []).map((category, index) => {
+              const icons = [Shirt, Briefcase, Coffee, PackageOpen];
+              const colors = ["text-blue-500", "text-indigo-500", "text-emerald-500", "text-gray-500"];
+              const Icon = icons[index % icons.length];
+              return <div key={category.name} className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-2 font-medium">
+                    <Icon className={`w-4 h-4 ${colors[index % colors.length]}`} /> {category.name}
+                  </div>
+                  <span className="font-bold">{category.percentage}%</span>
                 </div>
-                <span className="font-bold">45%</span>
-              </div>
-              <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden dark:bg-gray-800">
-                <div className="h-full bg-blue-500 w-[45%] rounded-full"></div>
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center gap-2 font-medium">
-                  <Briefcase className="w-4 h-4 text-indigo-500" /> Corporate Packages
+                <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden dark:bg-gray-800">
+                  <div className="h-full bg-blue-500 rounded-full" style={{ width: `${category.percentage}%` }}></div>
                 </div>
-                <span className="font-bold">30%</span>
-              </div>
-              <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden dark:bg-gray-800">
-                <div className="h-full bg-indigo-500 w-[30%] rounded-full"></div>
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center gap-2 font-medium">
-                  <Coffee className="w-4 h-4 text-emerald-500" /> Mugs & Bottles
-                </div>
-                <span className="font-bold">15%</span>
-              </div>
-              <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden dark:bg-gray-800">
-                <div className="h-full bg-emerald-500 w-[15%] rounded-full"></div>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center gap-2 font-medium">
-                  <PackageOpen className="w-4 h-4 text-gray-500" /> Standard Retail
-                </div>
-                <span className="font-bold">10%</span>
-              </div>
-              <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden dark:bg-gray-800">
-                <div className="h-full bg-gray-400 w-[10%] rounded-full"></div>
-              </div>
-            </div>
-            
+              </div>;
+            })}
+            {!analytics && <p className="text-sm font-bold text-gray-500">Loading category data...</p>}
           </div>
         </div>
       </div>

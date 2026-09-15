@@ -100,7 +100,7 @@ export default function CheckoutPage() {
       await loginUser({ email: orderSuccessUser.email, password: newPassword });
       
       alert("Password set successfully! Redirecting to dashboard...");
-      window.location.href = "/dashboard"; // Navigate and force reload to update auth state
+      window.location.href = "/main/dashboard"; // Navigate and force reload to update auth state
     } catch (error) {
       console.error("Failed to set password:", error);
       alert("Failed to set password. You can try resetting it later.");
