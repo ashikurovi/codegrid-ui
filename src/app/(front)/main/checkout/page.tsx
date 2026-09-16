@@ -10,6 +10,31 @@ import { createIncompleteOrder, updateIncompleteOrder, deleteIncompleteOrder } f
 import { updateUser } from "@/api/userApi";
 import { loginUser } from "@/api/authApi";
 
+const getDeviceId = () => {
+  const storageKey = "codegrid_device_id";
+  const existingId = localStorage.getItem(storageKey);
+  if (existingId) return existingId;
+
+  const newId = typeof crypto.randomUUID === "function"
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  localStorage.setItem(storageKey, newId);
+  return newId;
+};
+
+const getDeviceLocation = () => new Promise<string>((resolve) => {
+  if (!navigator.geolocation) {
+    resolve("Not available");
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    ({ coords }) => resolve(`${coords.latitude.toFixed(6)}, ${coords.longitude.toFixed(6)}`),
+    () => resolve("Permission not granted"),
+    { enableHighAccuracy: false, timeout: 5000, maximumAge: 300000 },
+  );
+});
+
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, clearCart } = useCartStore();
@@ -134,6 +159,7 @@ const shippingOptions = [
       return;
     }
 
+    const location = await getDeviceLocation();
     const orderData = {
       items: items.map(item => ({
         productId: Number(item.id),
@@ -148,7 +174,10 @@ const shippingOptions = [
       deliveryFee: Number(selectedShippingCost),
       orderNotes: formData.notes,
       totalAmount: Number(totalAmount),
-      status: "Pending"
+      status: "Pending",
+      deviceId: getDeviceId(),
+      device: navigator.userAgent,
+      location,
     };
 
     try {

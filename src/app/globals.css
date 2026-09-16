@@ -128,3 +128,82 @@
     @apply font-sans;
   }
 }
+
+/* Shared visual language for the authenticated admin workspace. */
+.admin-shell {
+  background: #f5f7fb;
+  color: #172033;
+}
+
+.admin-shell main [class*="shadow-["] {
+  box-shadow: 0 8px 24px rgba(30, 41, 59, 0.07) !important;
+}
+
+.admin-shell main form input:not([type="checkbox"]):not([type="radio"]),
+.admin-shell main form select,
+.admin-shell main form textarea {
+  border: 1px solid #d8e0ec !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+  box-shadow: none !important;
+  color: #172033 !important;
+  font-weight: 500 !important;
+  text-transform: none !important;
+}
+
+.admin-shell main form input:not([type="checkbox"]):not([type="radio"]):focus,
+.admin-shell main form select:focus,
+.admin-shell main form textarea:focus {
+  border-color: #2d6cdf !important;
+  box-shadow: 0 0 0 3px rgba(45, 108, 223, 0.12) !important;
+  outline: none !important;
+}
+
+.admin-shell main form label {
+  color: #64748b;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.admin-shell main form button,
+.admin-shell main a[class*="shadow-["],
+.admin-shell main button[class*="shadow-["] {
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(30, 41, 59, 0.1) !important;
+  transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+.admin-shell main form button:hover,
+.admin-shell main a[class*="shadow-["]:hover,
+.admin-shell main button[class*="shadow-["]:hover {
+  box-shadow: 0 7px 16px rgba(30, 41, 59, 0.14) !important;
+  transform: translateY(-1px);
+}
+
+.admin-shell main [class*="border-b-2"],
+.admin-shell main [class*="border-t-4"] {
+  border-width: 1px !important;
+  border-color: #e2e8f0 !important;
+}
+
+.admin-shell main [class*="border-[3px]"],
+.admin-shell main [class*="border-2"] {
+  border-width: 1px !important;
+}
+
+.admin-shell main [class*="border-b-4"] {
+  border-bottom-width: 1px !important;
+}
+
+.admin-shell main [class~="rounded-none"] {
+  border-radius: 10px !important;
+}
+
+.admin-shell main [class*="font-black"] {
+  font-weight: 700 !important;
+}
+
+.admin-shell main [class*="uppercase"] {
+  letter-spacing: 0.04em;
+}

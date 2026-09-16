@@ -82,22 +82,22 @@ export default function Sideber() {
     };
 
     return (
-        <div className="hidden bg-white lg:block border-r-[3px] border-black shadow-[4px_0px_0px_0px_rgba(0,0,0,1)] w-[260px] flex-shrink-0 z-10 relative">
+        <div className="hidden w-[260px] flex-shrink-0 bg-[#172338] text-white lg:block">
             <div className="flex h-full max-h-screen flex-col">
                 {/* Header */}
-                <div className="flex h-[60px] items-center px-6 border-b-[3px] border-black">
-                    <Link href="/dotadmin" className="flex items-center gap-2 font-black tracking-tighter">
-                        <span className="text-2xl text-black font-black uppercase">CODEGRID</span>
-                        <span className="text-xs font-black px-2 py-0.5 bg-[#3b82f6] text-white border-2 border-black ml-1 uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">ADMIN</span>
+                <div className="flex h-[72px] items-center border-b border-white/10 px-6">
+                    <Link href="/dotadmin" className="flex items-center gap-2 tracking-tight">
+                        <span className="text-xl font-bold uppercase text-white">CODEGRID</span>
+                        <span className="rounded bg-[#ef476f] px-2 py-1 text-[9px] font-bold uppercase tracking-widest text-white">ADMIN</span>
                     </Link>
                 </div>
                 
                 {/* Scrollable Nav Area */}
                 <div className="flex-1 overflow-y-auto overflow-x-hidden py-4 px-3 hide-scrollbar">
-                    <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-7">
                         {navGroups.map((group, idx) => (
                             <div key={idx} className="flex flex-col gap-2">
-                                <h4 className="px-3 text-xs font-black uppercase tracking-widest text-black mb-1 border-b-2 border-black w-max pb-1">
+                                <h4 className="mb-1 px-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">
                                     {group.title}
                                 </h4>
                                 <nav className="grid gap-2">
@@ -108,13 +108,13 @@ export default function Sideber() {
                                             <Link
                                                 key={link.name}
                                                 href={link.href}
-                                                className={`flex items-center gap-3 px-3 py-2 text-sm font-black uppercase border-2 transition-all duration-200 rounded-none ${
+                                                    className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-200 ${
                                                     isActive
-                                                        ? "bg-[#3b82f6] text-white border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-                                                        : "text-black border-transparent hover:border-black hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 hover:-translate-x-0.5 bg-transparent"
+                                                        ? "bg-[#2d6cdf] text-white shadow-lg shadow-blue-950/20"
+                                                        : "text-slate-300 hover:bg-white/10 hover:text-white"
                                                 }`}
                                             >
-                                                <Icon className={`h-4 w-4 ${isActive ? 'text-white' : 'text-black'}`} />
+                                                <Icon className={`h-4 w-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
                                                 {link.name}
                                             </Link>
                                         );
@@ -126,10 +126,10 @@ export default function Sideber() {
                 </div>
                 
                 {/* Footer User Area */}
-                <div className="p-4 border-t-[3px] border-black bg-white">
-                    <div className="flex items-center justify-between gap-3 px-3 py-2 bg-white border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                <div className="border-t border-white/10 p-4">
+                    <div className="flex items-center justify-between gap-3 rounded-lg bg-white/10 px-3 py-2">
                         <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 border-2 border-black bg-[#3b82f6] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center text-white font-black text-xs rounded-none overflow-hidden relative">
+                            <div className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-[#ef476f] text-xs font-bold text-white">
                                 {user?.picture ? (
                                     <img src={user.picture} alt={user.name} className="w-full h-full object-cover" />
                                 ) : (
@@ -137,13 +137,13 @@ export default function Sideber() {
                                 )}
                             </div>
                             <div className="flex flex-col truncate max-w-[120px]">
-                                <span className="text-sm font-black text-black uppercase truncate">{user?.name || "Admin User"}</span>
-                                <span className="text-[10px] font-bold text-gray-600 uppercase truncate">{user?.email || "admin@codegrid.com"}</span>
+                                <span className="truncate text-sm font-semibold uppercase text-white">{user?.name || "Admin User"}</span>
+                                <span className="truncate text-[10px] text-slate-400">{user?.email || "admin@codegrid.com"}</span>
                             </div>
                         </div>
                         <button 
                             onClick={handleLogout}
-                            className="p-2 text-black border-2 border-transparent hover:border-black hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-red-500 hover:text-white transition-all rounded-none shrink-0"
+                            className="shrink-0 p-2 text-slate-300 transition-colors hover:text-white"
                             title="Logout"
                         >
                             <LogOut className="w-4 h-4 font-black" />

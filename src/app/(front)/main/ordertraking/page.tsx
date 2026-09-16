@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { trackOrder } from '@/api/orderApi';
 import { Package, Search, Clock, CheckCircle2, Truck, Check } from 'lucide-react';
 import Link from 'next/link';
@@ -11,15 +11,14 @@ export default function OrderTrackingPage() {
     const [orderData, setOrderData] = useState<any>(null);
     const [error, setError] = useState("");
 
-    const handleTrack = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!orderId) return;
+    const trackOrderById = async (identifier: string) => {
+        if (!identifier) return;
 
         setLoading(true);
         setError("");
         setOrderData(null);
         try {
-            const res = await trackOrder(orderId);
+            const res = await trackOrder(identifier);
             if (res && res.data) {
                 setOrderData(res.data);
             } else if (res && res.id) {
@@ -33,6 +32,19 @@ export default function OrderTrackingPage() {
         } finally {
             setLoading(false);
         }
+    };
+
+    useEffect(() => {
+        const linkedOrderId = new URLSearchParams(window.location.search).get('order');
+        if (linkedOrderId) {
+            setOrderId(linkedOrderId);
+            trackOrderById(linkedOrderId);
+        }
+    }, []);
+
+    const handleTrack = async (e: React.FormEvent) => {
+        e.preventDefault();
+        await trackOrderById(orderId.trim());
     };
 
     const getStatusMessage = (status: string) => {
