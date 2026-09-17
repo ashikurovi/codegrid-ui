@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import { Upload, X, Loader2 } from "lucide-react";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { getCustomProductById, updateCustomProduct } from "../../../../api/customproductsApi";
 import { uploadImage } from "../../../../api/cdnApi";
 
@@ -226,13 +227,12 @@ export default function EditCustomProductPage() {
             
             <div className="flex flex-col gap-2 mt-4">
               <label htmlFor="description" className="text-sm font-black uppercase text-black">Description</label>
-              <textarea 
-                id="description" 
-                rows={3}
+              <RichTextEditor
+                id="description"
                 value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Product description or package details..." 
-                className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase resize-none" 
+                onChange={(value) => setDescription(value)}
+                placeholder="Write product description or package details..."
+                minHeight="220px"
               />
             </div>
           </div>

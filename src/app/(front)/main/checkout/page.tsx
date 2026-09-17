@@ -300,28 +300,8 @@ const shippingOptions = [
   return (
     <div className="min-h-screen bg-white text-black py-12 px-4 sm:px-6 lg:px-8 font-sans">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-12 flex flex-col items-center">
+        <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4 text-black">Checkout</h1>
-          <div className="flex flex-col items-center justify-center text-sm gap-3">
-            <span className="text-gray-600 flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-              Have a coupon?
-            </span>
-            <div className="flex flex-col sm:flex-row items-center gap-2 w-full max-w-md">
-              <input
-                type="text"
-                value={couponCode}
-                onChange={(e) => setCouponCode(e.target.value)}
-                placeholder="Enter coupon code"
-                className="w-full border-[1px] border-gray-300 bg-white p-3 text-sm font-medium text-black focus:outline-none focus:border-black rounded-md"
-              />
-              <button type="button" onClick={handleCouponApply} className="bg-black text-white px-4 py-3 text-sm font-semibold rounded-md hover:bg-gray-800 transition-colors">
-                Apply
-              </button>
-            </div>
-            {couponMessage && <p className="text-sm text-green-600">{couponMessage}</p>}
-            {couponError && <p className="text-sm text-red-600">{couponError}</p>}
-          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-12">
@@ -452,6 +432,26 @@ const shippingOptions = [
                   {items.length === 0 && (
                     <div className="text-sm font-medium text-red-500 py-4 text-center bg-red-50 rounded-lg">Your cart is empty.</div>
                   )}
+                </div>
+              </div>
+
+              <div className="mb-6 border-b-[1px] border-gray-100 pb-6">
+                <span className="block font-semibold text-sm text-black mb-3">Coupon</span>
+                <div className="flex flex-col gap-3">
+                  <div className="flex flex-col sm:flex-row items-stretch gap-2">
+                    <input
+                      type="text"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value)}
+                      placeholder="Enter coupon code"
+                      className="w-full border-[1px] border-gray-300 bg-white p-3 text-sm font-medium text-black focus:outline-none focus:border-black rounded-md"
+                    />
+                    <button type="button" onClick={handleCouponApply} className="bg-black text-white px-4 py-3 text-sm font-semibold rounded-md hover:bg-gray-800 transition-colors whitespace-nowrap">
+                      Apply
+                    </button>
+                  </div>
+                  {couponMessage && <p className="text-sm text-green-600">{couponMessage}</p>}
+                  {couponError && <p className="text-sm text-red-600">{couponError}</p>}
                 </div>
               </div>
 
