@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
     LayoutDashboard, Users, Tags, CornerDownRight, Bookmark,
     ShoppingCart, Warehouse, ClipboardList, Wrench, AlertCircle,
-    BarChart, SettingsIcon, ImageIcon, PenTool, MessageSquareHeart, Calculator, Box, Zap, PiggyBank, Ruler, Shirt, LogOut, Percent
+    BarChart, SettingsIcon, ImageIcon, PenTool, MessageSquareHeart, Calculator, Box, Zap, PiggyBank, Ruler, Shirt, LogOut, Percent, Search
 } from "lucide-react";
 import { logoutUser } from "../../api/authApi";
 
@@ -65,6 +65,7 @@ export default function Sideber() {
     const pathname = usePathname();
     const router = useRouter();
     const [user, setUser] = useState<any>(null);
+    const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
         const storedUser = localStorage.getItem('user');
@@ -76,6 +77,15 @@ export default function Sideber() {
             }
         }
     }, []);
+
+    const filteredGroups = navGroups
+        .map((group) => ({
+            ...group,
+            links: group.links.filter((link) =>
+                link.name.toLowerCase().includes(searchTerm.trim().toLowerCase())
+            ),
+        }))
+        .filter((group) => group.links.length > 0 || !searchTerm.trim());
 
     const handleLogout = () => {
         logoutUser();
@@ -92,37 +102,56 @@ export default function Sideber() {
                         <span className="rounded bg-[#ef476f] px-2 py-1 text-[9px] font-bold uppercase tracking-widest text-white">ADMIN</span>
                     </Link>
                 </div>
+
+                <div className="px-3 pt-3">
+                    <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-slate-300 focus-within:border-blue-400 focus-within:bg-white/10">
+                        <Search className="h-4 w-4 text-slate-400" />
+                        <input
+                            type="text"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            placeholder="Search menu..."
+                            className="w-full border-0 bg-transparent text-sm text-white placeholder:text-slate-400 focus:outline-none"
+                        />
+                    </div>
+                </div>
                 
                 {/* Scrollable Nav Area */}
                 <div className="flex-1 overflow-y-auto overflow-x-hidden py-4 px-3 hide-scrollbar">
                     <div className="flex flex-col gap-7">
-                        {navGroups.map((group, idx) => (
-                            <div key={idx} className="flex flex-col gap-2">
-                                <h4 className="mb-1 px-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">
-                                    {group.title}
-                                </h4>
-                                <nav className="grid gap-2">
-                                    {group.links.map((link) => {
-                                        const isActive = pathname === link.href || (link.href !== "/dotadmin" && pathname.startsWith(link.href));
-                                        const Icon = link.icon;
-                                        return (
-                                            <Link
-                                                key={link.name}
-                                                href={link.href}
-                                                    className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-200 ${
-                                                    isActive
-                                                        ? "bg-[#2d6cdf] text-white shadow-lg shadow-blue-950/20"
-                                                        : "text-slate-300 hover:bg-white/10 hover:text-white"
-                                                }`}
-                                            >
-                                                <Icon className={`h-4 w-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
-                                                {link.name}
-                                            </Link>
-                                        );
-                                    })}
-                                </nav>
+                        {filteredGroups.length === 0 ? (
+                            <div className="px-3 py-5 text-sm text-slate-400">
+                                No menu found for "{searchTerm}"
                             </div>
-                        ))}
+                        ) : (
+                            filteredGroups.map((group, idx) => (
+                                <div key={idx} className="flex flex-col gap-2">
+                                    <h4 className="mb-1 px-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">
+                                        {group.title}
+                                    </h4>
+                                    <nav className="grid gap-2">
+                                        {group.links.map((link) => {
+                                            const isActive = pathname === link.href || (link.href !== "/dotadmin" && pathname.startsWith(link.href));
+                                            const Icon = link.icon;
+                                            return (
+                                                <Link
+                                                    key={link.name}
+                                                    href={link.href}
+                                                        className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-200 ${
+                                                        isActive
+                                                            ? "bg-[#2d6cdf] text-white shadow-lg shadow-blue-950/20"
+                                                            : "text-slate-300 hover:bg-white/10 hover:text-white"
+                                                    }`}
+                                                >
+                                                    <Icon className={`h-4 w-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                                                    {link.name}
+                                                </Link>
+                                            );
+                                        })}
+                                    </nav>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
                 
