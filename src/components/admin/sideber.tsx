@@ -53,6 +53,7 @@ const navGroups = [
     title: "System & Tools",
     links: [
       { name: "Coupons", href: "/dotadmin/coupons", icon: Percent },
+      { name: "Costing", href: "/dotadmin/costing", icon: Calculator },
       { name: "Inventory", href: "/dotadmin/inventory", icon: Warehouse },
       { name: "Calculator", href: "/dotadmin/calculation", icon: Calculator },
       { name: "Users", href: "/dotadmin/usermanagement", icon: Users },
