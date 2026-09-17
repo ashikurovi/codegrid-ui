@@ -13,22 +13,28 @@ export default function Home() {
   const [isReady, setIsReady] = useState(false);
   const [messageIndex, setMessageIndex] = useState(0);
   const loadingMessages = [
-    "Curating your next favorite piece...",
-    "Bringing fresh energy to your wardrobe...",
-    "Good things take a little style...",
-    "Almost there. Your CodeGrid world is loading...",
+    "Curating your next favorite look...",
+    "Preparing a fresh drop for your vibe...",
+    "A little more styling magic...",
+    "Almost ready for your CodeGrid moment...",
   ];
 
   useEffect(() => {
     const completedSections = new Set<string>();
     const handleSectionReady = (event: Event) => {
       const section = (event as CustomEvent<string>).detail;
+      if (!section) return;
       completedSections.add(section);
-      if (completedSections.size === 5) setIsReady(true);
+      if (completedSections.size >= 4) setIsReady(true);
     };
 
     window.addEventListener("landing-data-ready", handleSectionReady);
-    return () => window.removeEventListener("landing-data-ready", handleSectionReady);
+    const fallbackTimer = window.setTimeout(() => setIsReady(true), 2400);
+
+    return () => {
+      window.removeEventListener("landing-data-ready", handleSectionReady);
+      window.clearTimeout(fallbackTimer);
+    };
   }, []);
 
   useEffect(() => {
@@ -42,20 +48,21 @@ export default function Home() {
   return (
     <main className="relative flex min-h-[70vh] flex-1 w-full flex-col items-center justify-start">
       {!isReady && (
-        <div className="fixed inset-0 z-[80] flex min-h-screen items-center justify-center overflow-hidden bg-[#f7f9fc] px-6 text-center">
-          <div className="absolute -left-24 -top-24 h-72 w-72 rounded-full bg-[#dbeafe] blur-3xl" />
-          <div className="absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-[#fce7f3] blur-3xl" />
+        <div className="fixed inset-0 z-[80] flex min-h-screen items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f4f7fb_38%,_#eef3f8_100%)] px-6 text-center backdrop-blur-[2px] transition-opacity duration-700">
+          <div className="absolute -left-20 top-10 h-64 w-64 rounded-full bg-[#dbeafe]/80 blur-3xl" />
+          <div className="absolute -right-20 bottom-10 h-64 w-64 rounded-full bg-[#fce7f3]/80 blur-3xl" />
           <div className="relative flex w-full max-w-md flex-col items-center">
-            <div className="relative mb-10 flex h-24 w-24 items-center justify-center rounded-full border border-slate-200 bg-white shadow-[0_16px_40px_rgba(30,41,59,0.1)]">
-              <div className="absolute inset-2 animate-spin rounded-full border-2 border-transparent border-t-[#2563eb] border-r-[#ef476f]" />
-              <span className="text-xl font-black tracking-[-0.08em] text-[#172033]">CG</span>
+            <div className="relative mb-9 flex h-20 w-20 items-center justify-center rounded-full border border-slate-200 bg-white/90 shadow-[0_20px_50px_rgba(15,23,42,0.08)] backdrop-blur-sm">
+              <div className="absolute inset-2 animate-[spin_2.7s_linear_infinite] rounded-full border-[1.5px] border-transparent border-t-slate-700 border-r-[#2563eb]" />
+              <div className="absolute inset-4 rounded-full border border-slate-100" />
+              <span className="relative text-lg font-black tracking-[-0.08em] text-[#172033]">CG</span>
             </div>
-            <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.35em] text-[#2563eb]">CodeGrid</p>
-            <h1 className="min-h-16 text-2xl font-semibold tracking-tight text-[#172033] transition-opacity duration-500 sm:text-3xl">{loadingMessages[messageIndex]}</h1>
-            <div className="mt-8 h-1.5 w-56 overflow-hidden rounded-full bg-slate-200">
-              <div className="h-full w-1/2 animate-[loading_1.5s_ease-in-out_infinite] rounded-full bg-gradient-to-r from-[#2563eb] to-[#ef476f]" />
+            <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.32em] text-slate-500">CodeGrid</p>
+            <h1 className="min-h-14 max-w-sm text-xl font-medium tracking-[-0.04em] text-[#172033] transition-all duration-500 sm:text-2xl">{loadingMessages[messageIndex]}</h1>
+            <div className="mt-7 h-1.5 w-56 overflow-hidden rounded-full bg-slate-200/80">
+              <div className="h-full w-1/2 animate-[loading_2.4s_ease-in-out_infinite] rounded-full bg-gradient-to-r from-slate-800 via-[#2563eb] to-[#ef476f] opacity-90" />
             </div>
-            <p className="mt-5 text-xs text-slate-400">Loading collections, products and stories</p>
+            <p className="mt-4 text-[11px] uppercase tracking-[0.24em] text-slate-400">Loading the Story</p>
           </div>
         </div>
       )}
