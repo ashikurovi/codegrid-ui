@@ -30,6 +30,7 @@ export default function EditProductPage() {
   const [title, setTitle] = useState("");
   const [variantLabel, setVariantLabel] = useState("");
   const [description, setDescription] = useState("");
+  const [additionalInfo, setAdditionalInfo] = useState("");
   const [features, setFeatures] = useState("");
   const [originalPrice, setOriginalPrice] = useState("");
   const [currentPrice, setCurrentPrice] = useState("");
@@ -90,6 +91,7 @@ export default function EditProductPage() {
             setTitle(p.title || "");
             setVariantLabel(p.variantLabel || "");
             setDescription(p.description || "");
+            setAdditionalInfo(p.additionalInfo || "");
             setFeatures(Array.isArray(p.features) ? p.features.join("\n") : (p.features || ""));
             setOriginalPrice(p.originalPrice || "");
             setCurrentPrice(p.currentPrice || "");
@@ -147,6 +149,7 @@ export default function EditProductPage() {
         title,
         variantLabel,
         description,
+        additionalInfo,
         features: features.split("\n").filter(f => f.trim() !== ""),
         originalPrice: Number(originalPrice),
         currentPrice: Number(currentPrice),
@@ -224,6 +227,15 @@ export default function EditProductPage() {
                   value={description}
                   onChange={setDescription} 
                   placeholder="Write a detailed product description here..."
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-black uppercase text-black">Additional Information</label>
+                <RichTextEditor 
+                  value={additionalInfo}
+                  onChange={setAdditionalInfo} 
+                  placeholder="Write additional product information here..."
                 />
               </div>
 
