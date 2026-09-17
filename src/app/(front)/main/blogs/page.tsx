@@ -39,7 +39,29 @@ export default function BlogsPage() {
   };
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center font-medium">Loading blogs...</div>;
+    return (
+      <div className="min-h-screen flex flex-col font-sans">
+        <main className="flex-1 w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="mb-16 text-center">
+            <div className="mx-auto mb-4 h-10 w-64 animate-pulse rounded bg-slate-200" />
+            <div className="mx-auto h-4 w-80 animate-pulse rounded bg-slate-200" />
+          </div>
+
+          <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:gap-16">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <div key={index} className="animate-pulse">
+                <div className="mb-6 aspect-[4/3] w-full bg-slate-200" />
+                <div className="mb-3 h-3 w-24 rounded bg-slate-200" />
+                <div className="mb-3 h-6 w-3/4 rounded bg-slate-200" />
+                <div className="mb-2 h-4 w-full rounded bg-slate-200" />
+                <div className="mb-2 h-4 w-5/6 rounded bg-slate-200" />
+                <div className="h-10 w-28 rounded border border-slate-200 bg-slate-200" />
+              </div>
+            ))}
+          </div>
+        </main>
+      </div>
+    );
   }
 
   return (

@@ -149,7 +149,17 @@ export default function ShopPage() {
 
             {/* Product Grid */}
             {loading ? (
-              <div className="text-center py-10 font-medium uppercase">Loading products...</div>
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+                {Array.from({ length: 8 }).map((_, index) => (
+                  <div key={index} className="animate-pulse">
+                    <div className="mb-4 aspect-square w-full rounded-none bg-slate-200" />
+                    <div className="mb-2 h-4 w-3/4 rounded bg-slate-200" />
+                    <div className="mb-4 h-3 w-1/3 rounded bg-slate-200" />
+                    <div className="mb-2 h-5 w-1/2 rounded bg-slate-200" />
+                    <div className="h-9 w-full rounded-none bg-slate-200" />
+                  </div>
+                ))}
+              </div>
             ) : filteredProducts.length === 0 ? (
               <div className="text-center py-10 font-medium uppercase">No products found.</div>
             ) : (

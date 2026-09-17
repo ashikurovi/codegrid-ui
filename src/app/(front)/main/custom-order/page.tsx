@@ -292,7 +292,20 @@ export default function CustomOrderPage() {
           <div className="flex-1 space-y-12">
 
             {loadingProducts ? (
-              <div className="flex justify-center py-20 text-gray-500 font-medium">Loading custom options...</div>
+              <div className="animate-in fade-in duration-500">
+                <h3 className="mb-6 text-xl font-bold uppercase tracking-widest text-black">1. Choose Your Item</h3>
+                <div className="grid grid-cols-2 gap-6 sm:grid-cols-3">
+                  {Array.from({ length: 6 }).map((_, index) => (
+                    <div key={index} className="animate-pulse overflow-hidden border border-gray-200 bg-white">
+                      <div className="aspect-square w-full bg-slate-200" />
+                      <div className="p-4">
+                        <div className="mb-2 h-3 w-2/3 rounded bg-slate-200" />
+                        <div className="h-3 w-1/3 rounded bg-slate-200" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             ) : (
               <>
                 {/* Conditional Content based on Category */}
