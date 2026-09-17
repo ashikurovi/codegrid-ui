@@ -175,19 +175,19 @@ export default function OrderTrackingPage() {
                                 {orderData.items && orderData.items.map((item: any, idx: number) => (
                                     <div key={idx} className="flex justify-between items-center bg-white p-4 rounded-md border-[1px] border-gray-200">
                                         <div className="flex items-center gap-4">
-                                            {item.product?.images?.[0] ? (
+                                            {item.product?.thumbnail ? (
                                                 <div className="w-12 h-12 bg-gray-100 rounded overflow-hidden flex-shrink-0">
-                                                    <img src={item.product.images[0].startsWith('http') ? item.product.images[0] : `https://codegrid-api.vercel.app${item.product.images[0].startsWith('/') ? '' : '/'}${item.product.images[0]}`} alt={item.product.name} className="w-full h-full object-cover" />
+                                                    <img src={item.product.thumbnail.startsWith('http') ? item.product.thumbnail : `https://codegrid-api.vercel.app${item.product.thumbnail.startsWith('/') ? '' : '/'}${item.product.thumbnail}`} alt={item.product.title || 'Product'} className="w-full h-full object-cover" />
                                                 </div>
                                             ) : (
                                                 <div className="w-12 h-12 bg-gray-200 rounded flex-shrink-0"></div>
                                             )}
                                             <div>
-                                                <p className="text-sm font-bold text-black uppercase tracking-tighter">{item.product?.name || `Product #${item.productId}`}</p>
+                                                <p className="text-sm font-bold text-black uppercase tracking-tighter">{item.product?.title || item.flashsell?.title || item.budgetPick?.title || `Product #${item.product?.id || item.productId || item.id}`}</p>
                                                 <p className="text-xs font-medium text-gray-500">Qty: {item.quantity}</p>
                                             </div>
                                         </div>
-                                        <span className="text-sm font-bold text-black">৳ {item.price}</span>
+                                        <span className="text-sm font-bold text-black">৳ {item.product?.currentPrice || item.flashsell?.currentPrice || item.budgetPick?.currentPrice || "-"}</span>
                                     </div>
                                 ))}
                             </div>
