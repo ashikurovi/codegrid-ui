@@ -252,59 +252,98 @@ export function Navbar() {
                 </div>
             </div>
 
-            {/* --- MOBILE MENU (Side Drawer - Brutalist Modern) --- */}
+            {/* --- MOBILE MENU (Side Drawer - Premium) --- */}
             <div
-                className={`fixed inset-0 bg-black/40 backdrop-blur-sm z-[110] transition-opacity duration-300 lg:hidden ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+                className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-[110] transition-opacity duration-300 lg:hidden ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
                 onClick={() => setIsMobileMenuOpen(false)}
             >
                 <div
-                    className={`absolute top-0 right-0 w-[85%] max-w-sm h-full bg-white border-l-[3px] border-black transition-transform duration-500 ease-[cubic-bezier(0.77,0,0.175,1)] transform ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
+                    className={`absolute top-0 right-0 w-[85%] max-w-sm h-full bg-white shadow-[-10px_0_30px_rgba(0,0,0,0.1)] rounded-l-[24px] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] transform overflow-hidden ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
                     onClick={(e) => e.stopPropagation()}
                 >
                     <div className="flex flex-col h-full bg-white">
-                        <div className="flex justify-between items-center p-6 border-b-[3px] border-black">
-                            <span className="font-black text-2xl text-black uppercase tracking-tighter">Menu</span>
+                        <div className="flex justify-between items-center p-6 border-b-[1px] border-gray-100">
+                            <span className="font-semibold text-lg text-gray-900 tracking-wide">Menu</span>
                             <button
                                 onClick={() => setIsMobileMenuOpen(false)}
-                                className="text-black hover:bg-black hover:text-white border-[2px] border-transparent transition-colors rounded-none p-1"
+                                className="text-gray-400 hover:bg-gray-100 hover:text-black transition-colors rounded-full p-2"
                             >
-                                <X className="w-6 h-6" strokeWidth={2.5} />
+                                <X className="w-5 h-5" strokeWidth={2} />
                             </button>
                         </div>
-                        <div className="flex flex-col p-6 space-y-6 overflow-y-auto hide-scrollbar bg-white flex-1">
+                        <div className="flex flex-col p-4 space-y-1 overflow-y-auto hide-scrollbar flex-1 mt-2">
                             {[
                                 { name: "Big Sale", path: "/main/big-sale" },
                                 { name: "Budget Pick", path: "/main/budget-pick" },
                                 { name: "Collections", path: "/main/shop" },
-                                { name: "Blogs", path: "/main/blogs" }
+                                { name: "Blogs", path: "/main/blogs" },
+                                { name: "Account", path: user ? "/main/dashboard" : "/main/login" }
                             ].map((item) => (
                                 <Link 
                                     key={item.name}
                                     href={item.path} 
                                     onClick={() => setIsMobileMenuOpen(false)} 
-                                    className={`group flex items-center justify-between text-2xl font-black uppercase tracking-tight py-2 transition-all duration-300 ${pathname === item.path ? 'text-black' : 'text-gray-400 hover:text-black hover:translate-x-2'}`}
+                                    className={`flex items-center px-4 py-3.5 rounded-xl transition-all duration-200 ${pathname === item.path ? 'bg-gray-50 text-black font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-black font-medium'}`}
                                 >
-                                    <span>{item.name}</span>
-                                    <span className={`transition-opacity duration-300 ${pathname === item.path ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
-                                      →
-                                    </span>
+                                    <div className="flex items-center gap-3 w-full">
+                                        {item.name === "Account" && user && (
+                                            <div className="w-7 h-7 rounded-full bg-gray-200 overflow-hidden border border-gray-300 flex-shrink-0 flex items-center justify-center">
+                                                {user.image || user.profileImage || user.avatar ? (
+                                                    <img src={user.image || user.profileImage || user.avatar} alt="Profile" className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <User className="w-4 h-4 text-gray-500" />
+                                                )}
+                                            </div>
+                                        )}
+                                        {item.name === "Account" && !user && (
+                                            <User className="w-5 h-5" />
+                                        )}
+                                        <span className="text-base">{item.name}</span>
+                                    </div>
                                 </Link>
                             ))}
 
-                            <div className="pt-8 mt-4 border-t-[3px] border-black flex flex-col space-y-5">
-                                <Link href="/main/ordertraking" onClick={() => setIsMobileMenuOpen(false)} className={`text-sm font-bold uppercase tracking-widest transition-colors ${pathname === '/main/ordertraking' ? 'text-black' : 'text-gray-500 hover:text-black'}`}>Track Order</Link>
-                                <Link href="/main/custom-order" onClick={() => setIsMobileMenuOpen(false)} className={`text-sm font-bold uppercase tracking-widest transition-colors ${pathname === '/main/custom-order' ? 'text-black' : 'text-gray-500 hover:text-black'}`}>Custom/Bulk Order</Link>
+                            <div className="px-4 pt-6 mt-4 border-t-[1px] border-gray-100 flex flex-col space-y-3">
+                                <Link href="/main/ordertraking" onClick={() => setIsMobileMenuOpen(false)} className={`text-sm transition-colors ${pathname === '/main/ordertraking' ? 'text-black font-semibold' : 'text-gray-500 hover:text-black font-medium'}`}>Track Order</Link>
+                                <Link href="/main/custom-order" onClick={() => setIsMobileMenuOpen(false)} className={`text-sm transition-colors ${pathname === '/main/custom-order' ? 'text-black font-semibold' : 'text-gray-500 hover:text-black font-medium'}`}>Custom/Bulk Order</Link>
                             </div>
                         </div>
 
                         {/* Footer area of mobile menu */}
-                        <div className="p-6 bg-black text-white border-t-[3px] border-black mt-auto">
-                            <Link href={user ? "/main/dashboard" : "/main/login"} onClick={() => setIsMobileMenuOpen(false)} className="text-sm font-bold uppercase tracking-widest hover:text-gray-300 transition-colors flex items-center justify-center gap-3 w-full py-2">
-                                <User className="w-5 h-5" /> {user ? "Dashboard" : "Account / Login"}
+                        <div className="p-6 bg-gray-50 border-t-[1px] border-gray-100 mt-auto">
+                            <Link href={user ? "/main/dashboard" : "/main/login"} onClick={() => setIsMobileMenuOpen(false)} className="bg-black text-white text-sm font-semibold rounded-xl hover:bg-gray-800 transition-colors flex items-center justify-center gap-3 w-full py-3.5 shadow-md hover:shadow-lg">
+                                <User className="w-4 h-4" /> {user ? "My Dashboard" : "Sign In / Register"}
                             </Link>
                         </div>
                     </div>
                 </div>
+            </div>
+
+            {/* --- MOBILE BOTTOM NAVBAR --- */}
+            <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t-[1px] border-gray-200 z-[90] flex items-center justify-around py-3 pb-safe shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+                <Link href="/" className={`flex flex-col items-center gap-1 ${pathname === '/' ? 'text-black' : 'text-gray-500'}`}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <span className="text-[10px] font-medium tracking-wide">Home</span>
+                </Link>
+                <Link href="/main/shop" className={`flex flex-col items-center gap-1 ${pathname === '/main/shop' ? 'text-black' : 'text-gray-500'}`}>
+                    <Search className="w-[22px] h-[22px]" />
+                    <span className="text-[10px] font-medium tracking-wide">Shop</span>
+                </Link>
+                <button onClick={openCart} className="flex flex-col items-center gap-1 text-gray-500 relative">
+                    <div className="relative">
+                        <ShoppingBag className="w-[22px] h-[22px]" />
+                        {mounted && cartCount > 0 && (
+                            <span className="absolute -top-1.5 -right-1.5 bg-black text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-white">
+                                {cartCount}
+                            </span>
+                        )}
+                    </div>
+                    <span className="text-[10px] font-medium tracking-wide">Cart</span>
+                </button>
+                <Link href={user ? "/main/dashboard" : "/main/login"} className={`flex flex-col items-center gap-1 ${pathname.includes('/main/dashboard') || pathname.includes('/main/login') ? 'text-black' : 'text-gray-500'}`}>
+                    <User className="w-[22px] h-[22px]" />
+                    <span className="text-[10px] font-medium tracking-wide">Account</span>
+                </Link>
             </div>
 
         </div>
