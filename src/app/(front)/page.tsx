@@ -48,49 +48,21 @@ export default function Home() {
   return (
     <main className="relative flex min-h-[70vh] flex-1 w-full flex-col items-center justify-start">
       {!isReady && (
-        <div className="fixed inset-0 z-[80] flex min-h-screen items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f4f7fb_38%,_#eef3f8_100%)] px-4 py-10 backdrop-blur-[2px] transition-opacity duration-700 sm:px-6">
+        <div className="fixed inset-0 z-[80] flex min-h-screen items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f4f7fb_38%,_#eef3f8_100%)] px-6 text-center backdrop-blur-[2px] transition-opacity duration-700">
           <div className="absolute -left-20 top-10 h-64 w-64 rounded-full bg-[#dbeafe]/80 blur-3xl" />
           <div className="absolute -right-20 bottom-10 h-64 w-64 rounded-full bg-[#fce7f3]/80 blur-3xl" />
-
-          <div className="relative w-full max-w-6xl animate-pulse">
-            <div className="mb-6 flex items-center justify-between">
-              <div className="h-5 w-28 rounded bg-slate-200" />
-              <div className="h-5 w-24 rounded bg-slate-200" />
+          <div className="relative flex w-full max-w-md flex-col items-center">
+            <div className="relative mb-9 flex h-20 w-20 items-center justify-center rounded-full border border-slate-200 bg-white/90 shadow-[0_20px_50px_rgba(15,23,42,0.08)] backdrop-blur-sm">
+              <div className="absolute inset-2 animate-[spin_2.7s_linear_infinite] rounded-full border-[1.5px] border-transparent border-t-slate-700 border-r-[#2563eb]" />
+              <div className="absolute inset-4 rounded-full border border-slate-100" />
+              <span className="relative text-lg font-black tracking-[-0.08em] text-[#172033]">CG</span>
             </div>
-
-            <div className="mb-8 h-72 w-full rounded-[28px] bg-slate-200" />
-
-            <div className="mb-8 grid gap-4 md:grid-cols-4">
-              {Array.from({ length: 4 }).map((_, index) => (
-                <div key={index} className="h-28 rounded-[20px] bg-slate-200" />
-              ))}
+            <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.32em] text-slate-500">CodeGrid</p>
+            <h1 className="min-h-14 max-w-sm text-xl font-medium tracking-[-0.04em] text-[#172033] transition-all duration-500 sm:text-2xl">{loadingMessages[messageIndex]}</h1>
+            <div className="mt-7 h-1.5 w-56 overflow-hidden rounded-full bg-slate-200/80">
+              <div className="h-full w-1/2 animate-[loading_2.4s_ease-in-out_infinite] rounded-full bg-gradient-to-r from-slate-800 via-[#2563eb] to-[#ef476f] opacity-90" />
             </div>
-
-            <div className="mb-6 flex items-center justify-between">
-              <div className="h-8 w-36 rounded bg-slate-200" />
-              <div className="h-8 w-24 rounded bg-slate-200" />
-            </div>
-
-            <div className="mb-8 grid gap-6 md:grid-cols-4">
-              {Array.from({ length: 4 }).map((_, index) => (
-                <div key={index} className="space-y-3">
-                  <div className="h-56 rounded-[22px] bg-slate-200" />
-                  <div className="h-4 w-3/4 rounded bg-slate-200" />
-                  <div className="h-4 w-1/2 rounded bg-slate-200" />
-                </div>
-              ))}
-            </div>
-
-            <div className="mb-6 h-8 w-32 rounded bg-slate-200" />
-            <div className="grid gap-6 md:grid-cols-3">
-              {Array.from({ length: 3 }).map((_, index) => (
-                <div key={index} className="space-y-3">
-                  <div className="h-44 rounded-[22px] bg-slate-200" />
-                  <div className="h-4 w-2/3 rounded bg-slate-200" />
-                  <div className="h-4 w-1/3 rounded bg-slate-200" />
-                </div>
-              ))}
-            </div>
+            <p className="mt-4 text-[11px] uppercase tracking-[0.24em] text-slate-400">Loading the Story</p>
           </div>
         </div>
       )}
