@@ -176,7 +176,7 @@ export default function ShopPage() {
                           imgUrl = parsed[0];
                         }
                       } catch (e) {
-                        // fallback
+                        imgUrl = product.images;
                       }
                     }
                   }

@@ -80,28 +80,28 @@ export function AllProducts() {
       {/* Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-10 sm:gap-x-6 sm:gap-y-12">
         {displayProducts.map((product) => {
-          let primaryImg = "";
-          let hoverImg = "";
+          let primaryImg = product.thumbnail ? getImgUrl(product.thumbnail) : "";
+          let hoverImg = primaryImg;
 
           if (product.images) {
-            let parsed = [];
+            let parsed: string[] = [];
             if (typeof product.images === 'string') {
               try {
                 parsed = JSON.parse(product.images);
-              } catch (e) { }
+              } catch (e) {
+                parsed = [product.images];
+              }
             } else if (Array.isArray(product.images)) {
               parsed = product.images;
             }
             if (parsed.length > 0) {
-              primaryImg = getImgUrl(parsed[0]);
-              hoverImg = parsed.length > 1 ? getImgUrl(parsed[1]) : primaryImg;
+              if (!primaryImg) primaryImg = getImgUrl(parsed[0]);
+              hoverImg = parsed.length > 1 ? getImgUrl(parsed[1]) : getImgUrl(parsed[0]);
             }
           }
 
-          if (!primaryImg && product.thumbnail) {
-            primaryImg = getImgUrl(product.thumbnail);
-            hoverImg = primaryImg;
-          }
+          if (!primaryImg) primaryImg = "https://via.placeholder.com/600";
+          if (!hoverImg) hoverImg = primaryImg;
 
           return (
             <div key={product.id} className="group block bg-transparent transition-transform hover:-translate-y-1 flex flex-col h-full">

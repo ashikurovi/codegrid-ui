@@ -91,8 +91,14 @@ export default function PreOrderPage() {
                     if (Array.isArray(parsed) && parsed.length > 0) {
                       imgUrl = parsed[0];
                     }
-                  } catch (e) {}
+                  } catch (e) {
+                    imgUrl = product.images;
+                  }
                 }
+              }
+
+              if (imgUrl && !imgUrl.startsWith('http')) {
+                imgUrl = `https://codegrid-api.vercel.app${imgUrl.startsWith('/') ? '' : '/'}${imgUrl}`;
               }
 
 
