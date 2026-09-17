@@ -1,4 +1,4 @@
-export const BASE_URL = 'https://codegrid-api.vercel.app';
+export const BASE_URL = 'https://api.codegrid.shop';
 
 export const fetchApi = async (endpoint: string, options: RequestInit = {}) => {
   const url = `${BASE_URL}${endpoint}`;

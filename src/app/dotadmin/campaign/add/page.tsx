@@ -30,10 +30,6 @@ export default function AddCampaignPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!campaignName || !offerText) {
-      alert("Please fill in all required fields (Name, Offer text).");
-      return;
-    }
 
     setIsSubmitting(true);
     try {
@@ -84,7 +80,7 @@ export default function AddCampaignPage() {
             <h3 className="text-xl font-black uppercase mb-2 text-black border-b-4 border-black w-max pb-1">Campaign Info</h3>
             
             <div className="flex flex-col gap-2">
-              <label htmlFor="name" className="text-sm font-black uppercase text-black">Campaign Name *</label>
+              <label htmlFor="name" className="text-sm font-black uppercase text-black">Campaign Name</label>
               <input 
                 type="text" 
                 id="name" 
@@ -92,12 +88,11 @@ export default function AddCampaignPage() {
                 onChange={(e) => setCampaignName(e.target.value)}
                 placeholder="e.g. Flash Sale" 
                 className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black uppercase" 
-                required
               />
             </div>
             
             <div className="flex flex-col gap-2">
-              <label htmlFor="offerText" className="text-sm font-black uppercase text-black">Offer Text *</label>
+              <label htmlFor="offerText" className="text-sm font-black uppercase text-black">Offer Text</label>
               <textarea 
                 id="offerText" 
                 rows={2}

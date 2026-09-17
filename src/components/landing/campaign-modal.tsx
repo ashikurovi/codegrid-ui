@@ -13,8 +13,7 @@ export function CampaignModal() {
 
   const getImgUrl = (url: string) => {
     if (!url) return "";
-    if (url.startsWith('http')) return url;
-    return `https://codegrid-api.vercel.app${url.startsWith('/') ? '' : '/'}${url}`;
+    return url;
   };
 
   useEffect(() => {

@@ -70,7 +70,7 @@ export function DeveloperLifecycle() {
 
   return (
     <section ref={containerRef} className="relative bg-[#f8fafc] w-full mt-32" style={{ height: "300vh" }}>
-      <div className="sticky top-0 h-[100dvh] w-full flex flex-col items-center justify-between pt-24 pb-8 md:pt-32 md:pb-12 overflow-hidden">
+      <div className="sticky top-0 h-[100dvh] w-full flex flex-col items-center justify-between pt-12 pb-4 md:pt-32 md:pb-12 overflow-hidden">
         
         {/* Background gradient blur */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] max-w-[600px] max-h-[600px] bg-gradient-to-tr from-[#2563eb]/5 via-purple-500/5 to-[#ef476f]/5 rounded-full blur-3xl -z-10" />
@@ -85,14 +85,14 @@ export function DeveloperLifecycle() {
 
         {/* Dynamic Center Emoji/Icon with smooth transitions */}
         <div className="flex flex-col items-center justify-center flex-1 w-full gap-4 md:gap-6 px-6 z-10">
-          <div className="relative w-24 h-24 md:w-40 md:h-40 flex items-center justify-center rounded-2xl md:rounded-[2rem] bg-white shadow-[0_20px_60px_rgba(15,23,42,0.08)] border border-slate-100/50 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] transform hover:-translate-y-2 hover:shadow-[0_30px_70px_rgba(37,99,235,0.15)]">
+          <div className="relative w-32 h-32 md:w-40 md:h-40 flex items-center justify-center rounded-2xl md:rounded-[2rem] bg-white shadow-[0_20px_60px_rgba(15,23,42,0.08)] border border-slate-100/50 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] transform hover:-translate-y-2 hover:shadow-[0_30px_70px_rgba(37,99,235,0.15)]">
             <ActiveIcon 
               key={activeIndex + "icon"} 
-              className="w-12 h-12 md:w-16 md:h-16 text-[#172033] animate-[fade-in-up_0.5s_ease-out_forwards]" 
+              className="w-16 h-16 md:w-20 md:h-20 text-[#172033] animate-[fade-in-up_0.5s_ease-out_forwards]" 
             />
             {/* Ping effect when it changes */}
             <div key={activeIndex + "ping"} className="absolute inset-0 rounded-2xl md:rounded-[2rem] border-2 border-[#2563eb] animate-[ping_1.5s_ease-out_forwards] opacity-20" />
-            <div className="absolute -bottom-2 -right-2 md:-bottom-3 md:-right-3 w-8 h-8 md:w-12 md:h-12 bg-gradient-to-br from-[#2563eb] to-[#ef476f] rounded-lg md:rounded-xl shadow-xl flex items-center justify-center text-white font-black text-sm md:text-lg border-2 md:border-4 border-[#f8fafc]">
+            <div className="absolute -bottom-2 -right-2 md:-bottom-3 md:-right-3 w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-[#2563eb] to-[#ef476f] rounded-lg md:rounded-xl shadow-xl flex items-center justify-center text-white font-black text-sm md:text-lg border-2 md:border-4 border-[#f8fafc]">
               {steps[activeIndex].id}
             </div>
           </div>
