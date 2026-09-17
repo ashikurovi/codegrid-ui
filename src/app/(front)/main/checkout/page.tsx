@@ -9,6 +9,7 @@ import { createOrder } from "@/api/orderApi";
 import { createIncompleteOrder, updateIncompleteOrder, deleteIncompleteOrder } from "@/api/incompleteOrderApi";
 import { updateUser } from "@/api/userApi";
 import { loginUser } from "@/api/authApi";
+import { validateCoupon } from "@/api/couponApi";
 
 const getDeviceId = () => {
   const storageKey = "codegrid_device_id";
@@ -40,6 +41,11 @@ export default function CheckoutPage() {
   const { items, clearCart } = useCartStore();
   const [shippingMethod, setShippingMethod] = useState("INSIDE_DHAKA");
   const [paymentMethod, setPaymentMethod] = useState("COD");
+  const [couponCode, setCouponCode] = useState("");
+  const [couponMessage, setCouponMessage] = useState("");
+  const [couponError, setCouponError] = useState("");
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [couponApplied, setCouponApplied] = useState(false);
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -145,7 +151,39 @@ const shippingOptions = [
 
   const selectedShippingCost = shippingOptions.find(opt => opt.id === shippingMethod)?.cost || 0;
   const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  const totalAmount = subtotal + selectedShippingCost;
+  const totalAmountBeforeCoupon = subtotal + selectedShippingCost;
+  const totalAmount = Math.max(0, totalAmountBeforeCoupon - couponDiscount);
+
+  const handleCouponApply = async () => {
+    if (!couponCode.trim()) {
+      setCouponError("Please enter a coupon code.");
+      setCouponMessage("");
+      return;
+    }
+
+    try {
+      const res = await validateCoupon(couponCode.trim(), subtotal);
+      if (!res?.data?.valid && !res?.valid) {
+        setCouponApplied(false);
+        setCouponDiscount(0);
+        setCouponError(res?.data?.message || res?.message || "Coupon is invalid.");
+        setCouponMessage("");
+        return;
+      }
+
+      const discountValue = Number(res?.data?.discount ?? res?.discount ?? 0);
+      setCouponDiscount(discountValue);
+      setCouponApplied(true);
+      setCouponError("");
+      setCouponMessage(`Coupon applied successfully. You saved ৳${discountValue}.`);
+    } catch (error) {
+      console.error("Coupon validation failed", error);
+      setCouponApplied(false);
+      setCouponDiscount(0);
+      setCouponError("Failed to validate coupon. Please try again.");
+      setCouponMessage("");
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
@@ -178,6 +216,8 @@ const shippingOptions = [
       deviceId: getDeviceId(),
       device: navigator.userAgent,
       location,
+      couponCode: couponApplied ? couponCode.trim() : undefined,
+      discountAmount: couponApplied ? Number(couponDiscount) : 0,
     };
 
     try {
@@ -262,14 +302,25 @@ const shippingOptions = [
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12 flex flex-col items-center">
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4 text-black">Checkout</h1>
-          <div className="flex items-center justify-center text-sm">
+          <div className="flex flex-col items-center justify-center text-sm gap-3">
             <span className="text-gray-600 flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
               Have a coupon?
-              <button className="text-black font-semibold underline hover:no-underline transition-colors ml-1">
-                Click here to enter your code
-              </button>
             </span>
+            <div className="flex flex-col sm:flex-row items-center gap-2 w-full max-w-md">
+              <input
+                type="text"
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value)}
+                placeholder="Enter coupon code"
+                className="w-full border-[1px] border-gray-300 bg-white p-3 text-sm font-medium text-black focus:outline-none focus:border-black rounded-md"
+              />
+              <button type="button" onClick={handleCouponApply} className="bg-black text-white px-4 py-3 text-sm font-semibold rounded-md hover:bg-gray-800 transition-colors">
+                Apply
+              </button>
+            </div>
+            {couponMessage && <p className="text-sm text-green-600">{couponMessage}</p>}
+            {couponError && <p className="text-sm text-red-600">{couponError}</p>}
           </div>
         </div>
 
@@ -413,6 +464,12 @@ const shippingOptions = [
                   <span>Shipping</span>
                   <span className="font-medium text-black">{selectedShippingCost > 0 ? `৳${selectedShippingCost}` : 'Select shipping'}</span>
                 </div>
+                {couponDiscount > 0 && (
+                  <div className="flex justify-between items-center text-green-600">
+                    <span>Discount</span>
+                    <span className="font-medium">-৳{couponDiscount}</span>
+                  </div>
+                )}
               </div>
 
               <div className="mb-6 border-b-[1px] border-gray-100 pb-6">

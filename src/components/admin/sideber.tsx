@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
     LayoutDashboard, Users, Tags, CornerDownRight, Bookmark,
     ShoppingCart, Warehouse, ClipboardList, Wrench, AlertCircle,
-    BarChart, SettingsIcon, ImageIcon, PenTool, MessageSquareHeart, Calculator, Box, Zap, PiggyBank, Ruler, Shirt, LogOut
+    BarChart, SettingsIcon, ImageIcon, PenTool, MessageSquareHeart, Calculator, Box, Zap, PiggyBank, Ruler, Shirt, LogOut, Percent
 } from "lucide-react";
 import { logoutUser } from "../../api/authApi";
 
@@ -52,6 +52,7 @@ const navGroups = [
   {
     title: "System & Tools",
     links: [
+      { name: "Coupons", href: "/dotadmin/coupons", icon: Percent },
       { name: "Inventory", href: "/dotadmin/inventory", icon: Warehouse },
       { name: "Calculator", href: "/dotadmin/calculation", icon: Calculator },
       { name: "Users", href: "/dotadmin/usermanagement", icon: Users },
