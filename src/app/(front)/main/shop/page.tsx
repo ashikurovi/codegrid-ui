@@ -190,6 +190,12 @@ export default function ShopPage() {
                       <Link href={`/main/product/${product.id}`} className="flex flex-col flex-1 pb-0">
                         {/* Square Image */}
                         <div className="relative aspect-square bg-gray-100 overflow-hidden mb-4 rounded-none">
+                          {/* Discount Badge */}
+                          {product.originalPrice && product.currentPrice && product.originalPrice > product.currentPrice && (
+                            <div className="absolute top-2 left-2 z-10 bg-red-600 text-white text-[10px] sm:text-xs font-bold px-2 py-1 uppercase rounded-none">
+                              -{Math.round(((product.originalPrice - product.currentPrice) / product.originalPrice) * 100)}%
+                            </div>
+                          )}
                           {imgUrl ? (
                             <img
                               src={imgUrl}

@@ -108,6 +108,12 @@ export function AllProducts() {
               <Link href={`/main/product/${product.id}`} className="flex flex-col flex-1">
                 {/* Image Container */}
                 <div className="relative aspect-[4/5] bg-gray-100 overflow-hidden rounded-none">
+                  {/* Discount Badge */}
+                  {product.originalPrice && product.currentPrice && product.originalPrice > product.currentPrice && (
+                    <div className="absolute top-2 left-2 z-10 bg-red-600 text-white text-[10px] sm:text-xs font-bold px-2 py-1 uppercase rounded-none">
+                      -{Math.round(((product.originalPrice - product.currentPrice) / product.originalPrice) * 100)}%
+                    </div>
+                  )}
                   {/* Primary Image */}
                   <img
                     src={primaryImg || "https://via.placeholder.com/600"}

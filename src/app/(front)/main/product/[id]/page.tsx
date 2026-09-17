@@ -196,10 +196,10 @@ export default function ProductDetailPage() {
             </div>
             <div className="py-6 text-sm text-gray-700 font-medium leading-relaxed space-y-4">
               {activeTab === "DESCRIPTION" && (
-                <div dangerouslySetInnerHTML={{ __html: product.description || "No description available." }} />
+                <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: product.description || "No description available." }} />
               )}
               {activeTab === "ADDITIONAL INFORMATION" && (
-                <div dangerouslySetInnerHTML={{ __html: product.additionalInfo || "No additional info available." }} />
+                <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: product.additionalInfo || "No additional info available." }} />
               )}
               {activeTab === "REVIEWS" && (
                 <p className="italic text-gray-400">No reviews yet.</p>
@@ -442,7 +442,14 @@ export default function ProductDetailPage() {
                           <span className="text-xs sm:text-sm font-semibold text-black uppercase truncate max-w-[140px] sm:max-w-[200px] group-hover:text-gray-600 transition-colors">
                             {rp.title}
                           </span>
-                          <span className="text-xs font-medium text-gray-600 mt-1">৳{rp.currentPrice || rp.originalPrice}</span>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-xs font-medium text-gray-600">৳{rp.currentPrice || rp.originalPrice}</span>
+                            {rp.originalPrice && rp.currentPrice && rp.originalPrice > rp.currentPrice && (
+                              <span className="bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 uppercase rounded-none">
+                                -{Math.round(((rp.originalPrice - rp.currentPrice) / rp.originalPrice) * 100)}%
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
                       <Link href={`/main/product/${rp.id}`} className="text-xs font-semibold text-black uppercase tracking-widest hover:text-gray-500 transition-colors">

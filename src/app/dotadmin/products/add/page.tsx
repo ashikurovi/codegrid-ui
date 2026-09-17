@@ -26,6 +26,7 @@ export default function AddProductPage() {
   const [title, setTitle] = useState("");
   const [variantLabel, setVariantLabel] = useState("");
   const [description, setDescription] = useState("");
+  const [additionalInfo, setAdditionalInfo] = useState("");
   const [features, setFeatures] = useState("");
   const [originalPrice, setOriginalPrice] = useState("");
   const [currentPrice, setCurrentPrice] = useState("");
@@ -104,6 +105,7 @@ export default function AddProductPage() {
         title,
         variantLabel,
         description,
+        additionalInfo,
         features: features.split("\n").filter(f => f.trim() !== ""),
         originalPrice: Number(originalPrice),
         currentPrice: Number(currentPrice),
@@ -176,6 +178,15 @@ export default function AddProductPage() {
                   value={description}
                   onChange={setDescription} 
                   placeholder="Write a detailed product description here..."
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-black uppercase text-black">Additional Information</label>
+                <RichTextEditor 
+                  value={additionalInfo}
+                  onChange={setAdditionalInfo} 
+                  placeholder="Write additional product information here..."
                 />
               </div>
 
