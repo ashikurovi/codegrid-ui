@@ -56,7 +56,7 @@ export default function CheckoutPage() {
     notes: ""
   });
   const [loading, setLoading] = useState(false);
-  const [orderSuccessUser, setOrderSuccessUser] = useState<{id: number, email: string} | null>(null);
+  const [orderSuccessUser, setOrderSuccessUser] = useState<{ id: number, email: string } | null>(null);
   const [newPassword, setNewPassword] = useState("");
   const [settingPassword, setSettingPassword] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -117,19 +117,19 @@ export default function CheckoutPage() {
     return () => clearTimeout(timeoutId);
   }, [formData, items, mounted]);
 
-  
+
   const handleSetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!orderSuccessUser || !newPassword) return;
-    
+
     try {
       setSettingPassword(true);
       // Update the user's password
       await updateUser(orderSuccessUser.id, { password: newPassword });
-      
+
       // Log them in
       await loginUser({ email: orderSuccessUser.email, password: newPassword });
-      
+
       alert("Password set successfully! Redirecting to dashboard...");
       window.location.href = "/main/dashboard"; // Navigate and force reload to update auth state
     } catch (error) {
@@ -141,7 +141,7 @@ export default function CheckoutPage() {
     }
   };
 
-const shippingOptions = [
+  const shippingOptions = [
     { id: "INSIDE_DHAKA", label: "Inside Dhaka", cost: 65 },
     { id: "OUTSIDE_DHAKA", label: "Outside Dhaka", cost: 115 },
     { id: "DHAKA_SUBURBS", label: "Dhaka Suburbs", cost: 85 },
@@ -232,7 +232,7 @@ const shippingOptions = [
             console.error("Failed to clear incomplete order", e);
           }
         }
-        
+
         const isGuestCheckout = !localStorage.getItem("user");
         if (isGuestCheckout && res.data?.user?.id && formData.email) {
           setOrderSuccessUser({ id: res.data.user.id, email: formData.email });
@@ -261,10 +261,10 @@ const shippingOptions = [
           </div>
           <h2 className="text-2xl font-bold text-black mb-2">Order Placed Successfully!</h2>
           <p className="text-gray-600 mb-6 text-sm">
-            We&apos;ve created an account for you with the email <strong>{orderSuccessUser.email}</strong>. 
+            We&apos;ve created an account for you with the email <strong>{orderSuccessUser.email}</strong>.
             Set a password below to track your orders and manage your account.
           </p>
-          
+
           <form onSubmit={handleSetPassword} className="flex flex-col gap-4 text-left">
             <div>
               <label className="text-sm font-semibold text-gray-700 mb-1 block">New Password</label>
@@ -554,6 +554,7 @@ const shippingOptions = [
                   "Complete Order"
                 )}
               </button>
+
             </div>
           </div>
         </form>

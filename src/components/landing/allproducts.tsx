@@ -196,23 +196,25 @@ export function AllProducts() {
                   }
 
                   return (
-                    <button
-                      className="w-full bg-black text-white text-center text-xs sm:text-sm font-medium py-3 uppercase tracking-wide hover:bg-gray-800 transition-colors"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        addToCart({
-                          id: product.id,
-                          title: product.title,
-                          price: product.currentPrice || product.originalPrice || 0,
-                          image: primaryImg,
-                          quantity: 1,
-                          variantLabel: product.variantLabel,
-                        });
-                        openCart();
-                      }}
-                    >
-                      Add to Cart
-                    </button>
+                    <div className="flex flex-col gap-2 w-full">
+                      <button
+                        className="w-full bg-black text-white text-center text-xs sm:text-sm font-medium py-3 uppercase tracking-wide hover:bg-gray-800 transition-colors"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          addToCart({
+                            id: product.id,
+                            title: product.title,
+                            price: product.currentPrice || product.originalPrice || 0,
+                            image: primaryImg,
+                            quantity: 1,
+                            variantLabel: product.variantLabel,
+                          });
+                          openCart();
+                        }}
+                      >
+                        Add to Cart
+                      </button>
+                    </div>
                   );
                 })()}
               </div>

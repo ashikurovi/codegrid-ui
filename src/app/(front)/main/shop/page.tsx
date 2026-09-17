@@ -277,24 +277,26 @@ export default function ShopPage() {
                           }
 
                           return (
-                            <button
-                              className="w-full bg-black text-white text-center text-xs sm:text-sm font-medium py-2.5 uppercase tracking-wide hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                              disabled={product.stock <= 0}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                if (product.stock <= 0) return;
-                                addToCart({
-                                  id: product.id,
-                                  title: product.title,
-                                  price: Number(product.currentPrice) || Number(product.originalPrice) || 0,
-                                  image: imgUrl || "",
-                                  quantity: 1,
-                                });
-                                openCart();
-                              }}
-                            >
-                              {product.stock > 0 ? "Add to Cart" : "Out of Stock"}
-                            </button>
+                            <div className="flex flex-col gap-2 w-full">
+                              <button
+                                className="w-full bg-black text-white text-center text-xs sm:text-sm font-medium py-2.5 uppercase tracking-wide hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled={product.stock <= 0}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  if (product.stock <= 0) return;
+                                  addToCart({
+                                    id: product.id,
+                                    title: product.title,
+                                    price: Number(product.currentPrice) || Number(product.originalPrice) || 0,
+                                    image: imgUrl || "",
+                                    quantity: 1,
+                                  });
+                                  openCart();
+                                }}
+                              >
+                                {product.stock > 0 ? "Add to Cart" : "Out of Stock"}
+                              </button>
+                            </div>
                           );
                         })()}
                       </div>

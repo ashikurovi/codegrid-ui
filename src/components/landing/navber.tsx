@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import { ChevronDown, Search, User, X, Menu, ShoppingBag } from "lucide-react";
+import { ChevronDown, Search, User, X, Menu, ShoppingBag, Package } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
 import { getAllProducts } from "@/api/productApi";
 
@@ -319,30 +319,43 @@ export function Navbar() {
                 </div>
             </div>
 
-            {/* --- MOBILE BOTTOM NAVBAR --- */}
-            <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t-[1px] border-gray-200 z-[90] flex items-center justify-around py-3 pb-safe shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
-                <Link href="/" className={`flex flex-col items-center gap-1 ${pathname === '/' ? 'text-black' : 'text-gray-500'}`}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                    <span className="text-[10px] font-medium tracking-wide">Home</span>
+            {/* --- MODERN MOBILE BOTTOM NAVBAR --- */}
+            <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-[400px] bg-white/80 backdrop-blur-xl border-[1px] border-white/40 rounded-2xl z-[90] flex items-center justify-between px-2 py-2 shadow-[0_8px_32px_rgba(0,0,0,0.12)]">
+                {/* Home */}
+                <Link href="/" className={`flex flex-col items-center justify-center w-[60px] h-12 rounded-xl transition-all ${pathname === '/' ? 'bg-black/5 text-black' : 'text-gray-500 hover:text-black'}`}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={pathname === '/' ? 'scale-110 transition-transform' : ''}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <span className="text-[9px] font-bold tracking-wide mt-1">Home</span>
                 </Link>
-                <Link href="/main/shop" className={`flex flex-col items-center gap-1 ${pathname === '/main/shop' ? 'text-black' : 'text-gray-500'}`}>
-                    <Search className="w-[22px] h-[22px]" />
-                    <span className="text-[10px] font-medium tracking-wide">Shop</span>
+                
+                {/* Shop */}
+                <Link href="/main/shop" className={`flex flex-col items-center justify-center w-[60px] h-12 rounded-xl transition-all ${pathname === '/main/shop' ? 'bg-black/5 text-black' : 'text-gray-500 hover:text-black'}`}>
+                    <Search className={`w-5 h-5 ${pathname === '/main/shop' ? 'scale-110 transition-transform stroke-[2.5px]' : 'stroke-2'}`} />
+                    <span className="text-[9px] font-bold tracking-wide mt-1">Shop</span>
                 </Link>
-                <button onClick={openCart} className="flex flex-col items-center gap-1 text-gray-500 relative">
+
+                {/* Track Order */}
+                <Link href="/main/ordertraking" className={`flex flex-col items-center justify-center w-[60px] h-12 rounded-xl transition-all ${pathname === '/main/ordertraking' ? 'bg-black/5 text-black' : 'text-gray-500 hover:text-black'}`}>
+                    <Package className={`w-5 h-5 ${pathname === '/main/ordertraking' ? 'scale-110 transition-transform stroke-[2.5px]' : 'stroke-2'}`} />
+                    <span className="text-[9px] font-bold tracking-wide mt-1">Track</span>
+                </Link>
+
+                {/* Cart */}
+                <button onClick={openCart} className="flex flex-col items-center justify-center w-[60px] h-12 rounded-xl text-gray-500 hover:text-black transition-all">
                     <div className="relative">
-                        <ShoppingBag className="w-[22px] h-[22px]" />
+                        <ShoppingBag className="w-5 h-5 stroke-2" />
                         {mounted && cartCount > 0 && (
-                            <span className="absolute -top-1.5 -right-1.5 bg-black text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-white">
+                            <span className="absolute -top-1.5 -right-2 bg-black text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-white shadow-sm">
                                 {cartCount}
                             </span>
                         )}
                     </div>
-                    <span className="text-[10px] font-medium tracking-wide">Cart</span>
+                    <span className="text-[9px] font-bold tracking-wide mt-1">Cart</span>
                 </button>
-                <Link href={user ? "/main/dashboard" : "/main/login"} className={`flex flex-col items-center gap-1 ${pathname.includes('/main/dashboard') || pathname.includes('/main/login') ? 'text-black' : 'text-gray-500'}`}>
-                    <User className="w-[22px] h-[22px]" />
-                    <span className="text-[10px] font-medium tracking-wide">Account</span>
+
+                {/* Account */}
+                <Link href={user ? "/main/dashboard" : "/main/login"} className={`flex flex-col items-center justify-center w-[60px] h-12 rounded-xl transition-all ${pathname.includes('/main/dashboard') || pathname.includes('/main/login') ? 'bg-black/5 text-black' : 'text-gray-500 hover:text-black'}`}>
+                    <User className={`w-5 h-5 ${pathname.includes('/main/dashboard') || pathname.includes('/main/login') ? 'scale-110 transition-transform stroke-[2.5px]' : 'stroke-2'}`} />
+                    <span className="text-[9px] font-bold tracking-wide mt-1">Account</span>
                 </Link>
             </div>
 

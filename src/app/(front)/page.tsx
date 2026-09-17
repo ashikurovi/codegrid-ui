@@ -9,6 +9,8 @@ import { Customer } from "@/components/landing/customer";
 import { CampaignModal } from "@/components/landing/campaign-modal";
 import { RecentBlog } from "@/components/landing/recentblog";
 
+import { DeveloperLifecycle } from "@/components/landing/DeveloperLifecycle";
+
 export default function Home() {
   const [isReady, setIsReady] = useState(false);
   const [messageIndex, setMessageIndex] = useState(0);
@@ -70,6 +72,7 @@ export default function Home() {
       <Banner />
       <Category />
       <AllProducts />
+      <DeveloperLifecycle />
       <RecentBlog />
       <Customer />
     </main>

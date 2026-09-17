@@ -1,5 +1,6 @@
 import { Navbar } from "@/components/landing/navber";
 import { Footer } from "@/components/landing/footer";
+import { WhatsAppButton } from "@/components/whatsapp-button";
 
 export default function FrontLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -11,6 +12,7 @@ export default function FrontLayout({ children }: { children: React.ReactNode })
           {children}
         </main>
         <Footer />
+        <WhatsAppButton />
       </div>
     </div>
   );
