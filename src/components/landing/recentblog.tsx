@@ -15,7 +15,7 @@ export function RecentBlog() {
         if (res.data) {
           const published = res.data.filter((b: any) => b.status === "Published" || !b.status);
           published.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-          setRecentBlogs(published.slice(0, 3));
+          setRecentBlogs(published.slice(0, 4));
         }
       } catch (error) {
         console.error("Failed to fetch blogs", error);
@@ -56,19 +56,15 @@ export function RecentBlog() {
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
         {recentBlogs.map((blog, index) => (
           <Link
             key={blog.id}
             href={`/main/blogs/${blog.id}`}
-            className={`group flex flex-col block bg-transparent transition-transform hover:-translate-y-1 ${index === 0 ? "md:col-span-2 lg:col-span-2" : "col-span-1"
-              }`}
+            className="group flex flex-col block bg-transparent transition-transform hover:-translate-y-1 col-span-1"
           >
             {/* Image Container */}
-            <div
-              className={`relative bg-gray-100 overflow-hidden rounded-none ${index === 0 ? "aspect-video md:aspect-[2/1] lg:aspect-[16/9]" : "aspect-video lg:aspect-[4/3]"
-                }`}
-            >
+            <div className="relative bg-gray-100 overflow-hidden rounded-none aspect-video lg:aspect-[4/3]">
               <img
                 src={getImgUrl(blog.image)}
                 alt={blog.title}
@@ -81,16 +77,10 @@ export function RecentBlog() {
               <span className="inline-block bg-black text-white px-3 py-1 text-[10px] sm:text-xs font-bold tracking-widest uppercase w-max mb-4">
                 {formatDate(blog.date || blog.createdAt)}
               </span>
-              <h3
-                className={`font-semibold text-black mb-4 leading-tight group-hover:text-gray-600 transition-colors ${index === 0 ? "text-2xl sm:text-3xl lg:text-4xl" : "text-xl sm:text-2xl line-clamp-2"
-                  }`}
-              >
+              <h3 className="font-semibold text-black mb-4 leading-tight group-hover:text-gray-600 transition-colors text-xl sm:text-2xl line-clamp-2">
                 {blog.title}
               </h3>
-              <p
-                className={`text-gray-500 flex-1 mb-6 font-medium ${index === 0 ? "text-base sm:text-lg line-clamp-3" : "text-sm line-clamp-2"
-                  }`}
-              >
+              <p className="text-gray-500 flex-1 mb-6 font-medium text-sm line-clamp-2">
                 {blog.excerpt || (blog.content ? blog.content.replace(/<[^>]+>/g, '').substring(0, 100) + '...' : '')}
               </p>
               <div className="mt-auto">
