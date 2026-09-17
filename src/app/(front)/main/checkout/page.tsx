@@ -473,7 +473,7 @@ const shippingOptions = [
                 <label className="flex items-start gap-3 cursor-pointer group">
                   <input type="checkbox" className="mt-1 w-4 h-4 text-black border-gray-300 rounded-sm focus:ring-black transition-colors" required />
                   <span className="text-xs font-medium text-gray-500 leading-relaxed select-none">
-                    I agree to the website&apos;s <a href="#" className="text-black underline hover:no-underline font-semibold">terms and conditions</a> *
+                    I agree to the website&apos;s <Link href="/main/terms-and-conditions" className="text-black underline hover:no-underline font-semibold">terms and conditions</Link> *
                   </span>
                 </label>
               </div>

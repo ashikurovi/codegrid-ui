@@ -23,9 +23,9 @@ export function Footer() {
   const legalLinks = [
     { name: "About Us", href: "#" },
     { name: "Privacy Policy", href: "#" },
-    { name: "Terms and Condition", href: "#" },
+    { name: "Terms and Condition", href: "/main/terms-and-conditions" },
     { name: "Franchise Shop", href: "#" },
-    { name: "Refund & Returns", href: "#" }
+    { name: "Refund & Returns", href: "/main/refund-returns" }
   ];
 
   return (
