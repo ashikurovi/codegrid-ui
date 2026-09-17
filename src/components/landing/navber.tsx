@@ -252,41 +252,56 @@ export function Navbar() {
                 </div>
             </div>
 
-            {/* --- MOBILE MENU (Side Drawer) --- */}
+            {/* --- MOBILE MENU (Side Drawer - Brutalist Modern) --- */}
             <div
                 className={`fixed inset-0 bg-black/40 backdrop-blur-sm z-[110] transition-opacity duration-300 lg:hidden ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
                 onClick={() => setIsMobileMenuOpen(false)}
             >
                 <div
-                    className={`absolute top-0 right-0 w-4/5 max-w-sm h-full bg-white shadow-xl transition-transform duration-500 ease-out transform ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
+                    className={`absolute top-0 right-0 w-[85%] max-w-sm h-full bg-white border-l-[3px] border-black transition-transform duration-500 ease-[cubic-bezier(0.77,0,0.175,1)] transform ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
                     onClick={(e) => e.stopPropagation()}
                 >
-                    <div className="flex flex-col h-full">
-                        <div className="flex justify-between items-center p-6 border-b-[1px] border-gray-100 bg-white">
-                            <span className="font-semibold text-lg text-black tracking-wide">Menu</span>
+                    <div className="flex flex-col h-full bg-white">
+                        <div className="flex justify-between items-center p-6 border-b-[3px] border-black">
+                            <span className="font-black text-2xl text-black uppercase tracking-tighter">Menu</span>
                             <button
                                 onClick={() => setIsMobileMenuOpen(false)}
-                                className="text-gray-500 hover:text-black hover:bg-gray-100 p-2 rounded-md transition-colors"
+                                className="text-black hover:bg-black hover:text-white border-[2px] border-transparent transition-colors rounded-none p-1"
                             >
-                                <X className="w-5 h-5" />
+                                <X className="w-6 h-6" strokeWidth={2.5} />
                             </button>
                         </div>
-                        <div className="flex flex-col p-6 space-y-1 overflow-y-auto hide-scrollbar bg-white">
-                            <Link href="/main/big-sale" onClick={() => setIsMobileMenuOpen(false)} className={`text-base py-3 transition-colors ${pathname === '/main/big-sale' ? 'text-black font-semibold' : 'text-gray-600 font-medium hover:text-black'}`}>Big Sale</Link>
-                            <Link href="/main/budget-pick" onClick={() => setIsMobileMenuOpen(false)} className={`text-base py-3 transition-colors ${pathname === '/main/budget-pick' ? 'text-black font-semibold' : 'text-gray-600 font-medium hover:text-black'}`}>Budget Pick</Link>
-                            <Link href="/main/shop" onClick={() => setIsMobileMenuOpen(false)} className={`text-base py-3 transition-colors ${pathname === '/main/shop' ? 'text-black font-semibold' : 'text-gray-600 font-medium hover:text-black'}`}>Collections</Link>
-                            <Link href="/main/blogs" onClick={() => setIsMobileMenuOpen(false)} className={`text-base py-3 transition-colors ${pathname === '/main/blogs' ? 'text-black font-semibold' : 'text-gray-600 font-medium hover:text-black'}`}>Blogs</Link>
-
-                            <div className="pt-6 mt-4 border-t-[1px] border-gray-100 flex flex-col space-y-1">
-                                <Link href="/main/ordertraking" onClick={() => setIsMobileMenuOpen(false)} className={`text-sm py-2 transition-colors ${pathname === '/main/ordertraking' ? 'text-black font-semibold' : 'text-gray-500 font-medium hover:text-black'}`}>Track Order</Link>
-                                <Link href="/main/custom-order" onClick={() => setIsMobileMenuOpen(false)} className={`text-sm py-2 transition-colors ${pathname === '/main/custom-order' ? 'text-black font-semibold' : 'text-gray-500 font-medium hover:text-black'}`}>Custom/Bulk Order</Link>
-                            </div>
-
-                            <div className="pt-6 mt-4 border-t-[1px] border-gray-100">
-                                <Link href={user ? "/main/dashboard" : "/main/login"} onClick={() => setIsMobileMenuOpen(false)} className="text-sm font-medium text-gray-700 hover:text-black transition-colors flex items-center gap-3 py-2">
-                                    <User className="w-5 h-5" /> {user ? "Dashboard" : "Account / Login"}
+                        <div className="flex flex-col p-6 space-y-6 overflow-y-auto hide-scrollbar bg-white flex-1">
+                            {[
+                                { name: "Big Sale", path: "/main/big-sale" },
+                                { name: "Budget Pick", path: "/main/budget-pick" },
+                                { name: "Collections", path: "/main/shop" },
+                                { name: "Blogs", path: "/main/blogs" }
+                            ].map((item) => (
+                                <Link 
+                                    key={item.name}
+                                    href={item.path} 
+                                    onClick={() => setIsMobileMenuOpen(false)} 
+                                    className={`group flex items-center justify-between text-2xl font-black uppercase tracking-tight py-2 transition-all duration-300 ${pathname === item.path ? 'text-black' : 'text-gray-400 hover:text-black hover:translate-x-2'}`}
+                                >
+                                    <span>{item.name}</span>
+                                    <span className={`transition-opacity duration-300 ${pathname === item.path ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+                                      →
+                                    </span>
                                 </Link>
+                            ))}
+
+                            <div className="pt-8 mt-4 border-t-[3px] border-black flex flex-col space-y-5">
+                                <Link href="/main/ordertraking" onClick={() => setIsMobileMenuOpen(false)} className={`text-sm font-bold uppercase tracking-widest transition-colors ${pathname === '/main/ordertraking' ? 'text-black' : 'text-gray-500 hover:text-black'}`}>Track Order</Link>
+                                <Link href="/main/custom-order" onClick={() => setIsMobileMenuOpen(false)} className={`text-sm font-bold uppercase tracking-widest transition-colors ${pathname === '/main/custom-order' ? 'text-black' : 'text-gray-500 hover:text-black'}`}>Custom/Bulk Order</Link>
                             </div>
+                        </div>
+
+                        {/* Footer area of mobile menu */}
+                        <div className="p-6 bg-black text-white border-t-[3px] border-black mt-auto">
+                            <Link href={user ? "/main/dashboard" : "/main/login"} onClick={() => setIsMobileMenuOpen(false)} className="text-sm font-bold uppercase tracking-widest hover:text-gray-300 transition-colors flex items-center justify-center gap-3 w-full py-2">
+                                <User className="w-5 h-5" /> {user ? "Dashboard" : "Account / Login"}
+                            </Link>
                         </div>
                     </div>
                 </div>
