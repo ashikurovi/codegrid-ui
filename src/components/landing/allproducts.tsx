@@ -34,6 +34,7 @@ export function AllProducts() {
         console.error("Failed to fetch products:", error);
       } finally {
         setLoading(false);
+        window.dispatchEvent(new CustomEvent("landing-data-ready", { detail: "products" }));
       }
     };
     fetchProducts();

@@ -16,6 +16,8 @@ export function Category() {
         }
       } catch (error) {
         console.error("Failed to fetch categories", error);
+      } finally {
+        window.dispatchEvent(new CustomEvent("landing-data-ready", { detail: "categories" }));
       }
     };
     fetchCategories();

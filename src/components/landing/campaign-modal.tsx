@@ -21,6 +21,7 @@ export function CampaignModal() {
     // Only fetch if we haven't shown it yet this session
     if (typeof window !== 'undefined') {
       if (sessionStorage.getItem('hasShownCampaignModal')) {
+        window.dispatchEvent(new CustomEvent("landing-data-ready", { detail: "campaign" }));
         return;
       }
     }
@@ -47,7 +48,8 @@ export function CampaignModal() {
           }
         }
       })
-      .catch(console.error);
+      .catch(console.error)
+      .finally(() => window.dispatchEvent(new CustomEvent("landing-data-ready", { detail: "campaign" })));
   }, []);
 
   const handleClose = () => {

@@ -22,6 +22,8 @@ export function Banner() {
                 }
             } catch (e) {
                 console.error("Failed to fetch banners", e);
+            } finally {
+                window.dispatchEvent(new CustomEvent("landing-data-ready", { detail: "banners" }));
             }
         };
         fetchBanners();

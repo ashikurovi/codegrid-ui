@@ -19,6 +19,8 @@ export function RecentBlog() {
         }
       } catch (error) {
         console.error("Failed to fetch blogs", error);
+      } finally {
+        window.dispatchEvent(new CustomEvent("landing-data-ready", { detail: "blogs" }));
       }
     };
     fetchBlogs();
