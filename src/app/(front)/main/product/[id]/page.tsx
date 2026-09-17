@@ -71,7 +71,43 @@ export default function ProductDetailPage() {
   }, [id]);
 
   if (loading) {
-    return <div className="text-center py-20 font-black uppercase text-xl">Loading product...</div>;
+    return (
+      <div className="mx-auto w-full max-w-screen-xl px-4 py-10 sm:px-6 lg:px-8">
+        <div className="grid gap-10 lg:grid-cols-2">
+          <div className="flex flex-col gap-5">
+            <div className="flex gap-4">
+              <div className="flex w-20 flex-col gap-3">
+                {[...Array(4)].map((_, index) => (
+                  <div key={index} className="h-20 animate-pulse rounded-sm bg-slate-200" />
+                ))}
+              </div>
+              <div className="h-[520px] flex-1 animate-pulse rounded-md bg-slate-200" />
+            </div>
+          </div>
+
+          <div className="space-y-6 pt-2">
+            <div className="h-4 w-28 animate-pulse rounded bg-slate-200" />
+            <div className="h-12 w-3/4 animate-pulse rounded bg-slate-200" />
+            <div className="h-8 w-32 animate-pulse rounded bg-slate-200" />
+            <div className="space-y-3">
+              <div className="h-4 w-full animate-pulse rounded bg-slate-200" />
+              <div className="h-4 w-5/6 animate-pulse rounded bg-slate-200" />
+              <div className="h-4 w-4/5 animate-pulse rounded bg-slate-200" />
+            </div>
+            <div className="grid grid-cols-4 gap-3 pt-3">
+              {[...Array(4)].map((_, index) => (
+                <div key={index} className="h-12 animate-pulse rounded border border-slate-200 bg-slate-100" />
+              ))}
+            </div>
+            <div className="space-y-3 pt-4">
+              <div className="h-4 w-24 animate-pulse rounded bg-slate-200" />
+              <div className="h-12 w-full animate-pulse rounded bg-slate-200" />
+              <div className="h-12 w-full animate-pulse rounded bg-slate-200" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (!product) {
