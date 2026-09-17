@@ -20,6 +20,8 @@ export default function EditCustomProductPage() {
   const [productName, setProductName] = useState("");
   const [category, setCategory] = useState("Apparel");
   const [price, setPrice] = useState("");
+  const [dtfPrintCost, setDtfPrintCost] = useState("60");
+  const [a4PrintCost, setA4PrintCost] = useState("150");
   const [status, setStatus] = useState("Active");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState("");
@@ -35,6 +37,8 @@ export default function EditCustomProductPage() {
           setProductName(data.productName || "");
           setCategory(data.category || "Apparel");
           setPrice(data.price || "");
+          setDtfPrintCost(String(data.dtfPrintCost ?? 60));
+          setA4PrintCost(String(data.a4PrintCost ?? 150));
           setStatus(data.status || "Active");
           setDescription(data.description || "");
           setImage(data.image || "");
@@ -105,6 +109,8 @@ export default function EditCustomProductPage() {
         productName,
         category,
         price,
+        dtfPrintCost: Number(dtfPrintCost) || 0,
+        a4PrintCost: Number(a4PrintCost) || 0,
         status,
         description,
         image
@@ -205,6 +211,16 @@ export default function EditCustomProductPage() {
                   <option value="Active">Active</option>
                   <option value="Inactive">Inactive</option>
                 </select>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label htmlFor="dtfPrintCost" className="text-sm font-black uppercase text-black">DTF Print Cost (৳) *</label>
+                <input type="number" min="0" id="dtfPrintCost" value={dtfPrintCost} onChange={(e) => setDtfPrintCost(e.target.value)} className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black" required />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label htmlFor="a4PrintCost" className="text-sm font-black uppercase text-black">A4 + DTF Print Cost (৳) *</label>
+                <input type="number" min="0" id="a4PrintCost" value={a4PrintCost} onChange={(e) => setA4PrintCost(e.target.value)} className="w-full border-[3px] border-black p-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-0 rounded-none bg-white text-black" required />
               </div>
             </div>
             

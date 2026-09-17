@@ -75,6 +75,8 @@ export default function CustomOrderPage() {
     id: p.id,
     name: p.productName,
     price: p.price,
+    dtfPrintCost: p.dtfPrintCost ?? 60,
+    a4PrintCost: p.a4PrintCost ?? 150,
     image: p.image?.startsWith('http') ? p.image : `https://codegrid-api.vercel.app${p.image?.startsWith('/') ? '' : '/'}${p.image}`
   }));
 
@@ -82,6 +84,8 @@ export default function CustomOrderPage() {
     id: p.id,
     name: p.productName,
     price: p.price,
+    dtfPrintCost: p.dtfPrintCost ?? 60,
+    a4PrintCost: p.a4PrintCost ?? 150,
     image: p.image?.startsWith('http') ? p.image : `https://codegrid-api.vercel.app${p.image?.startsWith('/') ? '' : '/'}${p.image}`
   }));
 
@@ -112,7 +116,7 @@ export default function CustomOrderPage() {
   } else if (selectedBaseItem) {
     const pStr = String(selectedBaseItem.price).replace(/[^0-9.]/g, '');
     const baseP = Number(pStr) || 0;
-    const printCost = printOption === "a4" ? 150 : 60;
+    const printCost = Number(printOption === "a4" ? selectedBaseItem.a4PrintCost : selectedBaseItem.dtfPrintCost) || 0;
     estimatedPrice = (baseP + printCost) * qtyNum;
   }
 
@@ -171,7 +175,7 @@ export default function CustomOrderPage() {
               <tr>
                 <td>${orderData.item}</td>
                 <td>${orderData.quantity}</td>
-                <td>${orderData.category === 'Corporate' ? 'Package Price' : 'Base Item + Print Cost (' + (printOption === "a4" ? "150 BDT" : "60 BDT") + ')'}</td>
+                <td>${orderData.category === 'Corporate' ? 'Package Price' : 'Base Item + Print Cost (' + (printOption === "a4" ? selectedBaseItem?.a4PrintCost : selectedBaseItem?.dtfPrintCost) + ' BDT)'}</td>
                 <td>৳ ${estPrice.toLocaleString()}</td>
               </tr>
             </tbody>
@@ -495,14 +499,14 @@ export default function CustomOrderPage() {
                           <input type="radio" name="printOption" value="dtf" checked={printOption === 'dtf'} onChange={() => setPrintOption('dtf')} className="w-4 h-4 text-black focus:ring-black border-gray-300" />
                           <div>
                             <span className="block text-sm font-bold text-black uppercase tracking-tighter">DTF Print</span>
-                            <span className="block text-xs font-medium text-gray-500">+৳60 per item</span>
+                            <span className="block text-xs font-medium text-gray-500">+৳{selectedBaseItem?.dtfPrintCost ?? 60} per item</span>
                           </div>
                         </label>
                         <label className={`flex-1 border-[1px] p-4 rounded-md cursor-pointer transition-colors flex items-center gap-3 ${printOption === 'a4' ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300 bg-white'}`}>
                           <input type="radio" name="printOption" value="a4" checked={printOption === 'a4'} onChange={() => setPrintOption('a4')} className="w-4 h-4 text-black focus:ring-black border-gray-300" />
                           <div>
                             <span className="block text-sm font-bold text-black uppercase tracking-tighter">Custom Design A4 & DTF Print</span>
-                            <span className="block text-xs font-medium text-gray-500">+200 per item</span>
+                            <span className="block text-xs font-medium text-gray-500">+৳{selectedBaseItem?.a4PrintCost ?? 150} per item</span>
                           </div>
                         </label>
                       </div>
