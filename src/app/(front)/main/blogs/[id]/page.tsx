@@ -28,7 +28,28 @@ export default function BlogDetailsPage() {
     if (id) fetchBlog();
   }, [id]);
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center font-medium">Loading...</div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-white font-sans">
+        <main className="mx-auto flex w-full max-w-screen-xl flex-1 px-4 py-12 sm:px-6 lg:px-8">
+          <div className="w-full max-w-4xl animate-pulse">
+            <div className="mb-8 h-4 w-28 rounded bg-slate-200" />
+            <div className="mb-8 h-12 w-3/4 rounded bg-slate-200 sm:h-16" />
+            <div className="mb-10 h-4 w-56 rounded bg-slate-200" />
+            <div className="mb-12 aspect-video w-full rounded-none bg-slate-200" />
+            <div className="space-y-4">
+              <div className="h-4 w-full rounded bg-slate-200" />
+              <div className="h-4 w-full rounded bg-slate-200" />
+              <div className="h-4 w-5/6 rounded bg-slate-200" />
+              <div className="h-4 w-full rounded bg-slate-200" />
+              <div className="h-4 w-4/5 rounded bg-slate-200" />
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   if (!blog) return <div className="min-h-screen flex items-center justify-center font-medium">Blog not found</div>;
 
   const getImgUrl = (url: string) => {
