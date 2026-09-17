@@ -144,6 +144,8 @@ export default function ProductDetailPage() {
   const features = product.features || [];
   const sizes = product.sizes || [];
   const types = product.types || [];
+  
+  const isPreOrderProduct = product.category?.name?.toLowerCase().includes('pre order') || product.category?.name?.toLowerCase().includes('pre-order');
 
   return (
     <div className="w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans text-black">
@@ -321,7 +323,7 @@ export default function ProductDetailPage() {
                         e.preventDefault();
                         updateQuantity(cartItem.id, cartItem.quantity + 1);
                       }}
-                      disabled={cartItem.quantity >= product.stock}
+                      disabled={!isPreOrderProduct && cartItem.quantity >= product.stock}
                     >
                       <Plus className="w-5 h-5" />
                     </button>
@@ -340,19 +342,20 @@ export default function ProductDetailPage() {
                       price: product.currentPrice || product.originalPrice,
                       image: mainImage,
                       quantity: 1,
+                      isPreOrder: isPreOrderProduct,
                     });
                     openCart();
                   }}
-                  disabled={product.stock <= 0}
+                  disabled={!isPreOrderProduct && product.stock <= 0}
                   className="w-full bg-transparent text-black font-semibold uppercase tracking-widest py-4 border-[1px] border-black hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  {product.stock > 0 ? "Add to Cart" : "Out of Stock"}
+                  {(product.stock > 0 || isPreOrderProduct) ? (isPreOrderProduct ? "Pre Order Now" : "Add to Cart") : "Out of Stock"}
                 </button>
               );
             })()}
             <button
               onClick={() => {
-                if (product.stock <= 0) return;
+                if (!isPreOrderProduct && product.stock <= 0) return;
                 const cartItem = items.find((i) => i.id === product.id);
                 if (!cartItem) {
                   addToCart({
@@ -361,11 +364,12 @@ export default function ProductDetailPage() {
                     price: product.currentPrice || product.originalPrice,
                     image: mainImage,
                     quantity: 1,
+                    isPreOrder: isPreOrderProduct,
                   });
                 }
                 router.push("/main/checkout");
               }}
-              disabled={product.stock <= 0}
+              disabled={!isPreOrderProduct && product.stock <= 0}
               className="w-full bg-black text-white font-semibold uppercase tracking-widest py-4 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               Buy Now

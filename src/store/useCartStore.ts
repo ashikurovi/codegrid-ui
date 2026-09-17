@@ -9,6 +9,7 @@ export interface CartItem {
   quantity: number;
   variantLabel?: string;
   size?: string;
+  isPreOrder?: boolean;
 }
 
 interface CartState {
