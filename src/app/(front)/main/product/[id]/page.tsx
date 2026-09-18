@@ -258,7 +258,12 @@ export default function ProductDetailPage() {
           )}
 
           {/* Title */}
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 leading-tight uppercase tracking-tight text-black">{product.title}</h1>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2 leading-tight uppercase tracking-tight text-black">{product.title}</h1>
+
+          {/* SKU Display */}
+          <div className="text-xs text-gray-500 font-bold uppercase tracking-widest mb-4">
+            SKU: <span className="text-black">{product.sku || `CG-${product.id}`}</span>
+          </div>
 
           {/* Price */}
           <div className="flex items-end space-x-4 mb-8">

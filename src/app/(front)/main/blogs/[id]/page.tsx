@@ -15,7 +15,7 @@ export default function BlogDetailsPage() {
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        const res = await getBlogById(Number(id));
+        const res = await getBlogById(id);
         if (res.data) {
           setBlog(res.data);
         }
