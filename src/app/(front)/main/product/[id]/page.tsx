@@ -149,6 +149,35 @@ export default function ProductDetailPage() {
 
   return (
     <div className="w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans text-black">
+      {/* Product JSON-LD Schema for SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org/",
+            "@type": "Product",
+            name: product.title,
+            image: productImages,
+            description: product.description ? product.description.replace(/<[^>]*>?/gm, "") : product.title,
+            sku: `CG-${product.id}`,
+            brand: {
+              "@type": "Brand",
+              name: "CodeGrid",
+            },
+            offers: {
+              "@type": "Offer",
+              url: typeof window !== "undefined" ? window.location.href : `https://codegrid.com.bd/main/product/${product.id}`,
+              priceCurrency: "BDT",
+              price: product.currentPrice || product.originalPrice || 0,
+              availability: (product.stock > 0 || isPreOrderProduct) ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+              seller: {
+                "@type": "Organization",
+                name: "CodeGrid",
+              },
+            },
+          }),
+        }}
+      />
       <div className="flex flex-col lg:flex-row gap-12 lg:gap-16">
         {/* Left Column: Images & Tabs */}
         <div className="w-full lg:w-1/2 flex flex-col gap-10">
