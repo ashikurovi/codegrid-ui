@@ -70,13 +70,13 @@ export function DeveloperLifecycle() {
 
   return (
     <section ref={containerRef} className="relative bg-[#f8fafc] w-full mt-32" style={{ height: "300vh" }}>
-      <div className="sticky top-0 h-[100dvh] w-full flex flex-col items-center justify-between pt-12 pb-4 md:pt-32 md:pb-12 overflow-hidden">
+      <div className="sticky top-0 h-[100dvh] w-full flex flex-col items-center justify-between pt-6 pb-4 md:pt-32 md:pb-12 overflow-hidden">
         
         {/* Background gradient blur */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] max-w-[600px] max-h-[600px] bg-gradient-to-tr from-[#2563eb]/5 via-purple-500/5 to-[#ef476f]/5 rounded-full blur-3xl -z-10" />
 
         {/* Header - Now in normal document flow to prevent overlapping */}
-        <div className="text-center w-full px-4 flex-shrink-0 z-10 mb-2 md:mb-6 mt-4 md:mt-0">
+        <div className="text-center w-full px-4 flex-shrink-0 z-10 mb-1 md:mb-6 mt-1 md:mt-0">
           <h2 className="text-[10px] md:text-sm font-bold tracking-[0.2em] text-[#2563eb] uppercase mb-1 md:mb-2">True Story</h2>
           <h3 className="text-2xl md:text-4xl lg:text-5xl font-black text-[#172033] tracking-tight">
             The Life of a Developer
@@ -84,22 +84,22 @@ export function DeveloperLifecycle() {
         </div>
 
         {/* Dynamic Center Emoji/Icon with smooth transitions */}
-        <div className="flex flex-col items-center justify-center flex-1 w-full gap-4 md:gap-6 px-6 z-10">
-          <div className="relative w-32 h-32 md:w-40 md:h-40 flex items-center justify-center rounded-2xl md:rounded-[2rem] bg-white shadow-[0_20px_60px_rgba(15,23,42,0.08)] border border-slate-100/50 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] transform hover:-translate-y-2 hover:shadow-[0_30px_70px_rgba(37,99,235,0.15)]">
+        <div className="flex flex-col items-center justify-center flex-1 w-full gap-2 md:gap-6 px-6 z-10">
+          <div className="relative w-28 h-28 md:w-40 md:h-40 flex items-center justify-center rounded-2xl md:rounded-[2rem] bg-white shadow-[0_20px_60px_rgba(15,23,42,0.08)] border border-slate-100/50 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] transform hover:-translate-y-2 hover:shadow-[0_30px_70px_rgba(37,99,235,0.15)]">
             <ActiveIcon 
               key={activeIndex + "icon"} 
-              className="w-16 h-16 md:w-20 md:h-20 text-[#172033] animate-[fade-in-up_0.5s_ease-out_forwards]" 
+              className="w-14 h-14 md:w-20 md:h-20 text-[#172033] animate-[fade-in-up_0.5s_ease-out_forwards]" 
             />
             {/* Ping effect when it changes */}
             <div key={activeIndex + "ping"} className="absolute inset-0 rounded-2xl md:rounded-[2rem] border-2 border-[#2563eb] animate-[ping_1.5s_ease-out_forwards] opacity-20" />
-            <div className="absolute -bottom-2 -right-2 md:-bottom-3 md:-right-3 w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-[#2563eb] to-[#ef476f] rounded-lg md:rounded-xl shadow-xl flex items-center justify-center text-white font-black text-sm md:text-lg border-2 md:border-4 border-[#f8fafc]">
+            <div className="absolute -bottom-2 -right-2 md:-bottom-3 md:-right-3 w-8 h-8 md:w-12 md:h-12 bg-gradient-to-br from-[#2563eb] to-[#ef476f] rounded-lg md:rounded-xl shadow-xl flex items-center justify-center text-white font-black text-xs md:text-lg border-2 md:border-4 border-[#f8fafc]">
               {steps[activeIndex].id}
             </div>
           </div>
 
           {/* Changing Text as Code Snippet */}
-          <div key={activeIndex + "text"} className="text-center min-h-[8rem] md:min-h-[9rem] flex flex-col justify-center animate-[fade-in-up_0.5s_ease-out_forwards] w-full max-w-sm md:max-w-md">
-            <h4 className="text-xl md:text-2xl font-extrabold text-[#172033] mb-2 md:mb-3">
+          <div key={activeIndex + "text"} className="text-center min-h-[7rem] md:min-h-[9rem] flex flex-col justify-center animate-[fade-in-up_0.5s_ease-out_forwards] w-full max-w-sm md:max-w-md">
+            <h4 className="text-lg md:text-2xl font-extrabold text-[#172033] mb-1 md:mb-3">
               {steps[activeIndex].title}
             </h4>
             <div className="bg-[#0f172a] rounded-xl p-3 md:p-4 shadow-inner border border-slate-700/50 text-left w-full mx-auto overflow-hidden">
@@ -111,7 +111,7 @@ export function DeveloperLifecycle() {
         </div>
 
         {/* Timeline Dots Indicator */}
-        <div className="flex items-center justify-center gap-2 md:gap-6 flex-shrink-0 z-10 w-full px-4 mt-4 md:mt-8">
+        <div className="flex items-center justify-center gap-2 md:gap-6 flex-shrink-0 z-10 w-full px-4 mt-2 md:mt-8">
           {steps.map((_, i) => (
             <div key={i} className="flex items-center">
               <div 

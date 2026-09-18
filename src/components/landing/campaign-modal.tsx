@@ -58,6 +58,22 @@ export function CampaignModal() {
 
   if (!isRendered || !campaign) return null;
 
+  const content = (
+    <div className="relative w-full overflow-hidden rounded-none border-4 border-transparent group-hover:border-[#0066FF] transition-all duration-300">
+      {campaign.image ? (
+        <img
+          src={getImgUrl(campaign.image)}
+          alt={campaign.campaignName || "Campaign"}
+          className="w-full h-auto max-h-[80vh] object-contain block"
+        />
+      ) : (
+        <div className="w-full h-64 flex items-center justify-center bg-gray-200">
+          <span className="font-black text-gray-400 text-xl uppercase">No Image</span>
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <div
       className={`fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4 transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
@@ -67,49 +83,21 @@ export function CampaignModal() {
       >
         <button
           onClick={handleClose}
-          className="absolute top-2 right-2 z-20 bg-white text-gray-900 hover:text-red-500 transition-colors p-2 shadow-sm rounded-none border border-transparent hover:border-red-500"
+          className="absolute top-2 right-2 z-30 bg-white/90 hover:bg-white text-gray-900 hover:text-red-500 transition-colors p-2 shadow-md rounded-full border border-gray-200"
+          aria-label="Close"
         >
           <X className="w-5 h-5" />
         </button>
 
-        <Link href={campaign.link || "/main/shop"} onClick={handleClose} className="block group">
-          <div className="relative w-full aspect-[4/5] sm:aspect-square bg-gray-100 overflow-hidden rounded-none border-4 border-transparent group-hover:border-[#0066FF] transition-all duration-300">
-            {campaign.image ? (
-              <img
-                src={getImgUrl(campaign.image)}
-                alt={campaign.campaignName || "Campaign"}
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-              />
-            ) : (
-              <div className="absolute inset-0 flex items-center justify-center bg-gray-200">
-                <span className="font-black text-gray-400 text-xl uppercase">No Image</span>
-              </div>
-            )}
-
-            {/* Dark Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10 flex flex-col justify-end items-center p-8 text-center">
-
-              {campaign.date && (
-                <div className="bg-red-600 text-white text-[10px] font-black px-3 py-1 uppercase tracking-widest mb-4 shadow-sm">
-                  {campaign.date}
-                </div>
-              )}
-
-              <h2 className="text-4xl sm:text-5xl font-black text-white uppercase tracking-tighter mb-2">
-                {campaign.campaignName}
-              </h2>
-
-              <p className="text-gray-200 text-sm sm:text-base mb-8 max-w-xs leading-relaxed">
-                {campaign.offerText}
-              </p>
-
-              <div className="bg-[#0066FF] text-white font-bold py-4 px-10 uppercase tracking-widest text-sm rounded-none group-hover:bg-white group-hover:bg-gradient-to-r group-hover:from-[#00B4DB] group-hover:to-[#0000FF] group-hover:bg-clip-text group-hover:text-transparent transition-colors shadow-lg border border-transparent group-hover:border-[#0066FF]">
-                Shop The Sale
-              </div>
-
-            </div>
+        {campaign.link ? (
+          <Link href={campaign.link} onClick={handleClose} className="block group cursor-pointer">
+            {content}
+          </Link>
+        ) : (
+          <div className="block group">
+            {content}
           </div>
-        </Link>
+        )}
       </div>
     </div>
   );
